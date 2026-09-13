@@ -14,25 +14,30 @@
         <span class="logo-icon">✦</span> Ai крафт
       </div>
       <nav class="dash-nav">
-        <a href="dashboard.html" class="active">Мои сайты</a>
+        <a href="dashboard.html" class="active">Мои проекты</a>
         <a href="create.html">Создать сайт</a>
+        <a href="media.html">Генерация медиа</a>
         <a href="builder.html">Визуальный редактор</a>
         <a href="code-editor.html">Редактор кода</a>
       </nav>
       <div class="dash-user">
         <strong id="userLogin">—</strong>
         <a href="#" onclick="logout(); return false;" style="color:var(--text-muted);font-size:13px;">Выйти</a>
+        <div style="margin-top:16px;padding-top:12px;border-top:1px solid var(--border);font-size:12px;color:var(--text-muted);line-height:1.6;">
+          <div>Поддержка</div>
+          <a href="tel:+79002373222" style="color:var(--text-muted);">+7 (900) 237-32-22</a><br>
+          <a href="mailto:superyaroslav8@iCloud.com" style="color:var(--text-muted);">superyaroslav8@iCloud.com</a>
+        </div>
       </div>
     </aside>
 
     <main class="dash-main">
       <div class="dash-header">
-        <h1>Мои сайты</h1>
-        <a href="create.html" class="btn-primary">+ Создать сайт</a>
+        <h1>Мои проекты</h1>
+        <a href="create.html" class="btn-primary">+ Новый проект</a>
       </div>
 
       <div id="sitesContainer">
-        <!-- filled by JS -->
       </div>
     </main>
   </div>
@@ -51,8 +56,8 @@
       if (!sites.length) {
         container.innerHTML = `
           <div class="empty-state">
-            <h3>Пока нет сайтов</h3>
-            <p>Создай первый — опиши идею или загрузи готовый проект.</p>
+            <h3>Пока нет проектов</h3>
+            <p>Создай сайт, сгенерируй фото, видео или музыку.</p>
             <a href="create.html" class="btn-primary" style="margin-top:20px;">Создать сайт</a>
           </div>`;
         return;
@@ -85,7 +90,7 @@
       const sites = getUserSites(session.login);
       const site = sites.find(s => s.id === id);
       if (!site || !site.content) {
-        alert('Контент сайта пока в разработке');
+        alert('Открываем проект');
         return;
       }
       const w = window.open('', '_blank');
