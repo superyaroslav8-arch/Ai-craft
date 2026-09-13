@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Редактор кода — Ai крафт</title>
+  <link rel="stylesheet" href="../css/style.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    .code-layout {
+      display: grid;
+      grid-template-columns: 200px 1fr 1fr;
+      height: 100vh;
+    }
+    .code-top {
+      grid-column: 1 / -1;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 20px;
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+    }
+    .code-top .left { display: flex; align-items: center; gap: 16px; }
+    .code-top a { color: var(--text-muted); font-size: 14px; }
+    .code-files {
+      background: var(--bg-alt);
+      border-right: 1px solid var(--border);
+      padding: 12px;
+      overflow-y: auto;
+    }
+    .code-files h4 {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--text-muted);
+      margin-bottom: 10px;
+      padding: 0 8px;
+    }
+    .c-file {
+      padding: 8px 12px;
+      font-size: 13px;
+      border-radius: 6px;
+      cursor: pointer;
+      color: var(--text-muted);
+      font-family: 'JetBrains Mono', monospace;
+    }
+    .c-file:hover, .c-file.active {
+      background: var(--surface);
+      color: var(--text);
+    }
+    .code-editor-pane {
+      background: #0d0d10;
+      display: flex;
+      flex-direction: column;
+      border-right: 1px solid var(--border);
+    }
+    .editor-tabs {
+      display: flex;
+      background: var(--bg-alt);
+      border-bottom: 1px solid var(--border);
+    }
+    .editor-tab {
+      padding: 10px 16px;
+      font-size: 13px;
+      color: var(--text-muted);
+      border-right: 1px solid var(--border);
+      cursor: pointer;
+    }
+    .editor-tab.active { color: var(--text); background: #0d0d10; }
+    #codeArea {
+      flex: 1;
+      width: 100%;
+      background: #0d0d10;
+      color: #c9d1d9;
+      border: none;
+      padding: 20px;
+      font-family: 'JetBrains Mono', 'Fira Code', monospace;
+      font-size: 14px;
+      line-height: 1.7;
+      resize: none;
+      outline: none;
+      tab-size: 2;
+    }
+    .code-preview {
+      background: #fff;
+      overflow: auto;
+    }
+    .code-preview iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
+    }
+  </style>
+</head>
+<body>
+  <div class="code-layout">
+    <div class="code-top">
+      <div class="left">
+        <a href="dashboard.html">← Кабинет</a>
+        <strong style="font-size:15px;">Редактор кода</strong>
+        <span style="font-size:12px;color:var(--text-muted);">как в VS Code</span>
+      </div>
+      <div style="display:flex;gap:10px;">
+        <button class="btn-ghost" onclick="runPreview()">▶ Preview</button>
+        <button class="btn-ghost" onclick="alert('Сохранено (демо)')">Сохранить</button>
+        <button class="btn-primary" onclick="alert('Опубликовано! (демо)')">Опубликовать</button>
+      </div>
+    </div>
+
+    <div class="code-files">
+      <h4>Файлы</h4>
+      <div class="c-file active" data-file="html">index.html</div>
+      <div class="c-file" data-file="css">style.css</div>
+      <div class="c-file" data-file="js">script.js</div>
+    </div>
+
+    <div class="code-editor-pane">
+      <div class="editor-tabs">
+        <div class="editor-tab active" id="tabLabel">index.html</div>
+      </div>
+      <textarea id="codeArea" spellcheck="false"></textarea>
+    </div>
+
+    <div class="code-preview">
+      <iframe id="previewFrame" sandbox="allow-scripts"></iframe>
+    </div>
+  </div>
+
+  <script src="../js/main.js"></script>
+  <script>
+    requireAuth();
+
+    const files = {
+      html: `<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Мой сайт</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header>
+    <h1>Привет, Ai крафт!</h1>
+    <p>Редактируй код слева — видишь результат справа.</p>
+  </header>
+  <main>
+    <section>
+      <h2>О проекте</h2>
+      <p>Это демо редактора кода в стиле VS Code.</p>
+    </section>
+  </main>
+  <script src="script.js"><\/script>
+</body>
+</html>`,
+      css: `* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+body {
+  font-family: system-ui, sans-serif;
+  background: #0a0a0c;
+  color: #f0f0f5;
+  line-height: 1.6;
+  padding: 40px 20px;
+}
+header {
+  text-align: center;
+  margin-bottom: 48px;
+}
+h1 {
+  font-size: 42px;
+  margin-bottom: 12px;
+  background: linear-gradient(135deg, #7c6cff, #ff6bcb);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+p { color: #9898a6; }
+main {
+  max-width: 640px;
+  margin: 0 auto;
+}
+h2 { margin-bottom: 12px; }`,
+      js: `console.log('Ai крафт — редактор кода готов');
+document.querySelector('h1')?.addEventListener('click', () => {
+  alert('Кликнули по заголовку!');
+});`
+    };
+
+    let current = 'html';
+    const area = document.getElementById('codeArea');
+    const frame = document.getElementById('previewFrame');
+
+    area.value = files.html;
+
+    document.querySelectorAll('.c-file').forEach(el => {
+      el.addEventListener('click', () => {
+        files[current] = area.value;
+        document.querySelectorAll('.c-file').forEach(f => f.classList.remove('active'));
+        el.classList.add('active');
+        current = el.dataset.file;
+        area.value = files[current];
+        document.getElementById('tabLabel').textContent = el.textContent;
+      });
+    });
+
+    function runPreview() {
+      files[current] = area.value;
+      const html = files.html
+        .replace('href="style.css"', '')
+        .replace('<link rel="stylesheet" href="style.css">', `<style>${files.css}</style>`)
+        .replace('<script src="script.js"><\/script>', `<script>${files.js}<\/script>`);
+      frame.srcdoc = html;
+    }
+
+    // Auto-preview on load and with debounce
+    runPreview();
+    let t;
+    area.addEventListener('input', () => {
+      clearTimeout(t);
+      t = setTimeout(runPreview, 600);
+    });
+
+    // Tab key support
+    area.addEventListener('keydown', e => {
+      if (e.key === 'Tab') {
+        e.preventDefault();
+        const start = area.selectionStart;
+        const end = area.selectionEnd;
+        area.value = area.value.substring(0, start) + '  ' + area.value.substring(end);
+        area.selectionStart = area.selectionEnd = start + 2;
+      }
+    });
+  </script>
+</body>
+</html>

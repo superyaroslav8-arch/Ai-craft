@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Визуальный редактор — Ai крафт</title>
+  <link rel="stylesheet" href="../css/style.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+  <style>
+    .builder-layout {
+      display: grid;
+      grid-template-columns: 220px 1fr 280px;
+      height: calc(100vh - 0px);
+      margin-left: 0;
+    }
+    .builder-blocks {
+      background: var(--bg-alt);
+      border-right: 1px solid var(--border);
+      padding: 16px;
+      overflow-y: auto;
+    }
+    .builder-blocks h4 {
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-muted);
+      margin-bottom: 12px;
+    }
+    .b-item {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 12px 14px;
+      margin-bottom: 8px;
+      font-size: 13px;
+      cursor: grab;
+      transition: border-color 0.15s;
+    }
+    .b-item:hover { border-color: var(--accent); }
+    .builder-canvas-area {
+      background: #1a1a1e;
+      overflow: auto;
+      padding: 40px;
+      display: flex;
+      justify-content: center;
+    }
+    .page-canvas {
+      width: 100%;
+      max-width: 800px;
+      min-height: 600px;
+      background: #fff;
+      color: #111;
+      border-radius: 8px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+      padding: 0;
+      overflow: hidden;
+    }
+    .canvas-section {
+      padding: 40px 32px;
+      border-bottom: 1px dashed #ddd;
+      position: relative;
+      min-height: 80px;
+    }
+    .canvas-section:hover {
+      outline: 2px solid var(--accent);
+      outline-offset: -2px;
+    }
+    .canvas-section .sec-label {
+      position: absolute;
+      top: 4px;
+      right: 8px;
+      font-size: 10px;
+      background: var(--accent);
+      color: #fff;
+      padding: 2px 6px;
+      border-radius: 4px;
+      opacity: 0;
+    }
+    .canvas-section:hover .sec-label { opacity: 1; }
+    .builder-props {
+      background: var(--bg-alt);
+      border-left: 1px solid var(--border);
+      padding: 16px;
+      overflow-y: auto;
+    }
+    .builder-props h4 {
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-muted);
+      margin-bottom: 12px;
+    }
+    .prop-group { margin-bottom: 16px; }
+    .prop-group label {
+      display: block;
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-bottom: 6px;
+    }
+    .prop-group input, .prop-group textarea, .prop-group select {
+      width: 100%;
+      padding: 10px;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: var(--text);
+      font-size: 13px;
+    }
+    .builder-top {
+      grid-column: 1 / -1;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 20px;
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+    }
+    .builder-top .left { display: flex; align-items: center; gap: 16px; }
+    .builder-top a { color: var(--text-muted); font-size: 14px; }
+    .builder-top a:hover { color: var(--text); }
+  </style>
+</head>
+<body>
+  <div class="builder-layout">
+    <div class="builder-top">
+      <div class="left">
+        <a href="dashboard.html">← Кабинет</a>
+        <strong style="font-size:15px;">Визуальный редактор</strong>
+      </div>
+      <div style="display:flex;gap:10px;">
+        <button class="btn-ghost" onclick="alert('Сохранено (демо)')">Сохранить</button>
+        <button class="btn-primary" onclick="alert('Опубликовано! (демо)')">Опубликовать</button>
+      </div>
+    </div>
+
+    <div class="builder-blocks">
+      <h4>Блоки</h4>
+      <div class="b-item" draggable="true" data-type="hero">Hero / Заголовок</div>
+      <div class="b-item" draggable="true" data-type="text">Текст</div>
+      <div class="b-item" draggable="true" data-type="button">Кнопка</div>
+      <div class="b-item" draggable="true" data-type="image">Изображение</div>
+      <div class="b-item" draggable="true" data-type="form">Форма</div>
+      <div class="b-item" draggable="true" data-type="gallery">Галерея</div>
+      <div class="b-item" draggable="true" data-type="reviews">Отзывы</div>
+      <div class="b-item" draggable="true" data-type="footer">Подвал</div>
+      <h4 style="margin-top:24px;">Секции</h4>
+      <div class="b-item" draggable="true" data-type="features">Преимущества</div>
+      <div class="b-item" draggable="true" data-type="pricing">Цены</div>
+      <div class="b-item" draggable="true" data-type="cta">Призыв к действию</div>
+    </div>
+
+    <div class="builder-canvas-area">
+      <div class="page-canvas" id="pageCanvas">
+        <div class="canvas-section" data-id="1">
+          <span class="sec-label">Hero</span>
+          <h1 style="font-size:36px;margin-bottom:12px;">Заголовок сайта</h1>
+          <p style="color:#555;margin-bottom:20px;">Подзаголовок. Опиши здесь главное предложение.</p>
+          <a href="#" style="display:inline-block;padding:12px 24px;background:#7c6cff;color:#fff;border-radius:999px;text-decoration:none;font-weight:600;">Кнопка</a>
+        </div>
+        <div class="canvas-section" data-id="2">
+          <span class="sec-label">Текст</span>
+          <h2 style="font-size:24px;margin-bottom:10px;">О проекте</h2>
+          <p style="color:#555;">Здесь будет основной текст. Перетащи блоки слева, чтобы добавить новые секции. Кликни на секцию, чтобы редактировать свойства справа.</p>
+        </div>
+        <div class="canvas-section" data-id="3">
+          <span class="sec-label">Контакты</span>
+          <h2 style="font-size:24px;margin-bottom:10px;">Свяжитесь с нами</h2>
+          <p style="color:#555;">email@example.com · +7 (999) 000-00-00</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="builder-props">
+      <h4>Свойства</h4>
+      <p style="font-size:13px;color:var(--text-muted);margin-bottom:16px;">Выбери секцию на холсте</p>
+      <div class="prop-group">
+        <label>Заголовок</label>
+        <input type="text" id="propTitle" placeholder="Текст заголовка" value="Заголовок сайта">
+      </div>
+      <div class="prop-group">
+        <label>Текст</label>
+        <textarea id="propText" rows="4" placeholder="Основной текст">Подзаголовок. Опиши здесь главное предложение.</textarea>
+      </div>
+      <div class="prop-group">
+        <label>Цвет фона</label>
+        <input type="color" id="propBg" value="#ffffff">
+      </div>
+      <div class="prop-group">
+        <label>Выравнивание</label>
+        <select id="propAlign">
+          <option value="left">Слева</option>
+          <option value="center" selected>По центру</option>
+          <option value="right">Справа</option>
+        </select>
+      </div>
+      <button class="btn-primary" style="width:100%;margin-top:12px;" onclick="applyProps()">Применить</button>
+    </div>
+  </div>
+
+  <script src="../js/main.js"></script>
+  <script>
+    requireAuth();
+
+    // Simple drag & drop mock
+    document.querySelectorAll('.b-item').forEach(item => {
+      item.addEventListener('dragstart', (e) => {
+        e.dataTransfer.setData('type', item.dataset.type);
+      });
+    });
+
+    const canvas = document.getElementById('pageCanvas');
+    canvas.addEventListener('dragover', e => e.preventDefault());
+    canvas.addEventListener('drop', e => {
+      e.preventDefault();
+      const type = e.dataTransfer.getData('type');
+      if (!type) return;
+      const sec = document.createElement('div');
+      sec.className = 'canvas-section';
+      sec.innerHTML = `<span class="sec-label">${type}</span><p style="color:#888;">Новый блок «${type}». Кликни, чтобы настроить.</p>`;
+      canvas.appendChild(sec);
+      attachSectionClick(sec);
+    });
+
+    function attachSectionClick(sec) {
+      sec.addEventListener('click', () => {
+        document.querySelectorAll('.canvas-section').forEach(s => s.style.outline = '');
+        sec.style.outline = '2px solid #7c6cff';
+      });
+    }
+    document.querySelectorAll('.canvas-section').forEach(attachSectionClick);
+
+    function applyProps() {
+      alert('Свойства применены (демо-режим). В полной версии изменения сразу видны на холсте.');
+    }
+  </script>
+</body>
+</html>
