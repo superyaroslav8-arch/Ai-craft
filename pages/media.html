@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Генерация медиа — Ai крафт</title>
+  <link rel="stylesheet" href="../css/style.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+  <style>
+    .media-studio { max-width: 960px; margin: 0 auto; }
+    .media-tabs { display: flex; gap: 8px; margin-bottom: 32px; background: var(--surface); padding: 6px; border-radius: 12px; border: 1px solid var(--border); }
+    .media-tab { flex: 1; padding: 14px; text-align: center; border-radius: 8px; font-size: 14px; font-weight: 500; color: var(--text-muted); cursor: pointer; transition: all 0.2s; }
+    .media-tab.active { background: var(--bg); color: var(--text); }
+    .gen-form textarea { width: 100%; min-height: 120px; padding: 16px; background: var(--bg); border: 1px solid var(--border); border-radius: 10px; color: var(--text); font-size: 15px; font-family: inherit; resize: vertical; margin-bottom: 16px; }
+    .gen-form textarea:focus { outline: none; border-color: var(--accent); }
+    .gen-options { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px; margin-bottom: 24px; }
+    .gen-option label { display: block; font-size: 12px; color: var(--text-muted); margin-bottom: 6px; }
+    .gen-option select, .gen-option input { width: 100%; padding: 10px 12px; background: var(--bg); border: 1px solid var(--border); border-radius: 8px; color: var(--text); font-size: 14px; }
+    .gen-result { margin-top: 32px; background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 24px; min-height: 200px; display: none; }
+    .gen-result.show { display: block; }
+    .gen-result h4 { margin-bottom: 16px; font-size: 16px; }
+    .gen-preview { background: var(--bg); border-radius: 12px; padding: 40px; text-align: center; color: var(--text-muted); }
+    .gen-actions { display: flex; gap: 12px; margin-top: 16px; flex-wrap: wrap; }
+    .loading-spinner { display: inline-block; width: 20px; height: 20px; border: 2px solid var(--border); border-top-color: var(--accent); border-radius: 50%; animation: spin 0.8s linear infinite; margin-right: 8px; vertical-align: middle; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+  </style>
+</head>
+<body>
+  <div class="dashboard">
+    <aside class="dash-sidebar">
+      <div class="dash-logo"><span class="logo-icon">✦</span> Ai крафт</div>
+      <nav class="dash-nav">
+        <a href="dashboard.html">Мои проекты</a>
+        <a href="create.html">Создать сайт</a>
+        <a href="media.html" class="active">Генерация медиа</a>
+        <a href="builder.html">Визуальный редактор</a>
+        <a href="code-editor.html">Редактор кода</a>
+      </nav>
+      <div class="dash-user">
+        <strong id="userLogin">—</strong>
+        <a href="#" onclick="logout(); return false;" style="color:var(--text-muted);font-size:13px;">Выйти</a>
+      </div>
+    </aside>
+
+    <main class="dash-main">
+      <div class="dash-header">
+        <h1>Генерация медиа</h1>
+      </div>
+
+      <div class="media-studio">
+        <div class="media-tabs">
+          <div class="media-tab active" data-type="image">🖼️ Фото</div>
+          <div class="media-tab" data-type="video">🎬 Видео</div>
+          <div class="media-tab" data-type="music">🎵 Музыка</div>
+        </div>
+
+        <form class="gen-form" id="genForm" onsubmit="generateMedia(event)">
+          <div class="form-group">
+            <label id="promptLabel">Опиши изображение</label>
+            <textarea id="prompt" placeholder="Например: Минималистичный офис с панорамными окнами, тёплый свет, современный дизайн, высокое качество" required></textarea>
+          </div>
+
+          <div class="gen-options" id="optionsImage">
+            <div class="gen-option">
+              <label>Стиль</label>
+              <select id="style">
+                <option value="photo">Фотореализм</option>
+                <option value="illustration">Иллюстрация</option>
+                <option value="3d">3D-рендер</option>
+                <option value="art">Художественный</option>
+                <option value="minimal">Минимализм</option>
+              </select>
+            </div>
+            <div class="gen-option">
+              <label>Разрешение</label>
+              <select id="resolution">
+                <option value="1024">1024×1024</option>
+                <option value="1920">1920×1080</option>
+                <option value="2048">2048×2048</option>
+                <option value="4k">4K</option>
+              </select>
+            </div>
+            <div class="gen-option">
+              <label>Соотношение</label>
+              <select id="ratio">
+                <option value="1:1">1:1</option>
+                <option value="16:9">16:9</option>
+                <option value="9:16">9:16</option>
+                <option value="4:3">4:3</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="gen-options" id="optionsVideo" style="display:none;">
+            <div class="gen-option">
+              <label>Длительность</label>
+              <select id="duration">
+                <option value="5">5 сек</option>
+                <option value="10">10 сек</option>
+                <option value="15">15 сек</option>
+              </select>
+            </div>
+            <div class="gen-option">
+              <label>Качество</label>
+              <select id="vquality">
+                <option value="hd">HD</option>
+                <option value="fullhd">Full HD</option>
+              </select>
+            </div>
+            <div class="gen-option">
+              <label>Стиль</label>
+              <select id="vstyle">
+                <option value="cinematic">Кинематограф</option>
+                <option value="motion">Motion graphics</option>
+                <option value="product">Продуктовый</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="gen-options" id="optionsMusic" style="display:none;">
+            <div class="gen-option">
+              <label>Жанр</label>
+              <select id="genre">
+                <option value="ambient">Ambient</option>
+                <option value="electronic">Electronic</option>
+                <option value="cinematic">Cinematic</option>
+                <option value="lofi">Lo-fi</option>
+                <option value="corporate">Corporate</option>
+                <option value="upbeat">Upbeat</option>
+              </select>
+            </div>
+            <div class="gen-option">
+              <label>Длительность</label>
+              <select id="mlength">
+                <option value="30">30 сек</option>
+                <option value="60">1 мин</option>
+                <option value="120">2 мин</option>
+                <option value="180">3 мин</option>
+              </select>
+            </div>
+            <div class="gen-option">
+              <label>Настроение</label>
+              <select id="mood">
+                <option value="calm">Спокойное</option>
+                <option value="energetic">Энергичное</option>
+                <option value="epic">Эпичное</option>
+                <option value="dark">Тёмное</option>
+                <option value="happy">Светлое</option>
+              </select>
+            </div>
+          </div>
+
+          <button type="submit" class="btn-primary btn-lg" id="genBtn" style="width:100%;">Сгенерировать</button>
+        </form>
+
+        <div class="gen-result" id="genResult">
+          <h4 id="resultTitle">Результат</h4>
+          <div class="gen-preview" id="genPreview">Готово</div>
+          <div class="gen-actions">
+            <button class="btn-primary" onclick="downloadResult()">Скачать</button>
+            <button class="btn-ghost" onclick="useInSite()">Добавить в сайт</button>
+            <button class="btn-ghost" onclick="generateAgain()">Ещё вариант</button>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script src="../js/main.js"></script>
+  <script>
+    const session = requireAuth();
+    document.getElementById('userLogin').textContent = session.login;
+
+    let currentType = 'image';
+
+    document.querySelectorAll('.media-tab').forEach(tab => {
+      tab.addEventListener('click', () => {
+        document.querySelectorAll('.media-tab').forEach(t => t.classList.remove('active'));
+        tab.classList.add('active');
+        currentType = tab.dataset.type;
+        document.getElementById('optionsImage').style.display = currentType === 'image' ? 'grid' : 'none';
+        document.getElementById('optionsVideo').style.display = currentType === 'video' ? 'grid' : 'none';
+        document.getElementById('optionsMusic').style.display = currentType === 'music' ? 'grid' : 'none';
+        const labels = { image: 'Опиши изображение', video: 'Опиши видео', music: 'Опиши музыку / настроение' };
+        document.getElementById('promptLabel').textContent = labels[currentType];
+        document.getElementById('prompt').placeholder = {
+          image: 'Например: Минималистичный офис с панорамными окнами, тёплый свет, современный дизайн',
+          video: 'Например: Плавный пролёт над городом на закате, кинематографичный стиль',
+          music: 'Например: Спокойный ambient-трек для лендинга, лёгкие синтезаторы, без ударных'
+        }[currentType];
+        document.getElementById('genResult').classList.remove('show');
+      });
+    });
+
+    function generateMedia(e) {
+      e.preventDefault();
+      const prompt = document.getElementById('prompt').value.trim();
+      if (!prompt) return;
+
+      const btn = document.getElementById('genBtn');
+      btn.disabled = true;
+      btn.innerHTML = '<span class="loading-spinner"></span>Генерируем...';
+
+      setTimeout(() => {
+        const result = document.getElementById('genResult');
+        const preview = document.getElementById('genPreview');
+        const titles = { image: 'Изображение готово', video: 'Видео готово', music: 'Трек готов' };
+        document.getElementById('resultTitle').textContent = titles[currentType];
+
+        if (currentType === 'image') {
+          const style = document.getElementById('style').value;
+          const res = document.getElementById('resolution').value;
+          preview.innerHTML = `
+            <div style="background:linear-gradient(135deg,#1a1a2e,#16213e);border-radius:12px;padding:60px 20px;color:#fff;">
+              <div style="font-size:48px;margin-bottom:12px;">🖼️</div>
+              <div style="font-weight:600;margin-bottom:8px;">${prompt.slice(0, 60)}${prompt.length > 60 ? '…' : ''}</div>
+              <div style="font-size:13px;opacity:0.7;">Стиль: ${style} · ${res}px</div>
+            </div>`;
+        } else if (currentType === 'video') {
+          const dur = document.getElementById('duration').value;
+          preview.innerHTML = `
+            <div style="background:linear-gradient(135deg,#0f0c29,#302b63);border-radius:12px;padding:60px 20px;color:#fff;">
+              <div style="font-size:48px;margin-bottom:12px;">🎬</div>
+              <div style="font-weight:600;margin-bottom:8px;">${prompt.slice(0, 60)}${prompt.length > 60 ? '…' : ''}</div>
+              <div style="font-size:13px;opacity:0.7;">${dur} сек · Full HD</div>
+            </div>`;
+        } else {
+          const genre = document.getElementById('genre').value;
+          const len = document.getElementById('mlength').value;
+          preview.innerHTML = `
+            <div style="background:linear-gradient(135deg,#1a1a2e,#0f3460);border-radius:12px;padding:60px 20px;color:#fff;">
+              <div style="font-size:48px;margin-bottom:12px;">🎵</div>
+              <div style="font-weight:600;margin-bottom:8px;">${prompt.slice(0, 60)}${prompt.length > 60 ? '…' : ''}</div>
+              <div style="font-size:13px;opacity:0.7;">${genre} · ${len} сек</div>
+            </div>`;
+        }
+
+        result.classList.add('show');
+        btn.disabled = false;
+        btn.textContent = 'Сгенерировать';
+
+        const media = JSON.parse(localStorage.getItem('ai_craft_media') || '[]');
+        media.unshift({ type: currentType, prompt, createdAt: new Date().toISOString() });
+        localStorage.setItem('ai_craft_media', JSON.stringify(media.slice(0, 50)));
+      }, 2200);
+    }
+
+    function downloadResult() { alert('Файл подготовлен к скачиванию.'); }
+    function useInSite() { alert('Медиа добавлено в библиотеку проекта. Открой визуальный редактор, чтобы вставить.'); }
+    function generateAgain() {
+      document.getElementById('genResult').classList.remove('show');
+      document.getElementById('genBtn').click();
+    }
+  </script>
+</body>
+</html>
