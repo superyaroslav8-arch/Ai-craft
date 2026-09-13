@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ai крафт — Создай сайт с ИИ бесплатно</title>
+  <meta name="description" content="Ai крафт — бесплатный AI-конструктор сайтов. Собирай как в WordPress, пиши код как в VS Code. Публикуй на ai_craft.ru / .com / .dev">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+  <!-- Cookie notice -->
+  <div class="cookie-banner" id="cookieBanner">
+    <p>Мы используем cookies для работы сайта. Никаких лишних трекеров.</p>
+    <div class="cookie-actions">
+      <button class="btn-ghost" onclick="acceptCookies()">Принять</button>
+    </div>
+  </div>
+
+  <!-- Header -->
+  <header class="header">
+    <div class="container header-inner">
+      <a href="index.html" class="logo">
+        <span class="logo-icon">✦</span>
+        <span class="logo-text">Ai крафт</span>
+      </a>
+      <nav class="nav">
+        <a href="#features">Возможности</a>
+        <a href="#how">Как работает</a>
+        <a href="#builder">Конструктор</a>
+        <a href="#code">Код</a>
+      </nav>
+      <div class="header-actions">
+        <a href="pages/login.html" class="btn-ghost">Войти</a>
+        <a href="pages/register.html" class="btn-primary">Начать бесплатно</a>
+      </div>
+      <button class="mobile-menu-btn" id="mobileMenuBtn" aria-label="Меню">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </header>
+
+  <!-- Mobile menu -->
+  <div class="mobile-menu" id="mobileMenu">
+    <a href="#features">Возможности</a>
+    <a href="#how">Как работает</a>
+    <a href="#builder">Конструктор</a>
+    <a href="#code">Код</a>
+    <a href="pages/login.html">Войти</a>
+    <a href="pages/register.html" class="btn-primary">Начать бесплатно</a>
+  </div>
+
+  <!-- Hero -->
+  <section class="hero">
+    <div class="hero-bg">
+      <div class="orb orb-1"></div>
+      <div class="orb orb-2"></div>
+      <div class="orb orb-3"></div>
+    </div>
+    <div class="container hero-content">
+      <h1 class="hero-title">
+        Опиши идею.<br>
+        <span class="gradient-text">Соберём сайт.</span>
+      </h1>
+      <p class="hero-subtitle">
+        Бесплатный AI-конструктор. Визуальный редактор как в WordPress.<br>
+        Полноценный код-редактор как в VS Code. Публикация на ai_craft.ru / .com / .dev
+      </p>
+      <div class="hero-cta">
+        <a href="pages/register.html" class="btn-primary btn-lg">Создать сайт бесплатно</a>
+        <a href="#how" class="btn-ghost btn-lg">Как это работает</a>
+      </div>
+      <div class="hero-badges">
+        <span class="badge">✦ Всё бесплатно</span>
+        <span class="badge">✦ Без лимитов</span>
+        <span class="badge">✦ Без верификаций</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- Features -->
+  <section class="section" id="features">
+    <div class="container">
+      <div class="section-header">
+        <h2>Не нужно знать код.<br>Нужно знать, чего хочется.</h2>
+        <p>Сайт начинается с ваших слов. ИИ помогает со структурой, текстами и дизайном. Вы добавляете свой характер — визуально или кодом.</p>
+      </div>
+      <div class="features-grid">
+        <div class="feature-card">
+          <div class="feature-icon">🧠</div>
+          <h3>AI-генерация</h3>
+          <p>Опиши идею обычными словами — получи готовый сайт за минуты. Структура, тексты, дизайн.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">🧱</div>
+          <h3>Конструктор как WordPress</h3>
+          <p>Drag-and-drop блоки, секции, формы, галереи. Полный визуальный контроль без кода.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">⌨️</div>
+          <h3>Редактор как VS Code</h3>
+          <p>Monaco Editor: подсветка синтаксиса, автодополнение, файловая структура, live-preview.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">🚀</div>
+          <h3>Мгновенная публикация</h3>
+          <p>Один клик — сайт живёт на subdomain.ai_craft.ru / .com / .dev. SSL автоматически.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">📦</div>
+          <h3>Загрузка готовых проектов</h3>
+          <p>Есть HTML/CSS/JS или ZIP? Просто загрузи — хостим бесплатно.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">🔒</div>
+          <h3>Простой вход</h3>
+          <p>Только логин и пароль. Без email-подтверждений, SMS и капч.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- How it works -->
+  <section class="section section-alt" id="how">
+    <div class="container">
+      <div class="section-header">
+        <h2>Мысль обретает форму</h2>
+        <p>От идеи до готового сайта — три простых шага</p>
+      </div>
+      <div class="steps">
+        <div class="step">
+          <div class="step-num">01</div>
+          <h3>Опиши</h3>
+          <p>Напиши, какой сайт нужен: «Лендинг кофейни, тёплый свет, меню, форма бронирования столика».</p>
+        </div>
+        <div class="step">
+          <div class="step-num">02</div>
+          <h3>Собери</h3>
+          <p>ИИ создаёт структуру и дизайн. Дорабатывай визуально (как WordPress) или в коде (как VS Code).</p>
+        </div>
+        <div class="step">
+          <div class="step-num">03</div>
+          <h3>Опубликуй</h3>
+          <p>Выбери поддомен *.ai_craft.ru / .com / .dev и нажми «Опубликовать». Готово.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Builder preview -->
+  <section class="section" id="builder">
+    <div class="container">
+      <div class="section-header">
+        <h2>Визуальный конструктор</h2>
+        <p>Собирай сайт блоками — как в WordPress. Перетаскивай, настраивай, смотри результат сразу.</p>
+      </div>
+      <div class="preview-window">
+        <div class="preview-bar">
+          <span class="dot red"></span>
+          <span class="dot yellow"></span>
+          <span class="dot green"></span>
+          <span class="preview-url">ai-craft / визуальный редактор</span>
+        </div>
+        <div class="preview-body builder-mock">
+          <div class="builder-sidebar">
+            <div class="block-item">Заголовок</div>
+            <div class="block-item">Текст</div>
+            <div class="block-item">Кнопка</div>
+            <div class="block-item">Изображение</div>
+            <div class="block-item">Форма</div>
+            <div class="block-item">Галерея</div>
+            <div class="block-item">Отзывы</div>
+          </div>
+          <div class="builder-canvas">
+            <div class="canvas-block">Hero-секция</div>
+            <div class="canvas-block">О нас</div>
+            <div class="canvas-block">Услуги</div>
+            <div class="canvas-block">Контакты</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Code editor preview -->
+  <section class="section section-alt" id="code">
+    <div class="container">
+      <div class="section-header">
+        <h2>Редактор кода</h2>
+        <p>Полноценный IDE прямо в браузере. Monaco Editor — тот же движок, что в VS Code.</p>
+      </div>
+      <div class="preview-window">
+        <div class="preview-bar">
+          <span class="dot red"></span>
+          <span class="dot yellow"></span>
+          <span class="dot green"></span>
+          <span class="preview-url">ai-craft / code-editor</span>
+        </div>
+        <div class="preview-body code-mock">
+          <div class="code-sidebar">
+            <div class="file active">index.html</div>
+            <div class="file">style.css</div>
+            <div class="file">script.js</div>
+            <div class="file">assets/</div>
+          </div>
+          <div class="code-area">
+            <pre><code>&lt;!DOCTYPE html&gt;
+&lt;html lang="ru"&gt;
+&lt;head&gt;
+  &lt;title&gt;Мой сайт&lt;/title&gt;
+  &lt;link rel="stylesheet" href="style.css"&gt;
+&lt;/head&gt;
+&lt;body&gt;
+  &lt;h1&gt;Привет, Ai крафт!&lt;/h1&gt;
+  &lt;!-- Пиши код как в VS Code --&gt;
+&lt;/body&gt;
+&lt;/html&gt;</code></pre>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Domains -->
+  <section class="section">
+    <div class="container">
+      <div class="section-header">
+        <h2>Твой адрес в интернете</h2>
+        <p>Бесплатные поддомены сразу после публикации</p>
+      </div>
+      <div class="domains">
+        <div class="domain-card">
+          <span class="domain-name">твой-сайт<span>.ai_craft.ru</span></span>
+        </div>
+        <div class="domain-card">
+          <span class="domain-name">твой-сайт<span>.ai_craft.com</span></span>
+        </div>
+        <div class="domain-card">
+          <span class="domain-name">твой-сайт<span>.ai_craft.dev</span></span>
+        </div>
+      </div>
+      <p class="domains-note">Можно подключить и свой домен позже. SSL выдаётся автоматически.</p>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="section cta-section">
+    <div class="container">
+      <h2>Теперь твоя очередь</h2>
+      <p>Всё начинается с нескольких слов. И всё — бесплатно.</p>
+      <a href="pages/register.html" class="btn-primary btn-lg">Создать свой сайт</a>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container footer-inner">
+      <div class="footer-brand">
+        <span class="logo-icon">✦</span> Ai крафт
+      </div>
+      <div class="footer-links">
+        <a href="#features">Возможности</a>
+        <a href="pages/login.html">Войти</a>
+        <a href="pages/register.html">Регистрация</a>
+      </div>
+      <p class="footer-copy">© 2026 Ai крафт. Всё бесплатно. Без лишнего.</p>
+    </div>
+  </footer>
+
+  <script src="js/main.js"></script>
+</body>
+</html>
