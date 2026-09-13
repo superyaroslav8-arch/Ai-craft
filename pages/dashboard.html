@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Кабинет — Ai крафт</title>
+  <link rel="stylesheet" href="../css/style.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+  <div class="dashboard">
+    <aside class="dash-sidebar">
+      <div class="dash-logo">
+        <span class="logo-icon">✦</span> Ai крафт
+      </div>
+      <nav class="dash-nav">
+        <a href="dashboard.html" class="active">Мои сайты</a>
+        <a href="create.html">Создать сайт</a>
+        <a href="builder.html">Визуальный редактор</a>
+        <a href="code-editor.html">Редактор кода</a>
+      </nav>
+      <div class="dash-user">
+        <strong id="userLogin">—</strong>
+        <a href="#" onclick="logout(); return false;" style="color:var(--text-muted);font-size:13px;">Выйти</a>
+      </div>
+    </aside>
+
+    <main class="dash-main">
+      <div class="dash-header">
+        <h1>Мои сайты</h1>
+        <a href="create.html" class="btn-primary">+ Создать сайт</a>
+      </div>
+
+      <div id="sitesContainer">
+        <!-- filled by JS -->
+      </div>
+    </main>
+  </div>
+
+  <script src="../js/main.js"></script>
+  <script>
+    const session = requireAuth();
+    if (!session) throw new Error('no auth');
+
+    document.getElementById('userLogin').textContent = session.login;
+
+    function renderSites() {
+      const sites = getUserSites(session.login);
+      const container = document.getElementById('sitesContainer');
+
+      if (!sites.length) {
+        container.innerHTML = `
+          <div class="empty-state">
+            <h3>Пока нет сайтов</h3>
+            <p>Создай первый — опиши идею или загрузи готовый проект.</p>
+            <a href="create.html" class="btn-primary" style="margin-top:20px;">Создать сайт</a>
+          </div>`;
+        return;
+      }
+
+      container.innerHTML = `<div class="sites-grid">${sites.map(s => `
+        <div class="site-card">
+          <h3>${escapeHtml(s.name)}</h3>
+          <div class="url">${s.subdomain}.${s.domain}</div>
+          <p style="font-size:13px;color:var(--text-muted);margin-bottom:16px;line-height:1.5;">
+            ${escapeHtml((s.description || '').slice(0, 100))}${(s.description || '').length > 100 ? '…' : ''}
+          </p>
+          <div class="site-actions">
+            <a href="#" onclick="previewSite('${s.id}'); return false;">Открыть</a>
+            <a href="builder.html?id=${s.id}">Редактор</a>
+            <a href="code-editor.html?id=${s.id}">Код</a>
+            <button onclick="removeSite('${s.id}')">Удалить</button>
+          </div>
+        </div>
+      `).join('')}</div>`;
+    }
+
+    function escapeHtml(str) {
+      const d = document.createElement('div');
+      d.textContent = str || '';
+      return d.innerHTML;
+    }
+
+    function previewSite(id) {
+      const sites = getUserSites(session.login);
+      const site = sites.find(s => s.id === id);
+      if (!site || !site.content) {
+        alert('Контент сайта пока в разработке');
+        return;
+      }
+      const w = window.open('', '_blank');
+      w.document.write(site.content.html);
+      w.document.close();
+    }
+
+    function removeSite(id) {
+      if (!confirm('Удалить сайт?')) return;
+      deleteSite(session.login, id);
+      renderSites();
+    }
+
+    renderSites();
+  </script>
+</body>
+</html>
