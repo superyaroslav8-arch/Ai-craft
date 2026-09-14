@@ -4,6 +4,11 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Ai-Craft — AI Website Builder</title>
+  
+  <!-- PWA и иконки -->
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#0d1117">
+  
   <link rel="stylesheet" href="style.css">
   <!-- Загрузчик Monaco Editor -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.38.0/min/vs/loader.min.js"></script>
@@ -11,7 +16,6 @@
 <body data-theme="dark">
 
   <div class="app-container nav-bottom" id="app">
-    
     <main class="main-content">
       <header class="top-bar">
         <div class="logo">Ai-Craft 🚀</div>
@@ -45,9 +49,9 @@
       <button class="nav-btn">🤖 Нейрочат</button>
       <button class="nav-btn" onclick="toggleSettingsModal()">⚙️ Настройки</button>
     </nav>
-
   </div>
 
+  <!-- Модальное окно настроек -->
   <div class="modal" id="settings-modal">
     <div class="modal-content">
       <h3>Настройки Ai-Craft</h3>
