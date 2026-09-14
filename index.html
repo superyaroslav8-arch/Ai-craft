@@ -5,23 +5,27 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Ai-Craft — AI Website Builder</title>
   
-  <!-- PWA и иконки -->
   <link rel="manifest" href="manifest.json">
   <meta name="theme-color" content="#0d1117">
   
   <link rel="stylesheet" href="style.css">
-  <!-- Загрузчик Monaco Editor -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.38.0/min/vs/loader.min.js"></script>
 </head>
 <body data-theme="dark">
 
   <div class="app-container nav-bottom" id="app">
+    
     <main class="main-content">
       <header class="top-bar">
         <div class="logo">Ai-Craft 🚀</div>
         <div class="actions">
           <button class="btn btn-primary" onclick="generateSite()">⚡ Сгенерировать AI</button>
-          <button class="btn btn-secondary" onclick="createPreviewLink()">🔗 Создать ссылку</button>
+          <button class="btn btn-secondary" onclick="createPreviewLink()">🔗 Ссылка</button>
+          
+          <div id="user-profile" class="user-profile" style="display: none;">
+            <span id="username-display"></span>
+            <button class="btn btn-danger" onclick="logout()">Выйти</button>
+          </div>
         </div>
       </header>
 
@@ -49,6 +53,21 @@
       <button class="nav-btn">🤖 Нейрочат</button>
       <button class="nav-btn" onclick="toggleSettingsModal()">⚙️ Настройки</button>
     </nav>
+
+  </div>
+
+  <!-- Модальное окно авторизации -->
+  <div class="modal" id="auth-modal" style="display: flex;">
+    <div class="modal-content auth-box">
+      <h2>Вход в Ai-Craft 🚀</h2>
+      <form onsubmit="handleAuth(event)">
+        <div class="input-group">
+          <label for="auth-username">Имя пользователя:</label>
+          <input type="text" id="auth-username" placeholder="Введите имя..." required>
+        </div>
+        <button type="submit" class="btn btn-primary btn-full">Войти в систему</button>
+      </form>
+    </div>
   </div>
 
   <!-- Модальное окно настроек -->
@@ -81,6 +100,7 @@
     </div>
   </div>
 
+  <script src="auth.js"></script>
   <script src="script.js"></script>
 </body>
 </html>
