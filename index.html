@@ -5,16 +5,14 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Ai-Craft — AI Website Builder</title>
   <link rel="stylesheet" href="style.css">
-  <!-- Подключение редактора Monaco Editor (движок VS Code) -->
+  <!-- Загрузчик Monaco Editor -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.38.0/min/vs/loader.min.js"></script>
 </head>
 <body data-theme="dark">
 
   <div class="app-container nav-bottom" id="app">
     
-    <!-- Главная рабочая панель -->
     <main class="main-content">
-      <!-- Панель управления проектом -->
       <header class="top-bar">
         <div class="logo">Ai-Craft 🚀</div>
         <div class="actions">
@@ -23,40 +21,33 @@
         </div>
       </header>
 
-      <!-- Основная область: Редактор и Чат -->
       <div class="workspace">
-        
-        <!-- Редактор кода (Monaco / GitHub Style) -->
         <section class="editor-section">
           <div class="section-header">Код сайта (HTML/CSS)</div>
           <div id="editor-container"></div>
         </section>
 
-        <!-- Чат-помощник "Нейро" -->
         <aside class="chat-section">
           <div class="section-header">AI-Помощник «Нейро»</div>
           <div class="chat-messages" id="chat-messages">
             <div class="message neuro">Привет! Я **Нейро**. Помогу сгенерировать сайт или ответить на вопросы. Напиши, что сделать!</div>
           </div>
           <div class="chat-input-area">
-            <input type="text" id="chat-input" placeholder="Спроси Нейро или опиши сайт..." onkeypress="handleKeyPress(event)">
-            <button class="btn btn-primary" onclick="sendMessage()">Отправить</button>
+            <input type="text" id="chat-input" placeholder="Спроси Нейро или опиши сайт...">
+            <button class="btn btn-primary" id="send-btn">Отправить</button>
           </div>
         </aside>
-
       </div>
     </main>
 
-    <!-- Панель переключения вкладок и настроек -->
     <nav class="navbar" id="navbar">
-      <button class="nav-btn active" onclick="switchTab('editor')">💻 Редактор</button>
-      <button class="nav-btn" onclick="switchTab('neuro')">🤖 Нейрочат</button>
+      <button class="nav-btn active">💻 Редактор</button>
+      <button class="nav-btn">🤖 Нейрочат</button>
       <button class="nav-btn" onclick="toggleSettingsModal()">⚙️ Настройки</button>
     </nav>
 
   </div>
 
-  <!-- Модальное окно настроек -->
   <div class="modal" id="settings-modal">
     <div class="modal-content">
       <h3>Настройки Ai-Craft</h3>
@@ -79,7 +70,7 @@
 
       <div class="setting-item">
         <label>Акцентный цвет:</label>
-        <input type="color" id="accent-color-picker" value="#007bff" onchange="changeAccentColor(this.value)">
+        <input type="color" id="accent-color-picker" value="#238636" onchange="changeAccentColor(this.value)">
       </div>
 
       <button class="btn btn-secondary" onclick="toggleSettingsModal()">Закрыть</button>
