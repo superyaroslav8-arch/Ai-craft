@@ -1,4 +1,3 @@
-// Проверка авторизации при загрузке
 document.addEventListener('DOMContentLoaded', () => {
   checkAuthStatus();
 });
@@ -19,7 +18,6 @@ function checkAuthStatus() {
   }
 }
 
-// Логика входа / регистрации
 function handleAuth(event) {
   event.preventDefault();
   const usernameInput = document.getElementById('auth-username').value.trim();
@@ -30,7 +28,6 @@ function handleAuth(event) {
   }
 }
 
-// Выход из аккаунта
 function logout() {
   localStorage.removeItem('ai_craft_user');
   checkAuthStatus();
