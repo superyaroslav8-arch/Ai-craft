@@ -1,7 +1,7 @@
 let editor;
 
-// Правильная инициализация Monaco Editor
 window.onload = function() {
+  // 1. Инициализация Monaco Editor
   if (typeof require !== 'undefined') {
     require.config({ paths: { 'vs': 'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.38.0/min/vs' }});
     require(['vs/editor/editor.main'], function() {
@@ -14,13 +14,19 @@ window.onload = function() {
     });
   }
 
-  // Навешиваем события для чата
-  document.getElementById('send-btn').addEventListener('click', sendMessage);
-  document.getElementById('chat-input').addEventListener('keypress', function(e) {
-    if (e.key === 'Enter') sendMessage();
-  });
+  // 2. Обработчики событий чата
+  const sendBtn = document.getElementById('send-btn');
+  const chatInput = document.getElementById('chat-input');
+
+  if (sendBtn) sendBtn.addEventListener('click', sendMessage);
+  if (chatInput) {
+    chatInput.addEventListener('keypress', function(e) {
+      if (e.key === 'Enter') sendMessage();
+    });
+  }
 };
 
+// Переключение темы
 function changeTheme(theme) {
   document.body.setAttribute('data-theme', theme);
   if (editor && typeof monaco !== 'undefined') {
@@ -28,22 +34,30 @@ function changeTheme(theme) {
   }
 }
 
+// Расположение панели (наверху / внизу)
 function changeNavPosition(pos) {
   const app = document.getElementById('app');
-  app.className = `app-container nav-${pos}`;
+  if (app) app.className = `app-container nav-${pos}`;
 }
 
+// Изменение акцентного цвета
 function changeAccentColor(color) {
   document.documentElement.style.setProperty('--accent-color', color);
 }
 
+// Переключение модального окна настроек
 function toggleSettingsModal() {
   const modal = document.getElementById('settings-modal');
-  modal.style.display = modal.style.display === 'flex' ? 'none' : 'flex';
+  if (modal) {
+    modal.style.display = modal.style.display === 'flex' ? 'none' : 'flex';
+  }
 }
 
+// Отправка сообщений в Нейрочат
 function sendMessage() {
   const input = document.getElementById('chat-input');
+  if (!input) return;
+  
   const text = input.value.trim();
   if (!text) return;
 
@@ -57,6 +71,8 @@ function sendMessage() {
 
 function addMessage(text, sender) {
   const container = document.getElementById('chat-messages');
+  if (!container) return;
+  
   const msg = document.createElement('div');
   msg.className = `message ${sender}`;
   msg.textContent = text;
@@ -64,6 +80,7 @@ function addMessage(text, sender) {
   container.scrollTop = container.scrollHeight;
 }
 
+// ИИ Генерация и создание предпросмотра
 function generateSite() {
   if (!editor) return;
   const aiGeneratedCode = `<!DOCTYPE html>\n<html>\n<head>\n  <style>\n    body { background: #111; color: #fff; font-family: sans-serif; text-align: center; padding: 50px; }\n    .btn { background: #238636; color: white; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer; }\n  </style>\n</head>\n<body>\n  <h1>Сгенерировано с помощью AI 🚀</h1>\n  <p>Ваш сайт полностью готов к работе.</p>\n  <button class="btn">Нажми меня</button>\n</body>\n</html>`;
