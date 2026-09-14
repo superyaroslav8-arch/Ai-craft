@@ -53,6 +53,12 @@ body {
 
 .logo { font-weight: bold; font-size: 1.2rem; }
 
+.actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
 .workspace {
   display: flex;
   flex: 1;
@@ -133,11 +139,14 @@ body {
 .btn-primary { background-color: var(--accent-color); color: white; border: none; }
 .btn-primary:hover { background-color: var(--accent-hover); }
 
+.btn-danger { background-color: #da3633; color: white; border: none; }
+.btn-danger:hover { background-color: #b82c2a; }
+
 .modal {
   display: none;
   position: fixed;
   top: 0; left: 0; width: 100%; height: 100%;
-  background: rgba(0,0,0,0.5);
+  background: rgba(0,0,0,0.6);
   justify-content: center;
   align-items: center;
   z-index: 1000;
@@ -154,4 +163,41 @@ body {
   gap: 15px;
 }
 
+.auth-box { text-align: center; }
+
+.input-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 15px;
+  text-align: left;
+}
+
+.input-group input {
+  padding: 10px;
+  background: var(--bg-color);
+  border: 1px solid var(--border-color);
+  color: var(--text-color);
+  border-radius: 6px;
+}
+
+.btn-full { width: 100%; padding: 10px; }
+
+.user-profile {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
 .setting-item { display: flex; justify-content: space-between; align-items: center; }
+
+/* Адаптированность под планшеты и смартфоны */
+@media (max-width: 768px) {
+  body { overflow: auto; }
+  .app-container { height: auto; min-height: 100vh; }
+  .workspace { flex-direction: column; overflow: visible; }
+  .editor-section, .chat-section { flex: none; width: 100%; height: 50vh; border-right: none; border-bottom: 1px solid var(--border-color); }
+  .top-bar { padding: 10px; flex-wrap: wrap; gap: 10px; }
+  .actions { width: 100%; justify-content: space-between; }
+  .navbar { padding: 12px; }
+}
