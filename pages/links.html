@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Ссылки — Ai крафт</title>
   <link rel="stylesheet" href="../css/style.css">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@600;700&display=swap" rel="stylesheet">
 </head>
 <body>
 <div class="app">
@@ -27,11 +26,11 @@
       <div class="prompt-box">
         <h2>Новая ссылка</h2>
         <div class="form-group"><label>Название</label><input id="title" placeholder="Мой сайт"></div>
-        <div class="form-group"><label>URL</label><input id="url" placeholder="https://..."></div>
-        <div class="form-group"><label>Слаг</label><input id="slug" placeholder="my-site"></div>
+        <div class="form-group"><label>URL</label><input id="url" placeholder="https://example.com"></div>
+        <div class="form-group"><label>Слаг</label><input id="slug" placeholder="my-link"></div>
         <button class="btn-primary" type="button" id="create">Создать</button>
       </div>
-      <div class="card"><h3 style="margin-bottom:12px">Ваши ссылки</h3><div id="list"></div></div>
+      <div class="card"><h3 style="margin-bottom:12px">Список</h3><div id="list"></div></div>
     </div>
   </main>
 </div>
@@ -41,19 +40,31 @@
   <a href="neuro.html">Нейро</a>
   <a href="settings.html">Ещё</a>
 </nav>
-<script src="../js/core.js"></script>
+<script src="../js/core.js" defer></script>
 <script>
-  const session = AC.requireAuth(); AC.applyTheme();
-  document.getElementById('userLogin').textContent = session.login;
-  document.getElementById('logout').onclick = e => { e.preventDefault(); AC.clearSession(); location.href='../index.html'; };
+document.addEventListener('DOMContentLoaded', () => {
+  const session = AC.requireAuth('auth.html');
+  if (!session) return;
+  AC.applyTheme();
+  document.getElementById('userLogin').textContent = session.name || session.login;
+  document.getElementById('logout').onclick = e => { e.preventDefault(); AC.clearSession(); location.href = 'auth.html'; };
   function render() {
     const links = AC.getLinks(session.login);
     const el = document.getElementById('list');
     if (!links.length) { el.innerHTML = '<p style="color:var(--text-muted);font-size:13px">Пока нет ссылок</p>'; return; }
-    el.innerHTML = '<table class="table"><thead><tr><th>Короткая</th><th>Куда</th><th></th></tr></thead><tbody>' +
-      links.map(l => '<tr><td><code>'+AC.escapeHtml(l.shortUrl)+'</code></td><td>'+AC.escapeHtml(l.url)+'</td><td><button type="button" data-copy="'+AC.escapeHtml(l.shortUrl)+'">Копировать</button> <button type="button" data-del="'+l.id+'">Удалить</button></td></tr>').join('') + '</tbody></table>';
-    el.querySelectorAll('[data-copy]').forEach(b => b.onclick = () => navigator.clipboard.writeText(b.dataset.copy).then(() => AC.toast('Скопировано')));
-    el.querySelectorAll('[data-del]').forEach(b => b.onclick = () => { if (confirm('Удалить?')) { AC.deleteLink(session.login, b.dataset.del); render(); } });
+    el.innerHTML = links.map(l =>
+      '<div style="padding:10px 0;border-bottom:1px solid var(--border)">' +
+      '<div class="meta">' + AC.escapeHtml(l.shortUrl) + '</div>' +
+      '<div style="font-size:13px;margin:4px 0">' + AC.escapeHtml(l.url) + '</div>' +
+      '<button type="button" class="btn-ghost btn-sm" data-copy="' + AC.escapeHtml(l.shortUrl) + '">Копировать</button> ' +
+      '<button type="button" class="btn-ghost btn-sm" data-del="' + l.id + '">Удалить</button></div>'
+    ).join('');
+    el.querySelectorAll('[data-copy]').forEach(b => b.onclick = () => {
+      navigator.clipboard.writeText(b.dataset.copy).then(() => AC.toast('Скопировано')).catch(() => AC.toast(b.dataset.copy));
+    });
+    el.querySelectorAll('[data-del]').forEach(b => b.onclick = () => {
+      if (confirm('Удалить?')) { AC.deleteLink(session.login, b.dataset.del); render(); }
+    });
   }
   document.getElementById('create').onclick = () => {
     const title = document.getElementById('title').value.trim();
@@ -61,10 +72,14 @@
     const slug = document.getElementById('slug').value.trim();
     if (!url) { AC.toast('Укажите URL'); return; }
     AC.createLink(session.login, { title, url, slug });
-    document.getElementById('title').value=''; document.getElementById('url').value=''; document.getElementById('slug').value='';
-    render(); AC.toast('Создано');
+    document.getElementById('title').value = '';
+    document.getElementById('url').value = '';
+    document.getElementById('slug').value = '';
+    render();
+    AC.toast('Создано');
   };
   render();
+});
 </script>
 </body>
 </html>

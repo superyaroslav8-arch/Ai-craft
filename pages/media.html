@@ -24,14 +24,14 @@
     <div class="page-head"><h1>Медиа</h1></div>
     <div class="domain-row" id="tabs" style="margin-bottom:20px">
       <button type="button" class="chip active" data-tab="photo">Фото</button>
-      <button type="button" class="chip" data-tab="video">Видео</button>
-      <button type="button" class="chip" data-tab="music">Музыка</button>
+      <button type="button" class="chip" data-tab="video">Кадр видео</button>
+      <button type="button" class="chip" data-tab="music">Музыка (идея)</button>
     </div>
     <div class="create-layout">
       <div class="prompt-box">
         <h2 id="tabTitle">Сгенерировать фото</h2>
-        <p class="hint">Опишите, что нужно — получите изображение по запросу. Бесплатно.</p>
-        <div class="form-group"><label>Описание</label><textarea id="prompt" placeholder="Уютная кофейня, тёплый свет, утро"></textarea></div>
+        <p class="hint">Опишите, что нужно. Фото создаётся по тексту (бесплатный AI).</p>
+        <div class="form-group"><label>Описание</label><textarea id="prompt" placeholder="Уютная кофейня, тёплый свет, утро, фотореализм"></textarea></div>
         <button class="btn-primary" type="button" id="gen">Сгенерировать</button>
         <p id="status" style="margin-top:12px;font-size:13px;color:var(--text-muted)"></p>
       </div>
@@ -64,7 +64,8 @@ document.addEventListener('DOMContentLoaded', () => {
     tab = c.dataset.tab;
     document.querySelectorAll('#tabs .chip').forEach(x => x.classList.remove('active'));
     c.classList.add('active');
-    document.getElementById('tabTitle').textContent = tab === 'photo' ? 'Сгенерировать фото' : tab === 'video' ? 'Кадр для видео' : 'Идея для музыки';
+    document.getElementById('tabTitle').textContent =
+      tab === 'photo' ? 'Сгенерировать фото' : tab === 'video' ? 'Кадр для видео' : 'Идея для музыки';
   });
   function renderHistory() {
     const el = document.getElementById('history');
@@ -81,35 +82,43 @@ document.addEventListener('DOMContentLoaded', () => {
     const status = document.getElementById('status');
     const result = document.getElementById('result');
     btn.disabled = true;
-    status.textContent = 'Генерация… подождите несколько секунд';
+    status.textContent = 'Генерация… 5–20 секунд';
     if (tab === 'music') {
-      setTimeout(() => {
-        result.innerHTML = '<p style="line-height:1.6">Трек по запросу: «'+AC.escapeHtml(prompt.slice(0,100))+'». Для прослушивания: Pixabay Music / FMA с этим описанием.</p>';
-        history.unshift({ type: 'music', prompt, at: Date.now() });
-        localStorage.setItem(KEY, JSON.stringify(history.slice(0,40)));
-        status.textContent = 'Готово'; btn.disabled = false; renderHistory();
-      }, 400);
+      result.innerHTML = '<p style="line-height:1.6;text-align:left">Идея трека: «' + AC.escapeHtml(prompt) + '». Подберите похожий трек на бесплатных библиотеках (Pixabay Music, Free Music Archive).</p>';
+      history.unshift({ type: 'music', prompt, at: Date.now() });
+      localStorage.setItem(KEY, JSON.stringify(history.slice(0, 40)));
+      status.textContent = 'Готово';
+      btn.disabled = false;
+      renderHistory();
       return;
     }
-    const url = (AC.imageUrl ? AC.imageUrl(tab === 'video' ? 'cinematic film still, ' + prompt : prompt) : 'https://image.pollinations.ai/prompt/' + encodeURIComponent(prompt) + '?width=768&height=512&nologo=true');
+    const fullPrompt = tab === 'video' ? ('cinematic film still, ' + prompt) : prompt;
+    const url = AC.imageUrl(fullPrompt, { width: 768, height: 512 });
     const img = new Image();
+    img.crossOrigin = 'anonymous';
     img.onload = () => {
       result.innerHTML = '';
       img.style.cssText = 'width:100%;border-radius:12px;display:block';
       result.appendChild(img);
+      const a = document.createElement('a');
+      a.href = url; a.target = '_blank'; a.rel = 'noopener';
+      a.textContent = 'Открыть в полном размере';
+      a.style.cssText = 'display:inline-block;margin-top:10px;font-size:13px;color:var(--accent)';
+      result.appendChild(a);
       history.unshift({ type: tab, prompt, url, at: Date.now() });
-      localStorage.setItem(KEY, JSON.stringify(history.slice(0,40)));
+      localStorage.setItem(KEY, JSON.stringify(history.slice(0, 40)));
       status.textContent = 'Готово';
       btn.disabled = false;
       renderHistory();
       AC.toast('Готово');
     };
     img.onerror = () => {
-      status.textContent = 'Не удалось загрузить. Нажмите ещё раз.';
+      status.textContent = 'Ошибка сети. Нажмите ещё раз.';
       btn.disabled = false;
+      result.innerHTML = '<p>Не загрузилось. Повторите попытку.</p>';
     };
-    result.innerHTML = '<p>Загрузка…</p>';
-    img.src = url;
+    result.innerHTML = '<p>Загрузка изображения…</p>';
+    img.src = url + '&t=' + Date.now();
   };
   renderHistory();
 });

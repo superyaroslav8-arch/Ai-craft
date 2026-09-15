@@ -1,104 +1,137 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Настройки — Ai крафт</title>
   <link rel="stylesheet" href="../css/style.css">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@600;700&display=swap" rel="stylesheet">
 </head>
 <body>
 <div class="app">
   <aside class="sidebar">
     <a href="../index.html" class="logo">Ai крафт</a>
     <nav class="side-nav">
-      <a href="dashboard.html">Проекты</a>
-      <a href="create.html">Создать сайт</a>
-      <a href="editor.html">Редактор кода</a>
-      <a href="links.html">Ссылки</a>
+      <a href="dashboard.html">Мои сайты</a>
+      <a href="create.html">Собрать сайт</a>
       <a href="neuro.html">Нейро</a>
+      <a href="media.html">Медиа</a>
+      <a href="links.html">Ссылки</a>
       <a href="settings.html" class="active">Настройки</a>
-      <a href="media.html">Медиа AI</a>
     </nav>
     <div class="side-user"><strong id="userLogin">—</strong><a href="#" id="logout">Выйти</a></div>
   </aside>
   <main class="main">
-    <div class="page-head"><h1>Настройки</h1></div>
-    <div class="settings-section"><h2>Внешний вид</h2>
-      <div class="settings-grid">
-        <div class="setting-row"><div><h3>Тема</h3><p>Тёмная или светлая</p></div>
-          <div class="toggle-group" id="theme"><button data-v="dark">Тёмная</button><button data-v="light">Светлая</button></div></div>
-        <div class="setting-row" style="flex-direction:column;align-items:flex-start"><div><h3>Акцентный цвет</h3><p>Кнопки и выделения</p></div>
-          <div class="swatches" id="accents" style="margin-top:12px">
-            <button class="swatch" data-c="#8b5cf6" style="background:#8b5cf6"></button>
-            <button class="swatch" data-c="#3b82f6" style="background:#3b82f6"></button>
-            <button class="swatch" data-c="#06b6d4" style="background:#06b6d4"></button>
-            <button class="swatch" data-c="#10b981" style="background:#10b981"></button>
-            <button class="swatch" data-c="#f59e0b" style="background:#f59e0b"></button>
-            <button class="swatch" data-c="#ef4444" style="background:#ef4444"></button>
-            <button class="swatch" data-c="#ec4899" style="background:#ec4899"></button>
-            <button class="swatch" data-c="#a855f7" style="background:#a855f7"></button>
-          </div></div>
-        <div class="setting-row"><div><h3>Анимации</h3><p>Плавные переходы</p></div>
-          <div class="toggle-group" id="animations"><button data-v="1">Вкл</button><button data-v="0">Выкл</button></div></div>
-      </div></div>
-    <div class="settings-section"><h2>Редактор кода</h2>
-      <div class="settings-grid">
-        <div class="setting-row"><div><h3>Вкладки</h3><p>Позиция панели</p></div>
-          <div class="toggle-group" id="tabs"><button data-v="bottom">Внизу</button><button data-v="top">Наверху</button></div></div>
-        <div class="setting-row"><div><h3>Предпросмотр</h3><p>Live-preview</p></div>
-          <div class="toggle-group" id="preview"><button data-v="1">Вкл</button><button data-v="0">Выкл</button></div></div>
-        <div class="setting-row"><div><h3>Автосохранение</h3><p>При вводе</p></div>
-          <div class="toggle-group" id="autosave"><button data-v="1">Вкл</button><button data-v="0">Выкл</button></div></div>
-        <div class="setting-row"><div><h3>Перенос строк</h3><p>Word wrap</p></div>
-          <div class="toggle-group" id="wrap"><button data-v="1">Вкл</button><button data-v="0">Выкл</button></div></div>
-        <div class="setting-row"><div><h3>Размер шрифта</h3><p>Код</p></div>
-          <div class="toggle-group" id="fontsize"><button data-v="12">12</button><button data-v="13">13</button><button data-v="14">14</button><button data-v="16">16</button><button data-v="18">18</button></div></div>
-      </div></div>
-    <div class="settings-section"><h2>Поддерживаемые файлы</h2>
-      <div class="card"><p style="font-size:13px;color:var(--text-muted);margin-bottom:12px">В редакторе:</p>
-        <div style="display:flex;flex-wrap:wrap;gap:8px" id="fileTypes"></div></div></div>
-    <div class="settings-section"><h2>Аккаунт</h2>
-      <div class="settings-grid"><div class="setting-row"><div><h3>Сброс настроек</h3><p>По умолчанию</p></div>
-        <button class="btn-ghost btn-sm" id="resetSettings">Сбросить</button></div></div></div>
+    <div class="page-head"><h1 id="tTitle">Настройки</h1></div>
+
+    <div class="settings-grid" style="max-width:560px">
+      <div class="setting-row">
+        <div><h3 id="tLang">Язык</h3><p id="tLangDesc">Интерфейс сайта</p></div>
+        <div class="toggle-group" id="lang">
+          <button type="button" data-v="ru">Русский</button>
+          <button type="button" data-v="en">English</button>
+        </div>
+      </div>
+      <div class="setting-row">
+        <div><h3 id="tTheme">Тема</h3><p id="tThemeDesc">Тёмная или светлая</p></div>
+        <div class="toggle-group" id="theme">
+          <button type="button" data-v="dark">Тёмная</button>
+          <button type="button" data-v="light">Светлая</button>
+        </div>
+      </div>
+      <div class="setting-row" style="flex-direction:column;align-items:flex-start">
+        <div><h3 id="tAccent">Акцент</h3><p id="tAccentDesc">Цвет кнопок</p></div>
+        <div class="swatches" id="accents" style="margin-top:12px">
+          <button type="button" class="swatch" data-c="#8b5cf6" style="background:#8b5cf6"></button>
+          <button type="button" class="swatch" data-c="#3b82f6" style="background:#3b82f6"></button>
+          <button type="button" class="swatch" data-c="#06b6d4" style="background:#06b6d4"></button>
+          <button type="button" class="swatch" data-c="#10b981" style="background:#10b981"></button>
+          <button type="button" class="swatch" data-c="#f59e0b" style="background:#f59e0b"></button>
+          <button type="button" class="swatch" data-c="#ef4444" style="background:#ef4444"></button>
+          <button type="button" class="swatch" data-c="#ec4899" style="background:#ec4899"></button>
+        </div>
+      </div>
+      <div class="setting-row">
+        <div><h3 id="tReset">Сброс</h3><p id="tResetDesc">Настройки по умолчанию</p></div>
+        <button type="button" class="btn-ghost btn-sm" id="reset">Сбросить</button>
+      </div>
+    </div>
   </main>
 </div>
-<nav class="mobile-nav"><a href="dashboard.html">Проекты</a><a href="create.html">Создать</a><a href="editor.html">Код</a><a href="neuro.html">Нейро</a><a href="settings.html" class="active">Ещё</a></nav>
-<script src="../js/core.js"></script>
+<nav class="mobile-nav">
+  <a href="dashboard.html">Сайты</a>
+  <a href="create.html">Собрать</a>
+  <a href="neuro.html">Нейро</a>
+  <a href="settings.html" class="active">Ещё</a>
+</nav>
+<script src="../js/core.js" defer></script>
 <script>
-  const session = AC.requireAuth();
+document.addEventListener('DOMContentLoaded', () => {
+  const session = AC.requireAuth('auth.html');
+  if (!session) return;
   let s = AC.getSettings();
+  if (!s.lang) s.lang = 'ru';
   AC.applyTheme(s);
-  document.getElementById('userLogin').textContent = session.login;
-  document.getElementById('logout').onclick = e => { e.preventDefault(); AC.clearSession(); location.href='../index.html'; };
-  document.getElementById('fileTypes').innerHTML = AC.FILE_TYPES.map(f => `<span class="chip" style="cursor:default">.${f.ext}</span>`).join('');
+  document.getElementById('userLogin').textContent = session.name || session.login;
+  document.getElementById('logout').onclick = e => {
+    e.preventDefault();
+    AC.clearSession();
+    location.href = 'auth.html';
+  };
+
+  const i18n = {
+    ru: {
+      tTitle: 'Настройки', tLang: 'Язык', tLangDesc: 'Интерфейс сайта',
+      tTheme: 'Тема', tThemeDesc: 'Тёмная или светлая', tAccent: 'Акцент', tAccentDesc: 'Цвет кнопок',
+      tReset: 'Сброс', tResetDesc: 'Настройки по умолчанию', saved: 'Сохранено', reset: 'Сброшено'
+    },
+    en: {
+      tTitle: 'Settings', tLang: 'Language', tLangDesc: 'Site interface',
+      tTheme: 'Theme', tThemeDesc: 'Dark or light', tAccent: 'Accent', tAccentDesc: 'Button color',
+      tReset: 'Reset', tResetDesc: 'Default settings', saved: 'Saved', reset: 'Reset done'
+    }
+  };
+
+  function applyLang() {
+    const L = i18n[s.lang] || i18n.ru;
+    Object.keys(L).forEach(k => {
+      const el = document.getElementById(k);
+      if (el) el.textContent = L[k];
+    });
+    document.documentElement.lang = s.lang || 'ru';
+  }
+
   function sync() {
-    const set = (id, key) => document.querySelectorAll('#' + id + ' button').forEach(b => {
-      const raw = b.dataset.v;
-      const val = ['1','0'].includes(raw) && typeof s[key] === 'boolean' ? (raw === '1') : (isNaN(+raw) ? raw : +raw);
-      b.classList.toggle('active', s[key] === val || String(s[key]) === String(val));
-    });
-    set('theme', 'theme'); set('tabs', 'tabsPosition'); set('animations', 'animations');
-    set('preview', 'showPreview'); set('autosave', 'autoSave'); set('wrap', 'wordWrap'); set('fontsize', 'fontSize');
-    document.querySelectorAll('#accents .swatch').forEach(b => b.classList.toggle('active', b.dataset.c === s.accent));
+    document.querySelectorAll('#lang button').forEach(b => b.classList.toggle('active', b.dataset.v === (s.lang || 'ru')));
+    document.querySelectorAll('#theme button').forEach(b => b.classList.toggle('active', b.dataset.v === (s.theme || 'dark')));
+    document.querySelectorAll('#accents .swatch').forEach(b => b.classList.toggle('active', b.dataset.c === (s.accent || '#8b5cf6')));
+    applyLang();
   }
-  function bind(id, key, cast) {
-    document.querySelectorAll('#' + id + ' button').forEach(b => b.onclick = () => {
-      s = AC.saveSettings({ [key]: cast ? cast(b.dataset.v) : b.dataset.v });
-      sync(); AC.toast('Сохранено');
-    });
-  }
-  bind('theme', 'theme'); bind('tabs', 'tabsPosition');
-  bind('animations', 'animations', v => v === '1');
-  bind('preview', 'showPreview', v => v === '1');
-  bind('autosave', 'autoSave', v => v === '1');
-  bind('wrap', 'wordWrap', v => v === '1');
-  bind('fontsize', 'fontSize', v => +v);
-  document.querySelectorAll('#accents .swatch').forEach(b => b.onclick = () => { s = AC.saveSettings({ accent: b.dataset.c }); sync(); AC.toast('Цвет обновлён'); });
-  document.getElementById('resetSettings').onclick = () => {
-    if (!confirm('Сбросить настройки?')) return;
-    localStorage.removeItem(AC.KEYS.settings); s = AC.getSettings(); AC.applyTheme(s); sync(); AC.toast('Сброшено');
+
+  document.querySelectorAll('#lang button').forEach(b => b.onclick = () => {
+    s = AC.saveSettings({ lang: b.dataset.v });
+    sync();
+    AC.toast(i18n[s.lang].saved);
+  });
+  document.querySelectorAll('#theme button').forEach(b => b.onclick = () => {
+    s = AC.saveSettings({ theme: b.dataset.v });
+    sync();
+    AC.toast(i18n[s.lang || 'ru'].saved);
+  });
+  document.querySelectorAll('#accents .swatch').forEach(b => b.onclick = () => {
+    s = AC.saveSettings({ accent: b.dataset.c });
+    sync();
+    AC.toast(i18n[s.lang || 'ru'].saved);
+  });
+  document.getElementById('reset').onclick = () => {
+    if (!confirm(s.lang === 'en' ? 'Reset settings?' : 'Сбросить настройки?')) return;
+    localStorage.removeItem(AC.KEYS.settings);
+    s = AC.getSettings();
+    AC.applyTheme(s);
+    sync();
+    AC.toast(i18n[s.lang || 'ru'].reset);
   };
   sync();
+});
 </script>
 </body>
 </html>
