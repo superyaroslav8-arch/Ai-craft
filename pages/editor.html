@@ -9,7 +9,7 @@
 <body>
 <div class="app">
   <aside class="sidebar">
-    <a href="../index.html" class="logo"><span class="logo-mark">✦</span> Ai крафт</a>
+    <a href="../index.html" class="logo">Ai крафт</a>
     <nav class="side-nav">
       <a href="dashboard.html">Проекты</a>
       <a href="create.html">Создать сайт</a>
@@ -24,88 +24,148 @@
   <main class="main" style="padding-top:16px">
     <div class="page-head">
       <h1 id="title">Редактор</h1>
-      <div style="display:flex;gap:8px;flex-wrap:wrap">
+      <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
         <select id="siteSelect" style="padding:8px 12px;border-radius:10px;border:1px solid var(--border);background:var(--surface);color:var(--text)"></select>
+        <button class="btn-ghost btn-sm" id="addFileBtn">+ Файл</button>
         <button class="btn-ghost btn-sm" id="previewBtn">Предпросмотр</button>
         <button class="btn-primary btn-sm" id="saveBtn">Сохранить</button>
       </div>
     </div>
     <div class="editor-shell">
       <div class="editor-toolbar">
-        <span style="font-size:12px;color:var(--text-muted)">Вкладки HTML · CSS · JS</span>
-        <span style="font-size:12px;color:var(--text-muted)">Позиция вкладок — в Настройках</span>
+        <span>HTML CSS JS TS JSON MD SVG PY PHP и другие</span>
+        <span id="activeFileLabel">—</span>
       </div>
-      <div class="editor-body">
+      <div class="editor-body with-files" id="editorBody">
+        <div class="file-list" id="fileList"></div>
         <div class="editor-code" id="codePane">
-          <div class="editor-tabs" id="tabs">
-            <button class="tab active" data-file="index.html">index.html</button>
-            <button class="tab" data-file="style.css">style.css</button>
-            <button class="tab" data-file="script.js">script.js</button>
-          </div>
+          <div class="editor-tabs" id="tabs"></div>
           <div class="editor-area"><textarea id="code" spellcheck="false"></textarea></div>
         </div>
-        <div class="editor-preview"><iframe id="frame" title="preview"></iframe></div>
+        <div class="editor-preview" id="previewPane"><iframe id="frame" title="preview"></iframe></div>
       </div>
     </div>
   </main>
 </div>
+<nav class="mobile-nav">
+  <a href="dashboard.html">Проекты</a><a href="create.html">Создать</a>
+  <a href="editor.html" class="active">Код</a><a href="neuro.html">Нейро</a><a href="settings.html">Ещё</a>
+</nav>
 <script src="../js/core.js"></script>
 <script>
   const session = AC.requireAuth();
-  AC.applyTheme();
+  const settings = AC.getSettings();
+  AC.applyTheme(settings);
   document.getElementById('userLogin').textContent = session.login;
   document.getElementById('logout').onclick = e => { e.preventDefault(); AC.clearSession(); location.href='../index.html'; };
+  const codeEl = document.getElementById('code');
+  codeEl.style.whiteSpace = settings.wordWrap ? 'pre-wrap' : 'pre';
+  if (!settings.showPreview) document.getElementById('previewPane').style.display = 'none';
   const params = new URLSearchParams(location.search);
   let sites = AC.getUserSites(session.login);
   let currentId = params.get('id') || sites[0]?.id;
-  let files = { 'index.html': '', 'style.css': '', 'script.js': '' };
+  let files = {};
   let active = 'index.html';
+  let openTabs = [];
   const select = document.getElementById('siteSelect');
   select.innerHTML = sites.map(s => `<option value="${s.id}">${AC.escapeHtml(s.name)}</option>`).join('') || '<option>Нет проектов</option>';
   if (currentId) select.value = currentId;
+  function fileNames() { return Object.keys(files).sort(); }
+  function renderFileList() {
+    const list = document.getElementById('fileList');
+    list.innerHTML = fileNames().map(f =>
+      `<button type="button" class="${f === active ? 'active' : ''}" data-f="${AC.escapeHtml(f)}">${AC.escapeHtml(f)}</button>`
+    ).join('') + `<button type="button" class="add-file" id="addFileSide">+ Новый файл</button>`;
+    list.querySelectorAll('[data-f]').forEach(b => b.onclick = () => openFile(b.dataset.f));
+    const add = document.getElementById('addFileSide');
+    if (add) add.onclick = () => addFile();
+  }
+  function renderTabs() {
+    const tabs = document.getElementById('tabs');
+    if (!openTabs.includes(active)) openTabs.push(active);
+    openTabs = openTabs.filter(t => files[t] !== undefined);
+    tabs.innerHTML = openTabs.map(f =>
+      `<button class="tab ${f === active ? 'active' : ''}" data-f="${AC.escapeHtml(f)}">${AC.escapeHtml(f)}</button>`
+    ).join('');
+    tabs.querySelectorAll('.tab').forEach(t => t.onclick = () => openFile(t.dataset.f));
+    document.getElementById('activeFileLabel').textContent = active;
+  }
+  function openFile(name) {
+    files[active] = codeEl.value;
+    active = name;
+    if (!openTabs.includes(name)) openTabs.push(name);
+    codeEl.value = files[name] || '';
+    renderFileList(); renderTabs(); refreshPreview();
+  }
+  function addFile() {
+    const types = AC.FILE_TYPES.map(t => t.ext).join(', ');
+    const name = prompt('Имя файла (about.html, app.ts, data.json):\n' + types);
+    if (!name) return;
+    const clean = name.trim().replace(/[^a-zA-Z0-9._-]/g, '');
+    if (!clean || clean.includes('..')) return alert('Некорректное имя');
+    if (files[clean] !== undefined) return alert('Файл уже есть');
+    files[clean] = '';
+    openFile(clean);
+    AC.toast('Файл создан');
+  }
+  function refreshPreview() {
+    if (!settings.showPreview) return;
+    const html = files['index.html'] || files[Object.keys(files).find(f => f.endsWith('.html'))] || '';
+    const css = [files['style.css'], files['styles.css'], files['main.css']].filter(Boolean).join('\n');
+    const js = [files['script.js'], files['main.js'], files['app.js']].filter(Boolean).join('\n');
+    let doc = html;
+    if (!doc) {
+      document.getElementById('frame').srcdoc = '<p style="padding:20px;font-family:system-ui;color:#666">Нет HTML</p>';
+      return;
+    }
+    if (doc.includes('</head>')) doc = doc.replace('</head>', `<style>${css}</style></head>`);
+    else doc = `<style>${css}</style>` + doc;
+    if (doc.includes('src="script.js"')) doc = doc.replace(/<script src="script\.js"><\/script>/, `<script>${js}<\/script>`);
+    else doc += `<script>${js}<\/script>`;
+    document.getElementById('frame').srcdoc = doc;
+  }
   function loadSite(id) {
     sites = AC.getUserSites(session.login);
     const site = sites.find(s => s.id === id);
     if (!site) return;
     currentId = id;
-    files = { 'index.html': '', 'style.css': '', 'script.js': '', ...(site.files || {}) };
+    files = { ...(site.files || {}) };
+    if (!Object.keys(files).length) files = { 'index.html': '<!-- start -->', 'style.css': '/* css */', 'script.js': '// js' };
+    active = files['index.html'] !== undefined ? 'index.html' : fileNames()[0];
+    openTabs = [active];
     document.getElementById('title').textContent = site.name;
-    document.getElementById('code').value = files[active] || '';
+    codeEl.value = files[active] || '';
+    renderFileList(); renderTabs(); refreshPreview();
+  }
+  let saveTimer;
+  codeEl.addEventListener('input', () => {
+    files[active] = codeEl.value;
     refreshPreview();
-  }
-  function refreshPreview() {
-    let doc = files['index.html'] || '';
-    const css = files['style.css'] || '';
-    const js = files['script.js'] || '';
-    if (doc.includes('</head>')) doc = doc.replace('</head>', `<style>${css}</style></head>`);
-    else doc = `<style>${css}</style>` + doc;
-    if (doc.includes('src="script.js"')) doc = doc.replace('<script src="script.js"></script>', `<script>${js}<\/script>`);
-    else doc += `<script>${js}<\/script>`;
-    document.getElementById('frame').srcdoc = doc;
-  }
-  document.getElementById('code').addEventListener('input', e => { files[active] = e.target.value; refreshPreview(); });
-  document.querySelectorAll('#tabs .tab').forEach(tab => {
-    tab.onclick = () => {
-      files[active] = document.getElementById('code').value;
-      document.querySelectorAll('#tabs .tab').forEach(t => t.classList.remove('active'));
-      tab.classList.add('active');
-      active = tab.dataset.file;
-      document.getElementById('code').value = files[active] || '';
-    };
+    if (settings.autoSave && currentId) {
+      clearTimeout(saveTimer);
+      saveTimer = setTimeout(() => AC.updateSite(session.login, currentId, { files: { ...files } }), 800);
+    }
   });
   select.onchange = () => loadSite(select.value);
+  document.getElementById('addFileBtn').onclick = addFile;
   document.getElementById('saveBtn').onclick = () => {
-    files[active] = document.getElementById('code').value;
+    files[active] = codeEl.value;
+    if (!currentId) return alert('Сначала создай проект');
     AC.updateSite(session.login, currentId, { files: { ...files } });
-    const b = document.getElementById('saveBtn');
-    b.textContent = 'Сохранено'; setTimeout(() => b.textContent = 'Сохранить', 1200);
+    AC.toast('Сохранено');
   };
   document.getElementById('previewBtn').onclick = () => {
-    files[active] = document.getElementById('code').value; refreshPreview();
-    const w = window.open('', '_blank'); w.document.write(document.getElementById('frame').srcdoc); w.document.close();
+    files[active] = codeEl.value; refreshPreview();
+    const w = window.open('', '_blank');
+    w.document.write(document.getElementById('frame').srcdoc);
+    w.document.close();
   };
   if (currentId) loadSite(currentId);
-  else document.getElementById('code').value = '<!-- Создай сайт в разделе «Создать сайт» -->';
+  else {
+    codeEl.value = '<!-- Создай сайт в «Создать сайт» -->';
+    files = { 'index.html': codeEl.value };
+    renderFileList(); renderTabs();
+  }
 </script>
 </body>
 </html>
