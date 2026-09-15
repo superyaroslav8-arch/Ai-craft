@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Создать сайт — Ai крафт</title>
+  <title>Создать сайт с ИИ — Ai крафт</title>
   <link rel="stylesheet" href="../css/style.css">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@600;700&display=swap" rel="stylesheet">
 </head>
@@ -13,40 +13,59 @@
     <a href="../index.html" class="logo">Ai крафт</a>
     <nav class="side-nav">
       <a href="dashboard.html">Проекты</a>
-      <a href="create.html" class="active">Создать сайт</a>
-      <a href="editor.html">Редактор кода</a>
-      <a href="links.html">Ссылки</a>
+      <a href="create.html" class="active">Создать с ИИ</a>
+      <a href="editor.html">Редактор</a>
       <a href="neuro.html">Нейро</a>
       <a href="settings.html">Настройки</a>
-      <a href="media.html">Медиа AI</a>
+      <a href="links.html">Ссылки</a>
+      <a href="media.html">Медиа</a>
     </nav>
     <div class="side-user"><strong id="userLogin">—</strong><a href="#" id="logout">Выйти</a></div>
   </aside>
   <main class="main">
-    <div class="page-head"><h1>Опиши идею — соберём сайт</h1></div>
+    <div class="page-head">
+      <div>
+        <h1>Создать сайт с ИИ</h1>
+        <p style="color:var(--text-muted);font-size:14px;margin-top:6px">Опишите идею слева — справа ИИ покажет результат</p>
+      </div>
+    </div>
     <div class="create-layout">
       <div class="prompt-box">
-        <h2>Ваша идея</h2>
-        <p class="hint">Обычными словами: ниша, стиль, что на сайте.</p>
-        <div class="form-group"><label>Описание</label><textarea id="desc" placeholder="Сайт кофейни. Тёплый свет, меню, контакты."></textarea></div>
-        <div class="form-group"><label>Поддомен</label><input id="sub" placeholder="pauza" autocomplete="off"></div>
+        <h2>Ваше описание</h2>
+        <p class="hint">Чем конкретнее — тем лучше. Ниша, аудитория, стиль, разделы.</p>
+        <div class="form-group">
+          <label>Описание сайта</label>
+          <textarea id="desc" placeholder="Сайт кофейни. Тёплый минимализм. Меню, о нас, контакты, кнопка «Забронировать»."></textarea>
+        </div>
+        <div class="form-group">
+          <label>Имя / поддомен (латиница)</label>
+          <input id="sub" placeholder="pauza" autocomplete="off">
+        </div>
+        <div style="font-size:12px;color:var(--text-muted);margin-bottom:8px">Домен</div>
         <div class="domain-row" id="domains">
           <span class="chip active" data-d="ai_craft.ru">.ai_craft.ru</span>
           <span class="chip" data-d="ai_craft.com">.ai_craft.com</span>
           <span class="chip" data-d="ai_craft.dev">.ai_craft.dev</span>
         </div>
-        <button class="btn-primary" id="build" type="button">Собрать сайт</button>
+        <button class="btn-primary btn-block" id="build" type="button" style="margin-top:8px">Собрать сайт с ИИ</button>
+        <p style="margin-top:14px;font-size:12px;color:var(--text-muted)">После сборки можно уточнить детали в редакторе.</p>
       </div>
       <div class="preview-panel">
-        <div class="preview-bar"><span class="dot r"></span><span class="dot y"></span><span class="dot g"></span><span id="prevUrl">предпросмотр</span></div>
+        <div class="preview-bar">
+          <span class="dot r"></span><span class="dot y"></span><span class="dot g"></span>
+          <span id="prevUrl">предпросмотр</span>
+        </div>
         <iframe class="preview-frame" id="preview" title="preview"></iframe>
       </div>
     </div>
   </main>
 </div>
 <nav class="mobile-nav">
-  <a href="dashboard.html">Проекты</a><a href="create.html" class="active">Создать</a>
-  <a href="editor.html">Код</a><a href="neuro.html">Нейро</a><a href="settings.html">Ещё</a>
+  <a href="dashboard.html">Проекты</a>
+  <a href="create.html" class="active">Создать</a>
+  <a href="editor.html">Код</a>
+  <a href="neuro.html">Нейро</a>
+  <a href="settings.html">Ещё</a>
 </nav>
 <script src="../js/core.js"></script>
 <script>
@@ -60,11 +79,11 @@
     c.classList.add('active'); domain = c.dataset.d; live();
   });
   function live() {
-    const desc = document.getElementById('desc').value.trim() || 'Ваша идея уже обретает форму.';
+    const desc = document.getElementById('desc').value.trim() || 'Здесь появится ваш сайт по описанию.';
     const sub = document.getElementById('sub').value.trim() || 'project';
     const html = AC.generateSiteHTML(desc, sub);
     const css = AC.generateSiteCSS();
-    document.getElementById('preview').srcdoc = html.replace('</head>', '<style>' + css + '</style></head>').replace('<script src="script.js"><\/script>', '');
+    document.getElementById('preview').srcdoc = html.replace('</head>', '<style>' + css + '</style></head>').replace(/<script src="script.js"><\/script>/, '');
     document.getElementById('prevUrl').textContent = sub + '.' + domain;
   }
   document.getElementById('desc').oninput = live;
@@ -73,10 +92,10 @@
   document.getElementById('build').onclick = () => {
     const desc = document.getElementById('desc').value.trim();
     let sub = document.getElementById('sub').value.trim().toLowerCase().replace(/[^a-z0-9-]/g, '');
-    if (!desc) { AC.toast('Опиши идею сайта'); return; }
-    if (sub.length < 3) { AC.toast('Поддомен минимум 3 символа'); return; }
+    if (!desc) { AC.toast('Напишите описание сайта'); return; }
+    if (sub.length < 3) { AC.toast('Поддомен — минимум 3 латинских символа'); return; }
     const btn = document.getElementById('build');
-    btn.disabled = true; btn.textContent = 'Собираем…';
+    btn.disabled = true; btn.textContent = 'ИИ собирает сайт…';
     setTimeout(() => {
       const site = AC.createSite(session.login, {
         name: sub, subdomain: sub, domain, description: desc,
@@ -86,9 +105,9 @@
           'script.js': 'console.log("Ai крафт");'
         }
       });
-      AC.toast('Сайт готов');
+      AC.toast('Сайт собран');
       location.href = 'editor.html?id=' + site.id;
-    }, 900);
+    }, 1100);
   };
 </script>
 </body>
