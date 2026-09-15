@@ -4,440 +4,1648 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Ai-craft</title>
-  <meta name="description" content="Создание сайтов по описанию, доменов и ссылок — бесплатно.">
+  <meta name="description" content="Ai-craft — создание сайтов и проверка доменов.">
   <link rel="stylesheet" href="css/app.css">
-  <style>
-    .cam{width:100%;max-width:220px;aspect-ratio:1;border-radius:16px;overflow:hidden;background:#0a0a0a;margin:8px auto;border:1px solid var(--border)}
-    .cam video,.cam img{width:100%;height:100%;object-fit:cover;display:block}
-    .cam img{display:none}.cam.shot video{display:none}.cam.shot img{display:block}
-  </style>
 </head>
 <body>
-<div id="gate" class="wrap center" style="display:none;max-width:400px">
-  <p class="badge">100% бесплатно</p>
+<div id="gate" class="wrap center" style="display:none;max-width:420px">
+  <p class="badge">Ai-craft</p>
   <h1>Ai-craft</h1>
-  <p class="lead" data-i18n="gateLead">Почта и пароль обязательны. Фото и имя — по желанию.</p>
-  <div class="chips" style="justify-content:center;margin-bottom:12px">
-    <span class="chip on" id="tabLogin" data-i18n="login">Вход</span>
-    <span class="chip" id="tabReg" data-i18n="register">Регистрация</span>
+  <p class="lead">
+    Создавайте сайты по описанию и управляйте своими доменами.
+  </p>
+  <div class="chips auth-tabs">
+    <span class="chip on" id="tabLogin">Вход</span>
+    <span class="chip" id="tabReg">Регистрация</span>
   </div>
   <div style="text-align:left">
     <div id="regOnly" style="display:none">
-      <label data-i18n="nameOpt">Имя (необязательно)</label>
-      <input id="name" maxlength="32" placeholder="Имя">
-      <label data-i18n="photoOpt">Фото (необязательно)</label>
-      <div class="cam" id="camBox">
-        <video id="video" autoplay playsinline muted></video>
-        <canvas id="canvas" style="display:none"></canvas>
-        <img id="snap" alt="">
-      </div>
-      <div class="chips" style="margin-bottom:8px">
-        <button type="button" class="chip" id="btnCam" data-i18n="camOn">Камера</button>
-        <button type="button" class="chip" id="btnSnap" style="display:none" data-i18n="camSnap">Снять</button>
-        <label class="chip" style="cursor:pointer"><span data-i18n="camFile">Файл</span><input id="photoFile" type="file" accept="image/*" style="display:none"></label>
-      </div>
+      <label>Имя</label>
+      <input id="name" maxlength="32" placeholder="Ваше имя">
     </div>
-    <label data-i18n="email">Почта *</label>
-    <input id="email" type="email" placeholder="you@mail.com" autocomplete="email">
-    <label data-i18n="password">Пароль * (от 6)</label>
-    <input id="password" type="password" placeholder="••••••" autocomplete="current-password">
-    <p id="authErr" style="color:#f87171;font-size:13px;margin-top:8px;display:none"></p>
-    <button class="btn" id="authBtn" type="button" style="width:100%;margin-top:16px" data-i18n="btnLogin">Войти</button>
+    <label>Почта *</label>
+    <input
+      id="email"
+      type="email"
+      placeholder="you@mail.com"
+      autocomplete="email"
+    >
+    <label>Пароль * (от 6 символов)</label>
+    <input
+      id="password"
+      type="password"
+      placeholder="••••••"
+      autocomplete="current-password"
+    >
+    <p
+      id="authErr"
+      class="error"
+      style="display:none"
+    ></p>
+    <button
+      class="btn"
+      id="authBtn"
+      type="button"
+      style="width:100%;margin-top:16px"
+    >
+      Войти
+    </button>
   </div>
-  <footer class="foot">+7 (900) 237-32-22 · superyaroslav8@iCloud.com</footer>
+  <footer class="foot">
+    Поддержка: +7 (900) 237-32-22 · superyaroslav8@iCloud.com
+  </footer>
 </div>
-
 <div class="app" id="shell" style="display:none">
   <aside class="side">
     <div class="brand">Ai-craft</div>
-    <p class="tag" data-i18n="tag">Сайты · домены · ссылки</p>
+    <p class="tag">
+      Сайты · домены · управление
+    </p>
     <nav>
-      <a href="#sites" data-page="sites" data-i18n="navSites">Мои сайты</a>
-      <a href="#create" data-page="create" data-i18n="navCreate">Собрать сайт</a>
-      <a href="#links" data-page="links" data-i18n="navLinks">Ссылки</a>
-      <a href="#settings" data-page="settings" data-i18n="navSettings">Настройки</a>
+      <a
+        href="#home"
+        data-page="home"
+      >
+        Главная
+      </a>
+      <a
+        href="#create"
+        data-page="create"
+      >
+        Создать сайт
+      </a>
+      <a
+        href="#domains"
+        data-page="domains"
+      >
+        Домены
+      </a>
+      <a
+        href="#settings"
+        data-page="settings"
+      >
+        Настройки
+      </a>
     </nav>
     <div class="user">
-      <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">
-        <img id="avatar" width="32" height="32" style="border-radius:8px;object-fit:cover;display:none;background:var(--border)" alt="">
+      <div class="user-line">
+        <img
+          id="avatar"
+          width="32"
+          height="32"
+          style="display:none"
+          alt=""
+        >
         <strong id="who">—</strong>
       </div>
-      <a href="#" id="logout" data-i18n="logout">Выйти</a>
+      <a href="#" id="logout">
+        Выйти
+      </a>
     </div>
   </aside>
   <main class="main">
-    <section class="page" id="page-sites">
-      <h2 data-i18n="sitesTitle">Мои сайты</h2>
-      <p class="sub" data-i18n="sitesSub">Сайты по описанию и их адреса</p>
-      <a class="btn" href="#create" data-i18n="sitesBtn">+ Собрать сайт</a>
-      <div id="siteList" style="margin-top:20px"></div>
+    <!-- ГЛАВНАЯ -->
+    <section
+      class="page"
+      id="page-home"
+    >
+      <div class="page-head">
+        <div>
+          <h2>Главная</h2>
+          <p class="sub">
+            Все ваши сайты, домены и ссылки в одном месте.
+          </p>
+        </div>
+        <a
+          class="btn"
+          href="#create"
+        >
+          + Создать сайт
+        </a>
+      </div>
+      <div class="stats">
+        <div class="stat">
+          <span>Сайты</span>
+          <strong id="statSites">0</strong>
+        </div>
+        <div class="stat">
+          <span>Домены</span>
+          <strong id="statDomains">0</strong>
+        </div>
+        <div class="stat">
+          <span>Ссылки</span>
+          <strong id="statLinks">0</strong>
+        </div>
+      </div>
+      <div class="section-title">
+        Мои проекты
+      </div>
+      <div id="siteList"></div>
+      <div class="section-title">
+        Мои домены
+      </div>
+      <div id="domainList"></div>
+      <div class="section-title">
+        Мои ссылки
+      </div>
+      <div id="linkList"></div>
     </section>
-
-    <section class="page" id="page-create">
-      <h2 data-i18n="createTitle">Собрать сайт</h2>
-      <p class="sub" data-i18n="createSub">Описание → превью → домен → сохранить</p>
+    <!-- СОЗДАНИЕ САЙТА -->
+    <section
+      class="page"
+      id="page-create"
+    >
+      <h2>Создать сайт</h2>
+      <p class="sub">
+        Опишите сайт обычными словами — Ai-craft создаст основу проекта.
+      </p>
       <div class="grid">
         <div>
-          <label data-i18n="idea">Описание сайта</label>
-          <textarea id="idea" placeholder="Сайт кофейни: меню, контакты"></textarea>
-          <button class="btn" id="btnBuild" type="button" style="margin-top:12px" data-i18n="build">Собрать</button>
-          <div id="addrBox" style="display:none;margin-top:18px">
-            <label data-i18n="domain">Домен / адрес</label>
+          <label>
+            Что нужно создать?
+          </label>
+          <textarea
+            id="idea"
+            placeholder="Например: сайт Лаборатории 3D с каталогом товаров, описанием услуг, контактами и красивым современным дизайном."
+          ></textarea>
+          <button
+            class="btn"
+            id="btnBuild"
+            type="button"
+            style="margin-top:12px"
+          >
+            Создать сайт
+          </button>
+          <div
+            id="addrBox"
+            style="display:none;margin-top:20px"
+          >
+            <div class="section-title">
+              Адрес сайта
+            </div>
             <div class="chips">
-              <span class="chip on" data-mode="sub" data-i18n="subdomain">Поддомен</span>
-              <span class="chip" data-mode="custom" data-i18n="customDomain">Свой домен</span>
+              <span
+                class="chip on"
+                data-mode="sub"
+              >
+                Внутренний адрес
+              </span>
+              <span
+                class="chip"
+                data-mode="custom"
+              >
+                Свой домен
+              </span>
             </div>
             <div id="subRow">
-              <input id="sub" placeholder="name" style="margin-bottom:8px">
+              <label>
+                Имя
+              </label>
+              <input
+                id="sub"
+                placeholder="my-site"
+              >
+              <label>
+                Доменная зона
+              </label>
               <select id="tld">
-                <option value="ai_craft.ru">.ai_craft.ru</option>
-                <option value="ai_craft.com">.ai_craft.com</option>
-                <option value="ai_craft.dev">.ai_craft.dev</option>
+                <option value="ai_craft.ru">
+                  .ai_craft.ru
+                </option>
+                <option value="ai_craft.com">
+                  .ai_craft.com
+                </option>
+                <option value="ai_craft.dev">
+                  .ai_craft.dev
+                </option>
               </select>
             </div>
-            <div id="customRow" style="display:none"><input id="customDomain" placeholder="mysite.ru"></div>
-            <button class="btn" id="btnSave" type="button" style="margin-top:12px" data-i18n="save">Сохранить</button>
+            <div
+              id="customRow"
+              style="display:none"
+            >
+              <label>
+                Ваш домен
+              </label>
+              <input
+                id="customDomain"
+                placeholder="mysite.ru"
+              >
+            </div>
+            <button
+              class="btn secondary"
+              id="btnCheckSiteDomain"
+              type="button"
+              style="margin-top:12px"
+            >
+              Проверить домен
+            </button>
+            <div
+              id="siteDomainResult"
+              class="domain-result"
+            ></div>
+            <button
+              class="btn"
+              id="btnSave"
+              type="button"
+              style="margin-top:12px"
+            >
+              Сохранить сайт
+            </button>
           </div>
         </div>
-        <div><div class="preview"><iframe id="preview" title="preview"></iframe></div></div>
+        <div>
+          <div class="preview">
+            <iframe
+              id="preview"
+              title="Предпросмотр сайта"
+            ></iframe>
+          </div>
+        </div>
       </div>
     </section>
-
-    <section class="page" id="page-links">
-      <h2 data-i18n="linksTitle">Ссылки</h2>
-      <p class="sub" data-i18n="linksSub">Короткие ссылки для сайтов</p>
-      <label data-i18n="linkName">Название</label><input id="linkTitle">
-      <label>URL</label><input id="linkUrl" placeholder="https://…">
-      <button class="btn" id="btnLink" type="button" style="margin-top:12px" data-i18n="linkCreate">Создать ссылку</button>
-      <div id="linkList" style="margin-top:16px"></div>
+    <!-- ДОМЕНЫ -->
+    <section
+      class="page"
+      id="page-domains"
+    >
+      <h2>Домены</h2>
+      <p class="sub">
+        Подберите доменное имя и проверьте его доступность.
+      </p>
+      <div class="card">
+        <label>
+          Название домена
+        </label>
+        <input
+          id="domainName"
+          placeholder="laboratoria3d"
+          autocomplete="off"
+        >
+        <label>
+          Доменная зона
+        </label>
+        <select id="domainTld">
+          <option value=".ru">.ru</option>
+          <option value=".com">.com</option>
+          <option value=".dev">.dev</option>
+        </select>
+        <button
+          class="btn"
+          id="btnDomainCheck"
+          type="button"
+          style="margin-top:14px"
+        >
+          Проверить домен
+        </button>
+        <div
+          id="domainResult"
+          class="domain-result"
+        ></div>
+      </div>
+      <div class="card">
+        <h3>
+          Автоматический подбор
+        </h3>
+        <p class="sub">
+          Введите название — Ai-craft проверит несколько популярных зон.
+        </p>
+        <input
+          id="autoDomainName"
+          placeholder="например: ai-craft"
+        >
+        <button
+          class="btn secondary"
+          id="btnAutoDomain"
+          type="button"
+          style="margin-top:12px"
+        >
+          Подобрать домен
+        </button>
+        <div
+          id="autoDomainResults"
+          style="margin-top:16px"
+        ></div>
+      </div>
+      <div class="section-title">
+        Сохранённые домены
+      </div>
+      <div id="savedDomains"></div>
     </section>
-
-    <section class="page" id="page-settings">
-      <h2 data-i18n="settingsTitle">Настройки</h2>
+    <!-- НАСТРОЙКИ -->
+    <section
+      class="page"
+      id="page-settings"
+    >
+      <h2>Настройки</h2>
+      <p class="sub">
+        Настройте внешний вид Ai-craft.
+      </p>
       <div class="row">
-        <div><strong data-i18n="lang">Язык</strong></div>
-        <div class="chips" id="lang">
-          <span class="chip" data-v="ru">Русский</span>
-          <span class="chip" data-v="en">English</span>
+        <div>
+          <strong>Язык</strong>
+        </div>
+        <div
+          class="chips"
+          id="lang"
+        >
+          <span
+            class="chip"
+            data-v="ru"
+          >
+            Русский
+          </span>
+          <span
+            class="chip"
+            data-v="en"
+          >
+            English
+          </span>
         </div>
       </div>
       <div class="row">
-        <div><strong data-i18n="theme">Тема</strong></div>
-        <div class="chips" id="theme">
-          <span class="chip" data-v="dark" data-i18n="dark">Тёмная</span>
-          <span class="chip" data-v="light" data-i18n="light">Светлая</span>
+        <div>
+          <strong>Тема</strong>
+        </div>
+        <div
+          class="chips"
+          id="theme"
+        >
+          <span
+            class="chip"
+            data-v="dark"
+          >
+            Тёмная
+          </span>
+          <span
+            class="chip"
+            data-v="light"
+          >
+            Светлая
+          </span>
         </div>
       </div>
-      <div class="row" style="flex-wrap:wrap">
-        <div><strong data-i18n="accent">Цвет</strong></div>
-        <div class="chips" id="accent">
-          <span class="chip" data-v="#8b5cf6" style="background:#8b5cf6;color:#fff">●</span>
-          <span class="chip" data-v="#3b82f6" style="background:#3b82f6;color:#fff">●</span>
-          <span class="chip" data-v="#10b981" style="background:#10b981;color:#fff">●</span>
-          <span class="chip" data-v="#f59e0b" style="background:#f59e0b;color:#fff">●</span>
+      <div class="row">
+        <div>
+          <strong>Акцентный цвет</strong>
+        </div>
+        <div
+          class="chips"
+          id="accent"
+        >
+          <span
+            class="chip color-chip"
+            data-v="#3b82f6"
+            style="background:#3b82f6"
+          ></span>
+          <span
+            class="chip color-chip"
+            data-v="#8b5cf6"
+            style="background:#8b5cf6"
+          ></span>
+          <span
+            class="chip color-chip"
+            data-v="#f59e0b"
+            style="background:#f59e0b"
+          ></span>
+          <span
+            class="chip color-chip"
+            data-v="#ef4444"
+            style="background:#ef4444"
+          ></span>
+          <span
+            class="chip color-chip"
+            data-v="#ffffff"
+            style="background:#ffffff"
+          ></span>
         </div>
       </div>
-      <p class="sub" style="margin-top:20px">+7 (900) 237-32-22 · superyaroslav8@iCloud.com</p>
+      <div class="card info-card">
+        <h3>О доменах</h3>
+        <p>
+          Ai-craft проверяет доступность доменного имени через RDAP.
+          Проверка не означает регистрацию домена.
+        </p>
+        <p>
+          Для настоящей регистрации потребуется подключение
+          официального регистратора доменов.
+        </p>
+      </div>
+      <div class="card">
+        <h3>Поддержка</h3>
+        <p class="sub">
+          +7 (900) 237-32-22<br>
+          superyaroslav8@iCloud.com
+        </p>
+      </div>
     </section>
   </main>
 </div>
 <nav class="mob">
-  <a href="#sites" data-page="sites" data-i18n="navSites">Сайты</a>
-  <a href="#create" data-page="create" data-i18n="navCreate">Собрать</a>
-  <a href="#links" data-page="links" data-i18n="navLinks">Ссылки</a>
-  <a href="#settings" data-page="settings" data-i18n="navSettings">Ещё</a>
+  <a
+    href="#home"
+    data-page="home"
+  >
+    Главная
+  </a>
+  <a
+    href="#create"
+    data-page="create"
+  >
+    Создать
+  </a>
+  <a
+    href="#domains"
+    data-page="domains"
+  >
+    Домены
+  </a>
+  <a
+    href="#settings"
+    data-page="settings"
+  >
+    Настройки
+  </a>
 </nav>
-
 <script src="js/app.js"></script>
 <script>
 (function () {
   if (typeof AK === 'undefined') {
-    document.body.innerHTML = '<div class="wrap center"><h1>Ai-craft</h1><p>Ctrl+F5</p></div>';
+    document.body.innerHTML =
+      '<div class="wrap center">' +
+      '<h1>Ai-craft</h1>' +
+      '<p>Ошибка загрузки приложения.</p>' +
+      '</div>';
     return;
   }
-
-  var I18N = {
-    ru: {
-      gateLead: 'Почта и пароль обязательны. Фото и имя — по желанию.',
-      login: 'Вход', register: 'Регистрация', nameOpt: 'Имя (необязательно)', photoOpt: 'Фото (необязательно)',
-      camOn: 'Камера', camSnap: 'Снять', camFile: 'Файл', email: 'Почта *', password: 'Пароль * (от 6)',
-      btnLogin: 'Войти', btnReg: 'Зарегистрироваться', tag: 'Сайты · домены · ссылки',
-      navSites: 'Мои сайты', navCreate: 'Собрать сайт', navLinks: 'Ссылки', navSettings: 'Настройки', logout: 'Выйти',
-      sitesTitle: 'Мои сайты', sitesSub: 'Сайты по описанию и их адреса', sitesBtn: '+ Собрать сайт',
-      createTitle: 'Собрать сайт', createSub: 'Описание → превью → домен → сохранить', idea: 'Описание сайта',
-      build: 'Собрать', domain: 'Домен / адрес', subdomain: 'Поддомен', customDomain: 'Свой домен', save: 'Сохранить',
-      linksTitle: 'Ссылки', linksSub: 'Короткие ссылки для сайтов', linkName: 'Название', linkCreate: 'Создать ссылку',
-      settingsTitle: 'Настройки', lang: 'Язык', theme: 'Тема', dark: 'Тёмная', light: 'Светлая', accent: 'Цвет',
-      noSites: 'Нет сайтов', open: 'Открыть', del: 'Удалить', emptyLinks: 'Пока нет ссылок', copy: 'Копировать'
-    },
-    en: {
-      gateLead: 'Email and password required. Name and photo optional.',
-      login: 'Sign in', register: 'Sign up', nameOpt: 'Name (optional)', photoOpt: 'Photo (optional)',
-      camOn: 'Camera', camSnap: 'Capture', camFile: 'File', email: 'Email *', password: 'Password * (min 6)',
-      btnLogin: 'Sign in', btnReg: 'Create account', tag: 'Sites · domains · links',
-      navSites: 'My sites', navCreate: 'Build site', navLinks: 'Links', navSettings: 'Settings', logout: 'Log out',
-      sitesTitle: 'My sites', sitesSub: 'Sites from description and addresses', sitesBtn: '+ Build site',
-      createTitle: 'Build site', createSub: 'Description → preview → domain → save', idea: 'Site description',
-      build: 'Build', domain: 'Domain / address', subdomain: 'Subdomain', customDomain: 'Custom domain', save: 'Save',
-      linksTitle: 'Links', linksSub: 'Short links for your sites', linkName: 'Title', linkCreate: 'Create link',
-      settingsTitle: 'Settings', lang: 'Language', theme: 'Theme', dark: 'Dark', light: 'Light', accent: 'Accent',
-      noSites: 'No sites yet', open: 'Open', del: 'Delete', emptyLinks: 'No links yet', copy: 'Copy'
-    }
-  };
-
-  function t(key) {
-    var lang = (AK.settings().lang || 'ru');
-    return (I18N[lang] && I18N[lang][key]) || I18N.ru[key] || key;
-  }
-  function applyI18n() {
-    document.querySelectorAll('[data-i18n]').forEach(function (el) {
-      var k = el.getAttribute('data-i18n');
-      if (k) el.textContent = t(k);
-    });
-    document.documentElement.lang = AK.settings().lang || 'ru';
-    document.getElementById('authBtn').textContent = isReg ? t('btnReg') : t('btnLogin');
-  }
-
-  AK.applyTheme();
+  var isReg = false;
   var session = AK.session();
-  var built = null, mode = 'sub', isReg = false, photoData = null, stream = null;
-
+  var built = null;
+  var mode = 'sub';
   function showGate() {
     document.getElementById('gate').style.display = 'block';
     document.getElementById('shell').style.display = 'none';
-    applyI18n();
   }
   function showApp() {
     document.getElementById('gate').style.display = 'none';
     document.getElementById('shell').style.display = 'flex';
-    document.getElementById('who').textContent = session.name || session.email;
-    var u = AK.users()[session.login];
-    var av = document.getElementById('avatar');
-    if (u && u.photo) { av.src = u.photo; av.style.display = 'block'; }
-    else av.style.display = 'none';
-    applyI18n();
+    var who = document.getElementById('who');
+    who.textContent =
+      session.name || session.email;
     route();
   }
-
-  function setMode(reg) {
+  function setAuthMode(reg) {
     isReg = reg;
-    document.getElementById('tabLogin').classList.toggle('on', !reg);
-    document.getElementById('tabReg').classList.toggle('on', reg);
-    document.getElementById('regOnly').style.display = reg ? 'block' : 'none';
-    document.getElementById('authBtn').textContent = reg ? t('btnReg') : t('btnLogin');
+    document
+      .getElementById('tabLogin')
+      .classList.toggle('on', !reg);
+    document
+      .getElementById('tabReg')
+      .classList.toggle('on', reg);
+    document
+      .getElementById('regOnly')
+      .style.display = reg ? 'block' : 'none';
+    document
+      .getElementById('authBtn')
+      .textContent = reg
+        ? 'Зарегистрироваться'
+        : 'Войти';
   }
-  document.getElementById('tabLogin').onclick = function () { setMode(false); };
-  document.getElementById('tabReg').onclick = function () { setMode(true); };
-
-  document.getElementById('btnCam').onclick = async function () {
-    try {
-      stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user' }, audio: false });
-      document.getElementById('video').srcObject = stream;
-      await document.getElementById('video').play().catch(function () {});
-      document.getElementById('btnSnap').style.display = 'inline-block';
-      document.getElementById('camBox').classList.remove('shot');
-    } catch (e) {
-      AK.toast(AK.settings().lang === 'en' ? 'Camera unavailable — use File' : 'Камера недоступна — выберите файл');
-    }
-  };
-  document.getElementById('btnSnap').onclick = function () {
-    var video = document.getElementById('video');
-    var canvas = document.getElementById('canvas');
-    var w = video.videoWidth || 480, h = video.videoHeight || 480;
-    canvas.width = w; canvas.height = h;
-    canvas.getContext('2d').drawImage(video, 0, 0, w, h);
-    photoData = canvas.toDataURL('image/jpeg', 0.85);
-    document.getElementById('snap').src = photoData;
-    document.getElementById('camBox').classList.add('shot');
-    if (stream) { stream.getTracks().forEach(function (tr) { tr.stop(); }); stream = null; }
-  };
-  document.getElementById('photoFile').onchange = function (e) {
-    var f = e.target.files && e.target.files[0];
-    if (!f) return;
-    var r = new FileReader();
-    r.onload = function () {
-      photoData = r.result;
-      document.getElementById('snap').src = photoData;
-      document.getElementById('camBox').classList.add('shot');
+  document.getElementById('tabLogin').onclick =
+    function () {
+      setAuthMode(false);
     };
-    r.readAsDataURL(f);
-  };
-
-  document.getElementById('authBtn').onclick = async function () {
-    var err = document.getElementById('authErr');
-    err.style.display = 'none';
-    try {
-      if (isReg) {
-        session = await AK.register({
-          email: document.getElementById('email').value,
-          password: document.getElementById('password').value,
-          name: document.getElementById('name').value,
-          photo: photoData
-        });
-      } else {
-        session = await AK.login({
-          email: document.getElementById('email').value,
-          password: document.getElementById('password').value
-        });
+  document.getElementById('tabReg').onclick =
+    function () {
+      setAuthMode(true);
+    };
+  document.getElementById('authBtn').onclick =
+    async function () {
+      var err =
+        document.getElementById('authErr');
+      err.style.display = 'none';
+      try {
+        if (isReg) {
+          session = await AK.register({
+            email:
+              document.getElementById('email').value,
+            password:
+              document.getElementById('password').value,
+            name:
+              document.getElementById('name').value
+          });
+        } else {
+          session = await AK.login({
+            email:
+              document.getElementById('email').value,
+            password:
+              document.getElementById('password').value
+          });
+        }
+        showApp();
+        location.hash = 'home';
+      } catch (e) {
+        err.textContent =
+          e.message || 'Ошибка';
+        err.style.display = 'block';
       }
-      showApp(); location.hash = 'sites';
-    } catch (ex) {
-      err.textContent = ex.message || 'Error';
-      err.style.display = 'block';
-    }
-  };
-
-  document.getElementById('logout').onclick = function (e) {
-    e.preventDefault(); AK.clearSession(); session = null; showGate();
-  };
-
+    };
+  document.getElementById('logout').onclick =
+    function (e) {
+      e.preventDefault();
+      AK.clearSession();
+      session = null;
+      showGate();
+    };
   function route() {
-    var page = (location.hash || '#sites').replace('#', '') || 'sites';
-    if (page === 'media' || page === 'neuro') page = 'sites';
-    document.querySelectorAll('.page').forEach(function (p) { p.classList.toggle('on', p.id === 'page-' + page); });
-    document.querySelectorAll('[data-page]').forEach(function (a) { a.classList.toggle('on', a.getAttribute('data-page') === page); });
-    if (page === 'sites') renderSites();
-    if (page === 'links') renderLinks();
-    if (page === 'settings') syncSettings();
+    var page =
+      (location.hash || '#home')
+        .replace('#', '') || 'home';
+    var allowed =
+      ['home', 'create', 'domains', 'settings'];
+    if (!allowed.includes(page)) {
+      page = 'home';
+    }
+    document
+      .querySelectorAll('.page')
+      .forEach(function (p) {
+        p.classList.toggle(
+          'on',
+          p.id === 'page-' + page
+        );
+      });
+    document
+      .querySelectorAll('[data-page]')
+      .forEach(function (a) {
+        a.classList.toggle(
+          'on',
+          a.getAttribute('data-page') === page
+        );
+      });
+    if (page === 'home') {
+      renderHome();
+    }
+    if (page === 'domains') {
+      renderSavedDomains();
+    }
+    if (page === 'settings') {
+      syncSettings();
+    }
   }
-  window.addEventListener('hashchange', route);
-
-  function renderSites() {
-    var list = AK.sites(session.login);
-    var el = document.getElementById('siteList');
-    if (!list.length) {
-      el.innerHTML = '<div class="empty"><p>' + t('noSites') + '</p><a class="btn" href="#create" style="margin-top:12px">' + t('sitesBtn') + '</a></div>';
+  window.addEventListener(
+    'hashchange',
+    route
+  );
+  function siteAddress(s) {
+    return (
+      s.customDomain ||
+      (
+        (s.subdomain || 'site') +
+        '.' +
+        (s.domain || 'ai_craft.ru')
+      )
+    );
+  }
+  function openSite(id) {
+    var s =
+      AK.sites(session.login)
+        .find(function (x) {
+          return x.id === id;
+        });
+    if (!s || !s.html) {
+      return AK.toast('Сайт не найден');
+    }
+    var doc = s.html;
+    if (doc.indexOf('</head>') !== -1) {
+      doc = doc.replace(
+        '</head>',
+        '<style>' +
+        (s.css || '') +
+        '</style></head>'
+      );
+    } else {
+      doc =
+        '<style>' +
+        (s.css || '') +
+        '</style>' +
+        doc;
+    }
+    var w =
+      window.open('', '_blank');
+    if (!w) {
+      AK.toast(
+        'Разрешите открытие новых окон'
+      );
       return;
     }
-    el.innerHTML = list.map(function (s) {
-      var addr = s.customDomain || ((s.subdomain || 'site') + '.' + (s.domain || 'ai_craft.ru'));
-      return '<div class="card"><h3>' + AK.esc(s.name) + '</h3><div class="meta">' + AK.esc(addr) + '</div><p style="color:var(--muted);font-size:13px">' +
-        AK.esc((s.description || '').slice(0, 120)) + '</p><div class="actions">' +
-        '<button type="button" data-open="' + s.id + '">' + t('open') + '</button>' +
-        '<button type="button" data-del="' + s.id + '">' + t('del') + '</button></div></div>';
-    }).join('');
-    el.querySelectorAll('[data-open]').forEach(function (b) {
-      b.onclick = function () {
-        var s = AK.sites(session.login).find(function (x) { return x.id === b.getAttribute('data-open'); });
-        if (!s || !s.html) return AK.toast('—');
-        var doc = s.html;
-        if (doc.indexOf('</head>') !== -1) doc = doc.replace('</head>', '<style>' + (s.css || '') + '</style></head>');
-        else doc = '<style>' + (s.css || '') + '</style>' + doc;
-        var w = window.open('', '_blank');
-        if (!w) return AK.toast('Popup blocked');
-        w.document.write(doc); w.document.close();
-      };
-    });
-    el.querySelectorAll('[data-del]').forEach(function (b) {
-      b.onclick = function () {
-        if (!confirm(t('del') + '?')) return;
-        AK.saveSites(session.login, AK.sites(session.login).filter(function (s) { return s.id !== b.getAttribute('data-del'); }));
-        renderSites();
-      };
-    });
+    w.document.write(doc);
+    w.document.close();
   }
-
-  function showPreview(html, css) {
-    var doc = html;
-    if (doc.indexOf('</head>') !== -1) doc = doc.replace('</head>', '<style>' + css + '</style></head>');
-    else doc = '<style>' + css + '</style>' + doc;
-    document.getElementById('preview').srcdoc = doc;
-  }
-
-  document.getElementById('btnBuild').onclick = function () {
-    var idea = document.getElementById('idea').value.trim();
-    if (idea.length < 5) return AK.toast('…');
-    var p = AK.parse(idea);
-    var html = AK.buildHTML(idea, p.title);
-    var css = AK.buildCSS();
-    built = { name: p.title, description: idea, html: html, css: css };
-    showPreview(html, css);
-    document.getElementById('addrBox').style.display = 'block';
-    if (!document.getElementById('sub').value)
-      document.getElementById('sub').value = (p.title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 16)) || 'site';
-    AK.toast(t('build'));
-  };
-
-  document.querySelectorAll('#addrBox .chip').forEach(function (c) {
-    c.onclick = function () {
-      mode = c.getAttribute('data-mode');
-      document.querySelectorAll('#addrBox .chip').forEach(function (x) { x.classList.toggle('on', x === c); });
-      document.getElementById('subRow').style.display = mode === 'sub' ? 'block' : 'none';
-      document.getElementById('customRow').style.display = mode === 'custom' ? 'block' : 'none';
-    };
-  });
-
-  document.getElementById('btnSave').onclick = function () {
-    if (!built) return AK.toast(t('build'));
-    var subdomain, domain, customDomain = '';
-    if (mode === 'custom') {
-      customDomain = document.getElementById('customDomain').value.trim().toLowerCase().replace(/^https?:\/\//, '');
-      if (!customDomain || customDomain.indexOf('.') < 0) return AK.toast('shop.ru');
-      subdomain = customDomain.split('.')[0]; domain = customDomain;
+  function copyText(text) {
+    if (
+      navigator.clipboard &&
+      navigator.clipboard.writeText
+    ) {
+      navigator.clipboard
+        .writeText(text)
+        .then(function () {
+          AK.toast('Скопировано');
+        })
+        .catch(function () {
+          AK.toast('Не удалось скопировать');
+        });
     } else {
-      subdomain = document.getElementById('sub').value.trim().toLowerCase().replace(/[^a-z0-9-]/g, '');
-      domain = document.getElementById('tld').value;
-      if (subdomain.length < 2) return AK.toast('…');
+      AK.toast(text);
     }
-    var list = AK.sites(session.login);
-    list.unshift({ id: 's_' + Date.now(), name: built.name, description: built.description, subdomain: subdomain, domain: domain, customDomain: customDomain, html: built.html, css: built.css, createdAt: new Date().toISOString() });
-    AK.saveSites(session.login, list);
-    AK.toast(t('save'));
-    location.hash = 'sites';
-  };
-
-  function renderLinks() {
-    var links = AK.links(session.login), el = document.getElementById('linkList');
-    if (!links.length) { el.innerHTML = '<p class="sub">' + t('emptyLinks') + '</p>'; return; }
-    el.innerHTML = links.map(function (l) {
-      return '<div class="card"><div class="meta">ai-craft/' + AK.esc(l.slug) + '</div><div style="font-size:13px">' + AK.esc(l.url) +
-        '</div><div class="actions"><button type="button" data-copy="ai-craft/' + AK.esc(l.slug) + '">' + t('copy') + '</button>' +
-        '<button type="button" data-ldel="' + l.id + '">' + t('del') + '</button></div></div>';
-    }).join('');
-    el.querySelectorAll('[data-copy]').forEach(function (b) {
-      b.onclick = function () { navigator.clipboard.writeText(b.getAttribute('data-copy')).then(function () { AK.toast(t('copy')); }); };
-    });
-    el.querySelectorAll('[data-ldel]').forEach(function (b) {
-      b.onclick = function () {
-        AK.saveLinks(session.login, AK.links(session.login).filter(function (l) { return l.id !== b.getAttribute('data-ldel'); }));
-        renderLinks();
-      };
-    });
   }
-  document.getElementById('btnLink').onclick = function () {
-    var url = document.getElementById('linkUrl').value.trim();
-    if (!url) return AK.toast('URL');
-    var slug = Math.random().toString(36).slice(2, 8);
-    var links = AK.links(session.login);
-    links.unshift({ id: 'l_' + Date.now(), title: document.getElementById('linkTitle').value.trim() || slug, url: url, slug: slug });
-    AK.saveLinks(session.login, links);
-    document.getElementById('linkTitle').value = '';
-    document.getElementById('linkUrl').value = '';
-    renderLinks();
-  };
-
-  function syncSettings() {
-    var s = AK.settings();
-    document.querySelectorAll('#lang .chip').forEach(function (c) { c.classList.toggle('on', c.getAttribute('data-v') === (s.lang || 'ru')); });
-    document.querySelectorAll('#theme .chip').forEach(function (c) { c.classList.toggle('on', c.getAttribute('data-v') === s.theme); });
-    document.querySelectorAll('#accent .chip').forEach(function (c) { c.classList.toggle('on', c.getAttribute('data-v') === s.accent); });
+  function renderHome() {
+    var sites =
+      AK.sites(session.login);
+    var domains =
+      AK.domains(session.login);
+    var links =
+      AK.links(session.login);
+    document.getElementById(
+      'statSites'
+    ).textContent = sites.length;
+    document.getElementById(
+      'statDomains'
+    ).textContent = domains.length;
+    document.getElementById(
+      'statLinks'
+    ).textContent = links.length;
+    var siteEl =
+      document.getElementById('siteList');
+    if (!sites.length) {
+      siteEl.innerHTML =
+        '<div class="empty">' +
+        '<h3>Сайтов пока нет</h3>' +
+        '<p>Создайте первый сайт по описанию.</p>' +
+        '<a class="btn" href="#create">' +
+        'Создать сайт' +
+        '</a>' +
+        '</div>';
+    } else {
+      siteEl.innerHTML =
+        sites.map(function (s) {
+          var addr =
+            siteAddress(s);
+          return (
+            '<div class="card project-card">' +
+            '<div>' +
+            '<h3>' +
+            AK.esc(s.name) +
+            '</h3>' +
+            '<div class="meta">' +
+            AK.esc(addr) +
+            '</div>' +
+            '<p class="card-text">' +
+            AK.esc(
+              (s.description || '')
+                .slice(0, 180)
+            ) +
+            '</p>' +
+            '</div>' +
+            '<div class="actions">' +
+            '<button data-open="' +
+            AK.esc(s.id) +
+            '">' +
+            'Открыть' +
+            '</button>' +
+            '<button data-copy="' +
+            AK.esc(addr) +
+            '">' +
+            'Копировать адрес' +
+            '</button>' +
+            '<button data-delete-site="' +
+            AK.esc(s.id) +
+            '">' +
+            'Удалить' +
+            '</button>' +
+            '</div>' +
+            '</div>'
+          );
+        }).join('');
+    }
+    siteEl
+      .querySelectorAll('[data-open]')
+      .forEach(function (button) {
+        button.onclick = function () {
+          openSite(
+            button.getAttribute('data-open')
+          );
+        };
+      });
+    siteEl
+      .querySelectorAll('[data-copy]')
+      .forEach(function (button) {
+        button.onclick = function () {
+          copyText(
+            button.getAttribute('data-copy')
+          );
+        };
+      });
+    siteEl
+      .querySelectorAll('[data-delete-site]')
+      .forEach(function (button) {
+        button.onclick = function () {
+          if (!confirm(
+            'Удалить этот сайт?'
+          )) return;
+          AK.saveSites(
+            session.login,
+            AK.sites(session.login)
+              .filter(function (s) {
+                return s.id !==
+                  button.getAttribute(
+                    'data-delete-site'
+                  );
+              })
+          );
+          renderHome();
+        };
+      });
+    var domainEl =
+      document.getElementById(
+        'domainList'
+      );
+    if (!domains.length) {
+      domainEl.innerHTML =
+        '<div class="empty compact">' +
+        'Доменов пока нет.' +
+        '<br><br>' +
+        '<a href="#domains">' +
+        'Проверить домен' +
+        '</a>' +
+        '</div>';
+    } else {
+      domainEl.innerHTML =
+        domains.map(function (d) {
+          return (
+            '<div class="card">' +
+            '<div class="meta">' +
+            AK.esc(d.domain) +
+            '</div>' +
+            '<div class="domain-status ok">' +
+            'Проверен' +
+            '</div>' +
+            '<div class="actions">' +
+            '<button data-copy-domain="' +
+            AK.esc(d.domain) +
+            '">' +
+            'Копировать' +
+            '</button>' +
+            '<button data-delete-domain="' +
+            AK.esc(d.id) +
+            '">' +
+            'Удалить' +
+            '</button>' +
+            '</div>' +
+            '</div>'
+          );
+        }).join('');
+    }
+    domainEl
+      .querySelectorAll('[data-copy-domain]')
+      .forEach(function (button) {
+        button.onclick = function () {
+          copyText(
+            button.getAttribute(
+              'data-copy-domain'
+            )
+          );
+        };
+      });
+    domainEl
+      .querySelectorAll('[data-delete-domain]')
+      .forEach(function (button) {
+        button.onclick = function () {
+          AK.saveDomains(
+            session.login,
+            AK.domains(session.login)
+              .filter(function (d) {
+                return d.id !==
+                  button.getAttribute(
+                    'data-delete-domain'
+                  );
+              })
+          );
+          renderHome();
+        };
+      });
+    var linkEl =
+      document.getElementById(
+        'linkList'
+      );
+    if (!links.length) {
+      linkEl.innerHTML =
+        '<div class="empty compact">' +
+        'Ссылок пока нет.' +
+        '</div>';
+    } else {
+      linkEl.innerHTML =
+        links.map(function (l) {
+          return (
+            '<div class="card">' +
+            '<h3>' +
+            AK.esc(l.title) +
+            '</h3>' +
+            '<div class="meta">' +
+            AK.esc(l.slug) +
+            '</div>' +
+            '<p class="card-text">' +
+            AK.esc(l.url) +
+            '</p>' +
+            '<div class="actions">' +
+            '<button data-copy-link="' +
+            AK.esc(l.url) +
+            '">' +
+            'Копировать' +
+            '</button>' +
+            '</div>' +
+            '</div>'
+          );
+        }).join('');
+    }
+    linkEl
+      .querySelectorAll('[data-copy-link]')
+      .forEach(function (button) {
+        button.onclick = function () {
+          copyText(
+            button.getAttribute(
+              'data-copy-link'
+            )
+          );
+        };
+      });
   }
-  document.querySelectorAll('#lang .chip').forEach(function (c) {
-    c.onclick = function () {
-      AK.saveSettings({ lang: c.getAttribute('data-v') });
-      applyI18n(); syncSettings();
-      if (session) { renderSites(); renderLinks(); }
+  function buildSite() {
+    var idea =
+      document.getElementById(
+        'idea'
+      ).value.trim();
+    if (idea.length < 5) {
+      AK.toast(
+        'Опишите сайт подробнее'
+      );
+      return;
+    }
+    var parsed =
+      AK.parse(
+        idea
+      );
+    var html =
+      AK.buildHTML(
+        idea,
+        parsed.title
+      );
+    var css =
+      AK.buildCSS();
+    built = {
+      name:
+        parsed.title,
+      description:
+        idea,
+      html:
+        html,
+      css:
+        css
     };
-  });
-  document.querySelectorAll('#theme .chip').forEach(function (c) {
-    c.onclick = function () { AK.saveSettings({ theme: c.getAttribute('data-v') }); syncSettings(); };
-  });
-  document.querySelectorAll('#accent .chip').forEach(function (c) {
-    c.onclick = function () { AK.saveSettings({ accent: c.getAttribute('data-v') }); syncSettings(); };
-  });
-
-  showPreview(AK.buildHTML('Preview', 'Ai-craft'), AK.buildCSS());
-  if (session) showApp(); else showGate();
+    showPreview(
+      html,
+      css
+    );
+    document.getElementById(
+      'addrBox'
+    ).style.display = 'block';
+    if (
+      !document.getElementById(
+        'sub'
+      ).value
+    ) {
+      document.getElementById(
+        'sub'
+      ).value =
+        parsed.title
+          .toLowerCase()
+          .replace(
+            /[^a-z0-9-]/g,
+            '-'
+          )
+          .replace(
+            /^-|-$/g,
+            ''
+          )
+          .slice(
+            0,
+            20
+          ) ||
+        'site';
+    }
+    AK.toast(
+      'Сайт создан'
+    );
+  }
+  function showPreview(
+    html,
+    css
+  ) {
+    var doc =
+      html;
+    if (
+      doc.indexOf(
+        '</head>'
+      ) !== -1
+    ) {
+      doc =
+        doc.replace(
+          '</head>',
+          '<style>' +
+          css +
+          '</style></head>'
+        );
+    } else {
+      doc =
+        '<style>' +
+        css +
+        '</style>' +
+        doc;
+    }
+    document.getElementById(
+      'preview'
+    ).srcdoc = doc;
+  }
+  document.getElementById(
+    'btnBuild'
+  ).onclick =
+    buildSite;
+  document
+    .querySelectorAll(
+      '#addrBox .chip'
+    )
+    .forEach(function (chip) {
+      chip.onclick =
+        function () {
+          mode =
+            chip.getAttribute(
+              'data-mode'
+            );
+          document
+            .querySelectorAll(
+              '#addrBox .chip'
+            )
+            .forEach(
+              function (x) {
+                x.classList.toggle(
+                  'on',
+                  x === chip
+                );
+              }
+            );
+          document.getElementById(
+            'subRow'
+          ).style.display =
+            mode === 'sub'
+              ? 'block'
+              : 'none';
+          document.getElementById(
+            'customRow'
+          ).style.display =
+            mode === 'custom'
+              ? 'block'
+              : 'none';
+        };
+    });
+  async function checkDomain(domain) {
+    domain =
+      domain
+        .trim()
+        .toLowerCase()
+        .replace(
+          /^https?:\/\//,
+          ''
+        )
+        .replace(
+          /\/.*$/,
+          ''
+        );
+    if (
+      !/^(?=.{1,253}$)([a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\.)+[a-z]{2,63}$/i
+        .test(domain)
+    ) {
+      throw new Error(
+        'Некорректное доменное имя'
+      );
+    }
+    var parts =
+      domain.split('.');
+    var tld =
+      parts
+        .slice(1)
+        .join('.');
+    var url = '';
+    if (tld === 'ru') {
+      url =
+        'https://rdap.tcinet.ru/domain/' +
+        encodeURIComponent(domain);
+    } else if (tld === 'com') {
+      url =
+        'https://rdap.verisign.com/com/v1/domain/' +
+        encodeURIComponent(domain);
+    } else if (tld === 'dev') {
+      url =
+        'https://rdap.identitydigital.services/rdap/domain/' +
+        encodeURIComponent(domain);
+    } else {
+      throw new Error(
+        'Для этой зоны автоматическая RDAP-проверка пока не настроена'
+      );
+    }
+    var response =
+      await fetch(
+        url,
+        {
+          method: 'GET',
+          headers: {
+            'Accept':
+              'application/rdap+json, application/json'
+          }
+        }
+      );
+    if (response.status === 404) {
+      return {
+        domain:
+          domain,
+        available:
+          true
+      };
+    }
+    if (response.ok) {
+      return {
+        domain:
+          domain,
+        available:
+          false
+      };
+    }
+    throw new Error(
+      'Сервис проверки домена не ответил'
+    );
+  }
+  function showDomainResult(
+    element,
+    result
+  ) {
+    if (result.available) {
+      element.className =
+        'domain-result available';
+      element.innerHTML =
+        '<strong>✓ Домен свободен</strong>' +
+        '<span>' +
+        AK.esc(result.domain) +
+        '</span>' +
+        '<small>' +
+        'Свободен по ответу RDAP. Это не является регистрацией домена.' +
+        '</small>';
+    } else {
+      element.className =
+        'domain-result unavailable';
+      element.innerHTML =
+        '<strong>✕ Домен уже занят</strong>' +
+        '<span>' +
+        AK.esc(result.domain) +
+        '</span>' +
+        '<small>' +
+        'Регистрация этого имени невозможна, пока оно занято.' +
+        '</small>';
+    }
+  }
+  document.getElementById(
+    'btnDomainCheck'
+  ).onclick =
+    async function () {
+      var name =
+        document.getElementById(
+          'domainName'
+        ).value.trim();
+      var tld =
+        document.getElementById(
+          'domainTld'
+        ).value;
+      var result =
+        document.getElementById(
+          'domainResult'
+        );
+      if (!name) {
+        result.className =
+          'domain-result error-result';
+        result.textContent =
+          'Введите название домена.';
+        return;
+      }
+      var domain =
+        name
+          .toLowerCase()
+          .replace(
+            /^https?:\/\//,
+            ''
+          )
+          .replace(
+            /\.[a-z0-9.-]+$/,
+            ''
+          )
+          .replace(
+            /[^a-z0-9-]/g,
+            ''
+          ) +
+        tld;
+      result.className =
+        'domain-result loading';
+      result.textContent =
+        'Проверяем домен…';
+      try {
+        var checked =
+          await checkDomain(
+            domain
+          );
+        showDomainResult(
+          result,
+          checked
+        );
+        if (checked.available) {
+          saveCheckedDomain(
+            checked.domain
+          );
+        }
+      } catch (e) {
+        result.className =
+          'domain-result error-result';
+        result.textContent =
+          e.message ||
+          'Не удалось проверить домен.';
+      }
+    };
+  document.getElementById(
+    'btnAutoDomain'
+  ).onclick =
+    async function () {
+      var value =
+        document.getElementById(
+          'autoDomainName'
+        ).value
+          .trim()
+          .toLowerCase()
+          .replace(
+            /[^a-z0-9-]/g,
+            ''
+          );
+      var container =
+        document.getElementById(
+          'autoDomainResults'
+        );
+      if (!value) {
+        container.innerHTML =
+          '<div class="domain-result error-result">' +
+          'Введите название.' +
+          '</div>';
+        return;
+      }
+      var zones =
+        ['.ru', '.com', '.dev'];
+      container.innerHTML =
+        '<div class="loading-line">' +
+        'Проверяем варианты…' +
+        '</div>';
+      var results = [];
+      for (
+        var i = 0;
+        i < zones.length;
+        i++
+      ) {
+        var domain =
+          value +
+          zones[i];
+        try {
+          var checked =
+            await checkDomain(
+              domain
+            );
+          results.push(
+            checked
+          );
+        } catch (e) {
+          results.push({
+            domain:
+              domain,
+            available:
+              null,
+            error:
+              e.message
+          });
+        }
+      }
+      container.innerHTML =
+        results
+          .map(function (r) {
+            if (r.available === true) {
+              return (
+                '<div class="domain-option available">' +
+                '<strong>' +
+                AK.esc(r.domain) +
+                '</strong>' +
+                '<span>✓ Свободен</span>' +
+                '<button data-save-domain="' +
+                AK.esc(r.domain) +
+                '">Сохранить</button>' +
+                '</div>'
+              );
+            }
+            if (r.available === false) {
+              return (
+                '<div class="domain-option unavailable">' +
+                '<strong>' +
+                AK.esc(r.domain) +
+                '</strong>' +
+                '<span>✕ Занят</span>' +
+                '</div>'
+              );
+            }
+            return (
+              '<div class="domain-option">' +
+              '<strong>' +
+              AK.esc(r.domain) +
+              '</strong>' +
+              '<span>⚠ Не удалось проверить</span>' +
+              '</div>'
+            );
+          })
+          .join('');
+      container
+        .querySelectorAll(
+          '[data-save-domain]'
+        )
+        .forEach(function (button) {
+          button.onclick =
+            function () {
+              saveCheckedDomain(
+                button.getAttribute(
+                  'data-save-domain'
+                )
+              );
+            };
+        });
+    };
+  function saveCheckedDomain(
+    domain
+  ) {
+    var domains =
+      AK.domains(
+        session.login
+      );
+    if (
+      domains.some(
+        function (d) {
+          return d.domain === domain;
+        }
+      )
+    ) {
+      AK.toast(
+        'Домен уже сохранён'
+      );
+      return;
+    }
+    domains.unshift({
+      id:
+        'd_' +
+        Date.now(),
+      domain:
+        domain,
+      checkedAt:
+        new Date().toISOString()
+    });
+    AK.saveDomains(
+      session.login,
+      domains
+    );
+    AK.toast(
+      'Домен сохранён'
+    );
+    renderSavedDomains();
+    renderHome();
+  }
+  document.getElementById(
+    'btnCheckSiteDomain'
+  ).onclick =
+    async function () {
+      var domain = '';
+      if (mode === 'custom') {
+        domain =
+          document.getElementById(
+            'customDomain'
+          ).value;
+      } else {
+        domain =
+          document.getElementById(
+            'sub'
+          ).value +
+          '.' +
+          document.getElementById(
+            'tld'
+          ).value;
+      }
+      var result =
+        document.getElementById(
+          'siteDomainResult'
+        );
+      result.className =
+        'domain-result loading';
+      result.textContent =
+        'Проверяем…';
+      try {
+        var checked =
+          await checkDomain(
+            domain
+          );
+        showDomainResult(
+          result,
+          checked
+        );
+      } catch (e) {
+        result.className =
+          'domain-result error-result';
+        result.textContent =
+          e.message;
+      }
+    };
+  document.getElementById(
+    'btnSave'
+  ).onclick =
+    function () {
+      if (!built) {
+        AK.toast(
+          'Сначала создайте сайт'
+        );
+        return;
+      }
+      var subdomain = '';
+      var domain = '';
+      var customDomain = '';
+      if (mode === 'custom') {
+        customDomain =
+          document.getElementById(
+            'customDomain'
+          ).value
+            .trim()
+            .toLowerCase()
+            .replace(
+              /^https?:\/\//,
+              ''
+            );
+        if (
+          !customDomain ||
+          customDomain.indexOf('.') < 0
+        ) {
+          AK.toast(
+            'Введите корректный домен'
+          );
+          return;
+        }
+        subdomain =
+          customDomain.split('.')[0];
+        domain =
+          customDomain;
+      } else {
+        subdomain =
+          document.getElementById(
+            'sub'
+          ).value
+            .trim()
+            .toLowerCase()
+            .replace(
+              /[^a-z0-9-]/g,
+              ''
+            );
+        domain =
+          document.getElementById(
+            'tld'
+          ).value;
+        if (
+          subdomain.length < 2
+        ) {
+          AK.toast(
+            'Введите имя сайта'
+          );
+          return;
+        }
+      }
+      var sites =
+        AK.sites(
+          session.login
+        );
+      sites.unshift({
+        id:
+          's_' +
+          Date.now(),
+        name:
+          built.name,
+        description:
+          built.description,
+        subdomain:
+          subdomain,
+        domain:
+          domain,
+        customDomain:
+          customDomain,
+        html:
+          built.html,
+        css:
+          built.css,
+        createdAt:
+          new Date().toISOString()
+      });
+      AK.saveSites(
+        session.login,
+        sites
+      );
+      AK.toast(
+        'Сайт сохранён'
+      );
+      location.hash =
+        'home';
+    };
+  function renderSavedDomains() {
+    var domains =
+      AK.domains(
+        session.login
+      );
+    var el =
+      document.getElementById(
+        'savedDomains'
+      );
+    if (!domains.length) {
+      el.innerHTML =
+        '<div class="empty">' +
+        'Сохранённых доменов пока нет.' +
+        '</div>';
+      return;
+    }
+    el.innerHTML =
+      domains.map(function (d) {
+        return (
+          '<div class="card domain-card">' +
+          '<div>' +
+          '<h3>' +
+          AK.esc(d.domain) +
+          '</h3>' +
+          '<div class="meta">' +
+          'Проверен' +
+          '</div>' +
+          '</div>' +
+          '<div class="actions">' +
+          '<button data-copy-domain="' +
+          AK.esc(d.domain) +
+          '">' +
+          'Копировать' +
+          '</button>' +
+          '<button data-remove-domain="' +
+          AK.esc(d.id) +
+          '">' +
+          'Удалить' +
+          '</button>' +
+          '</div>' +
+          '</div>'
+        );
+      }).join('');
+    el
+      .querySelectorAll(
+        '[data-copy-domain]'
+      )
+      .forEach(function (button) {
+        button.onclick =
+          function () {
+            copyText(
+              button.getAttribute(
+                'data-copy-domain'
+              )
+            );
+          };
+      });
+    el
+      .querySelectorAll(
+        '[data-remove-domain]'
+      )
+      .forEach(function (button) {
+        button.onclick =
+          function () {
+            AK.saveDomains(
+              session.login,
+              AK.domains(
+                session.login
+              ).filter(function (d) {
+                return d.id !==
+                  button.getAttribute(
+                    'data-remove-domain'
+                  );
+              })
+            );
+            renderSavedDomains();
+            renderHome();
+          };
+      });
+  }
+  function syncSettings() {
+    var s =
+      AK.settings();
+    document
+      .querySelectorAll(
+        '#lang .chip'
+      )
+      .forEach(function (chip) {
+        chip.classList.toggle(
+          'on',
+          chip.getAttribute(
+            'data-v'
+          ) === s.lang
+        );
+      });
+    document
+      .querySelectorAll(
+        '#theme .chip'
+      )
+      .forEach(function (chip) {
+        chip.classList.toggle(
+          'on',
+          chip.getAttribute(
+            'data-v'
+          ) === s.theme
+        );
+      });
+    document
+      .querySelectorAll(
+        '#accent .chip'
+      )
+      .forEach(function (chip) {
+        chip.classList.toggle(
+          'on',
+          chip.getAttribute(
+            'data-v'
+          ) === s.accent
+        );
+      });
+  }
+  document
+    .querySelectorAll(
+      '#lang .chip'
+    )
+    .forEach(function (chip) {
+      chip.onclick =
+        function () {
+          AK.saveSettings({
+            lang:
+              chip.getAttribute(
+                'data-v'
+              )
+          });
+          syncSettings();
+        };
+    });
+  document
+    .querySelectorAll(
+      '#theme .chip'
+    )
+    .forEach(function (chip) {
+      chip.onclick =
+        function () {
+          AK.saveSettings({
+            theme:
+              chip.getAttribute(
+                'data-v'
+              )
+          });
+          syncSettings();
+        };
+    });
+  document
+    .querySelectorAll(
+      '#accent .chip'
+    )
+    .forEach(function (chip) {
+      chip.onclick =
+        function () {
+          AK.saveSettings({
+            accent:
+              chip.getAttribute(
+                'data-v'
+              )
+          });
+          syncSettings();
+        };
+    });
+  if (session) {
+    showApp();
+  } else {
+    showGate();
+  }
 })();
 </script>
 </body>
