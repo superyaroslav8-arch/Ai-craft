@@ -20,27 +20,51 @@ const AK = {
     document.documentElement.setAttribute('data-theme', s.theme || 'dark');
     document.documentElement.style.setProperty('--accent', s.accent || '#8b5cf6');
   },
-  enter(name) {
-    name = (name || 'Гость').trim().slice(0, 32) || 'Гость';
-    const key = 'u_' + name.toLowerCase().replace(/\s+/g, '_').replace(/[^a-z0-9_а-яё]/gi, '') || ('u_' + Date.now());
+  async hash(text) {
+    const data = new TextEncoder().encode(String(text));
+    const buf = await crypto.subtle.digest('SHA-256', data);
+    return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, '0')).join('');
+  },
+  validEmail(e) {
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(e || '').trim());
+  },
+  async register({ email, password, name, photo }) {
+    email = String(email || '').trim().toLowerCase();
+    if (!this.validEmail(email)) throw new Error('Укажите корректную почту');
+    if (!password || String(password).length < 6) throw new Error('Пароль не короче 6 символов');
     const users = this.users();
-    if (!users[key]) users[key] = { name, sites: [], links: [] };
-    else users[key].name = name;
+    if (users[email]) throw new Error('Эта почта уже зарегистрирована');
+    const passHash = await this.hash(password + '|' + email);
+    const display = (name || '').trim().slice(0, 32) || email.split('@')[0];
+    users[email] = {
+      email, passHash, name: display, photo: photo || null,
+      sites: [], links: [], createdAt: new Date().toISOString()
+    };
     this.saveUsers(users);
-    this.setSession({ login: key, name });
+    this.setSession({ login: email, name: display, email });
+    return this.session();
+  },
+  async login({ email, password }) {
+    email = String(email || '').trim().toLowerCase();
+    const users = this.users();
+    const u = users[email];
+    if (!u) throw new Error('Нет аккаунта с этой почтой');
+    const passHash = await this.hash(password + '|' + email);
+    if (u.passHash !== passHash) throw new Error('Неверный пароль');
+    this.setSession({ login: email, name: u.name, email });
     return this.session();
   },
   sites(login) { return (this.users()[login] || {}).sites || []; },
   saveSites(login, sites) {
     const u = this.users();
-    if (!u[login]) u[login] = { name: login, sites: [], links: [] };
+    if (!u[login]) return;
     u[login].sites = sites;
     this.saveUsers(u);
   },
   links(login) { return (this.users()[login] || {}).links || []; },
   saveLinks(login, links) {
     const u = this.users();
-    if (!u[login]) u[login] = { name: login, sites: [], links: [] };
+    if (!u[login]) return;
     u[login].links = links;
     this.saveUsers(u);
   },
@@ -49,7 +73,7 @@ const AK = {
     let el = document.querySelector('.toast');
     if (!el) { el = document.createElement('div'); el.className = 'toast'; document.body.appendChild(el); }
     el.textContent = m; el.classList.add('on');
-    clearTimeout(el._t); el._t = setTimeout(() => el.classList.remove('on'), 2000);
+    clearTimeout(el._t); el._t = setTimeout(() => el.classList.remove('on'), 2200);
   },
   imageUrl(prompt) {
     const q = encodeURIComponent(String(prompt).slice(0, 300));
@@ -85,7 +109,7 @@ const AK = {
       t + '</h1><p>' + text + '</p></div></section>' + body + '<footer><div class="w">© ' + new Date().getFullYear() + ' ' + t +
       '</div></footer></body></html>';
   },
-  buildCSS(tone) {
+  buildCSS() {
     return '*{box-sizing:border-box;margin:0;padding:0}body{font-family:system-ui,sans-serif;line-height:1.6;color:#111;background:#fafafa}.w{max-width:900px;margin:0 auto;padding:0 20px}header{border-bottom:1px solid #eee;background:#fff;padding:16px 0}.hero{padding:64px 0;text-align:center;background:linear-gradient(180deg,#fff,#f5f0ff)}.hero h1{font-size:clamp(28px,5vw,42px);margin-bottom:12px}section{padding:48px 0}section h2{margin-bottom:10px}footer{padding:20px 0;border-top:1px solid #eee;font-size:13px;color:#888';
   }
 };
