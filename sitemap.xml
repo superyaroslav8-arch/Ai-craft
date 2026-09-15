@@ -1,8 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <url>
-    <loc>https://superyaroslav8-arch.github.io/ai-craft-site/</loc>
-    <lastmod>2026-09-14</lastmod>
-    <priority>1.00</priority>
-  </url>
+  <url><loc>https://superyaroslav8-arch.github.io/Ai-craft/</loc></url>
+  <url><loc>https://superyaroslav8-arch.github.io/Ai-craft/pages/login.html</loc></url>
+  <url><loc>https://superyaroslav8-arch.github.io/Ai-craft/pages/register.html</loc></url>
+  <url><loc>https://superyaroslav8-arch.github.io/Ai-craft/pages/create.html</loc></url>
 </urlset>

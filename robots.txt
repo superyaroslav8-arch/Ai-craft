@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://superyaroslav8-arch.github.io/Ai-craft/sitemap.xml

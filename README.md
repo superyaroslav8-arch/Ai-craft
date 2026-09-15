@@ -1,41 +1,39 @@
 # Ai крафт
 
-Создание сайтов по описанию (как ХостAI), на вашем бренде.
+**Сайт онлайн:** [https://superyaroslav8-arch.github.io/Ai-craft/](https://superyaroslav8-arch.github.io/Ai-craft/)
 
-## Что умеет
+**Репозиторий:** [https://github.com/superyaroslav8-arch/Ai-craft](https://github.com/superyaroslav8-arch/Ai-craft)
 
-- **Собрать сайт** — опишите идею → превью → поддомен или свой домен
-- **Мои сайты** — список, открыть, удалить
-- **Нейро** — помощник
-- **Медиа** — фото / видео / музыка по описанию
-- **Ссылки** — короткие ссылки
-- **Настройки** — тема, цвет
+Создание сайтов по описанию: идея → сборка → адрес (поддомен или свой домен). Без обязательного кода.
 
-Код знать не обязательно. Регистрация: логин и пароль.
+## Как пользоваться
 
-## Сайт
+1. Откройте сайт → **Начать** / **Регистрация** (логин + пароль)
+2. **Собрать сайт** — опишите идею
+3. Выберите **поддомен** (`*.ai_craft.ru` / `.com` / `.dev`) или **свой домен**
+4. **Опубликовать** → сайт в разделе «Мои сайты»
 
-https://superyaroslav8-arch.github.io/Ai-craft/
+Дополнительно: Нейро, Медиа, Ссылки, Настройки (тема).
 
-## Локально
-
-Откройте `index.html` в браузере.
-
-## Структура
+## Структура проекта
 
 ```
-index.html
-css/style.css
-js/core.js
-js/neuro.js
-pages/create.html
-pages/dashboard.html
-pages/neuro.html
-pages/media.html
-pages/links.html
-pages/settings.html
-pages/login.html
-pages/register.html
+index.html           — главная
+css/style.css        — стили
+js/core.js           — логика (аккаунт, сайты, настройки)
+js/neuro.js          — ответы помощника
+pages/
+  create.html        — собрать сайт
+  dashboard.html     — мои сайты
+  login.html         — вход
+  register.html      — регистрация
+  neuro.html         — Нейро
+  media.html         — медиа
+  links.html         — короткие ссылки
+  settings.html      — настройки
 ```
 
-Поддержка: +7 (900) 237-32-22 · superyaroslav8@iCloud.com
+## Поддержка
+
++7 (900) 237-32-22  
+superyaroslav8@iCloud.com
