@@ -3,31 +3,29 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta http-equiv="Cache-Control" content="no-cache">
-  <title>Ai крафт</title>
-  <link rel="stylesheet" href="css/style.css?v=3">
-  <style>
-    body{margin:0;font-family:system-ui,sans-serif;background:#09090b;color:#fafafa}
-    .wrap{max-width:720px;margin:0 auto;padding:48px 20px;text-align:center}
-    h1{font-size:clamp(28px,6vw,48px);line-height:1.1;margin:16px 0}
-    p{color:#a1a1aa;font-size:16px;line-height:1.5}
-    .btn{display:inline-block;margin-top:24px;padding:14px 28px;background:#8b5cf6;color:#fff;border-radius:999px;text-decoration:none;font-weight:600}
-    .badge{display:inline-block;padding:6px 12px;border-radius:999px;background:rgba(139,92,246,.2);color:#c4b5fd;font-size:12px;font-weight:600}
-  </style>
+  <title>Ai-craft</title>
+  <meta name="description" content="Создание сайтов по описанию с помощью искусственного интеллекта и создание доменов и ссылок для сайтов полностью бесплатно.">
+  <link rel="stylesheet" href="css/app.css">
 </head>
 <body>
-  <div class="wrap">
-    <div class="badge">Бесплатно</div>
-    <h1>Ai крафт</h1>
-    <p>Соберите сайт по описанию. Вход без пароля — одним нажатием.</p>
-    <a class="btn" href="pages/auth.html?v=3">Войти и начать</a>
+  <div class="wrap center">
+    <p class="badge">100% бесплатно</p>
+    <h1>Ai-craft</h1>
+    <p class="lead">Создание сайтов по описанию с помощью искусственного интеллекта. Домены и ссылки — бесплатно.</p>
+    <ul class="home-list">
+      <li>Сайт по вашему тексту</li>
+      <li>Адрес и ссылки</li>
+      <li>Без оплаты для вас и пользователей</li>
+    </ul>
+    <a class="btn" href="app.html">Начать бесплатно</a>
+    <footer class="foot">
+      <a href="tel:+79002373222">+7 (900) 237-32-22</a>
+      ·
+      <a href="mailto:superyaroslav8@iCloud.com">superyaroslav8@iCloud.com</a>
+    </footer>
   </div>
   <script>
-    try {
-      if (JSON.parse(localStorage.getItem('aicraft_session') || 'null')) {
-        location.replace('pages/dashboard.html?v=3');
-      }
-    } catch (e) {}
+    try { if (localStorage.getItem('ak_session')) location.replace('app.html#sites'); } catch (e) {}
   </script>
 </body>
 </html>
