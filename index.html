@@ -3,51 +3,31 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Ai крафт — сайт по идее</title>
-  <meta name="description" content="Вход по фото. Сайт по описанию. Реальные изображения. Бесплатно.">
-  <link rel="stylesheet" href="css/style.css">
+  <meta http-equiv="Cache-Control" content="no-cache">
+  <title>Ai крафт</title>
+  <link rel="stylesheet" href="css/style.css?v=3">
+  <style>
+    body{margin:0;font-family:system-ui,sans-serif;background:#09090b;color:#fafafa}
+    .wrap{max-width:720px;margin:0 auto;padding:48px 20px;text-align:center}
+    h1{font-size:clamp(28px,6vw,48px);line-height:1.1;margin:16px 0}
+    p{color:#a1a1aa;font-size:16px;line-height:1.5}
+    .btn{display:inline-block;margin-top:24px;padding:14px 28px;background:#8b5cf6;color:#fff;border-radius:999px;text-decoration:none;font-weight:600}
+    .badge{display:inline-block;padding:6px 12px;border-radius:999px;background:rgba(139,92,246,.2);color:#c4b5fd;font-size:12px;font-weight:600}
+  </style>
 </head>
 <body>
-  <header class="header">
-    <div class="container header-inner">
-      <a href="index.html" class="logo">Ai крафт</a>
-      <div class="header-actions">
-        <a class="btn-primary" href="pages/auth.html" id="cta">Войти</a>
-      </div>
-    </div>
-  </header>
-  <section class="hero container">
-    <div class="hero-glow" aria-hidden="true"></div>
-    <div class="hero-badge">Бесплатно · Вход по фото</div>
-    <h1>Опишите идею.<br>Соберём сайт.</h1>
-    <p>Без логина и пароля: фото → кабинет. Сайт по тексту. Картинки по описанию — настоящая генерация.</p>
-    <div class="hero-cta">
-      <a class="btn-primary" href="pages/auth.html">Войти и начать</a>
-    </div>
-  </section>
-  <section class="container steps" id="how">
-    <div class="steps-grid">
-      <div class="step"><div class="step-n">1</div><h3>Вход</h3><p>Камера или «без фото» — сразу работа.</p></div>
-      <div class="step"><div class="step-n">2</div><h3>Сайт</h3><p>Текст идеи → структура, тексты, превью.</p></div>
-      <div class="step"><div class="step-n">3</div><h3>Адрес</h3><p>Поддомен или свой домен. Открыть сайт.</p></div>
-    </div>
-  </section>
-  <section class="container features">
-    <div class="feature"><div class="feature-ico">1</div><h3>Вход по фото</h3><p>Один шаг.</p></div>
-    <div class="feature"><div class="feature-ico">2</div><h3>Сборка</h3><p>По описанию.</p></div>
-    <div class="feature"><div class="feature-ico">3</div><h3>Фото AI</h3><p>По запросу.</p></div>
-    <div class="feature"><div class="feature-ico">4</div><h3>Нейро</h3><p>Помощник.</p></div>
-    <div class="feature"><div class="feature-ico">5</div><h3>Ссылки</h3><p>Короткие.</p></div>
-    <div class="feature"><div class="feature-ico">6</div><h3>0 ₽</h3><p>Всегда.</p></div>
-  </section>
-  <footer class="container footer-mini"><span>© 2026 Ai крафт</span><span><a href="tel:+79002373222">+7 (900) 237-32-22</a> · <a href="mailto:superyaroslav8@iCloud.com">superyaroslav8@iCloud.com</a></span></footer>
-  <script src="js/core.js" defer></script>
+  <div class="wrap">
+    <div class="badge">Бесплатно</div>
+    <h1>Ai крафт</h1>
+    <p>Соберите сайт по описанию. Вход без пароля — одним нажатием.</p>
+    <a class="btn" href="pages/auth.html?v=3">Войти и начать</a>
+  </div>
   <script>
-    document.addEventListener('DOMContentLoaded', () => {
-      if (typeof AC !== 'undefined' && AC.getSession()) {
-        location.replace('pages/dashboard.html');
+    try {
+      if (JSON.parse(localStorage.getItem('aicraft_session') || 'null')) {
+        location.replace('pages/dashboard.html?v=3');
       }
-    });
+    } catch (e) {}
   </script>
 </body>
 </html>

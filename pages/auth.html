@@ -4,122 +4,122 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Вход — Ai крафт</title>
-  <link rel="stylesheet" href="../css/style.css">
+  <link rel="stylesheet" href="../css/style.css?v=3">
   <style>
-    .auth-wrap{min-height:100vh;display:grid;place-items:center;padding:20px;background:var(--bg)}
-    .auth-box{width:100%;max-width:400px;background:var(--surface);border:1px solid var(--border);border-radius:24px;padding:24px;text-align:center}
+    .auth-wrap{min-height:100vh;display:grid;place-items:center;padding:20px;background:#09090b;color:#fafafa;font-family:system-ui,sans-serif}
+    .auth-box{width:100%;max-width:400px;background:#16161a;border:1px solid #27272f;border-radius:24px;padding:24px;text-align:center}
     .auth-box h1{font-size:22px;margin:10px 0 6px}
-    .auth-box .sub{color:var(--text-muted);font-size:13px;margin-bottom:14px;line-height:1.5}
-    .cam-frame{position:relative;width:100%;aspect-ratio:1;max-height:280px;border-radius:18px;overflow:hidden;background:#0a0a0a;margin:0 auto 12px;border:1px solid var(--border)}
+    .auth-box .sub{color:#a1a1aa;font-size:13px;margin-bottom:14px;line-height:1.5}
+    .cam-frame{width:100%;aspect-ratio:1;max-height:260px;border-radius:18px;overflow:hidden;background:#0a0a0a;margin:0 auto 12px;border:1px solid #27272f}
     .cam-frame video,.cam-frame img{width:100%;height:100%;object-fit:cover;display:block}
     .cam-frame img{display:none}
     .cam-frame.shot video{display:none}
     .cam-frame.shot img{display:block}
     .name-row{text-align:left;margin-bottom:10px}
-    .name-row label{display:block;font-size:12px;color:var(--text-muted);margin-bottom:5px}
-    .name-row input{width:100%;padding:11px 12px;border-radius:12px;border:1px solid var(--border);background:var(--bg);color:var(--text)}
-    .hint{font-size:12px;color:var(--text-muted);margin:0 0 10px}
-    .err{display:none;color:var(--danger,#f87171);font-size:13px;margin-bottom:8px}
+    .name-row label{display:block;font-size:12px;color:#a1a1aa;margin-bottom:5px}
+    .name-row input{width:100%;padding:11px 12px;border-radius:12px;border:1px solid #27272f;background:#09090b;color:#fafafa;box-sizing:border-box}
+    .hint{font-size:12px;color:#a1a1aa;margin:0 0 10px}
+    .err{display:none;color:#f87171;font-size:13px;margin-bottom:8px}
     .err.show{display:block}
     .actions{display:flex;flex-direction:column;gap:8px}
-    .or{font-size:11px;color:var(--text-muted)}
+    .btn{padding:12px 16px;border-radius:999px;border:0;font-weight:600;font-size:14px;cursor:pointer;font-family:inherit}
+    .btn-main{background:#8b5cf6;color:#fff}
+    .btn-main:disabled{opacity:.5;cursor:not-allowed}
+    .btn-sec{background:transparent;color:#a1a1aa;border:1px solid #27272f}
+    .logo{font-weight:700;font-size:18px;color:#fafafa;text-decoration:none}
   </style>
 </head>
 <body>
   <div class="auth-wrap">
     <div class="auth-box">
-      <a href="../index.html" class="logo" style="display:flex;justify-content:center">Ai крафт</a>
-      <h1>Вход по фото</h1>
-      <p class="sub">Смотрите в камеру → «Готово» → кабинет. Без пароля. Бесплатно.</p>
-      <div class="name-row"><label>Имя</label><input id="name" placeholder="Как к вам обращаться" maxlength="32" autocomplete="name"></div>
+      <a href="../index.html?v=3" class="logo">Ai крафт</a>
+      <h1>Вход</h1>
+      <p class="sub">Нажмите «Войти без фото» — сразу в кабинет. Или снимите фото камерой.</p>
+      <div class="name-row"><label>Имя</label><input id="name" placeholder="Как к вам обращаться" maxlength="32" value="Гость"></div>
       <div class="cam-frame" id="frame">
         <video id="video" autoplay playsinline muted></video>
-        <canvas id="canvas" hidden></canvas>
-        <img id="preview" alt="Ваше фото">
+        <canvas id="canvas" style="display:none"></canvas>
+        <img id="preview" alt="">
       </div>
-      <p class="hint" id="hint">Включаем камеру…</p>
+      <p class="hint" id="hint">Камера необязательна</p>
       <p class="err" id="err"></p>
       <div class="actions">
-        <button type="button" class="btn-primary btn-block" id="btnReady" disabled>Готово — войти</button>
-        <button type="button" class="btn-ghost btn-block" id="btnRetake" hidden>Снять снова</button>
-        <span class="or">или</span>
-        <button type="button" class="btn-ghost btn-block" id="btnGuest">Продолжить без фото</button>
+        <button type="button" class="btn btn-main" id="btnGuest">Войти без фото →</button>
+        <button type="button" class="btn btn-sec" id="btnCam">Включить камеру</button>
+        <button type="button" class="btn btn-main" id="btnReady" style="display:none" disabled>Снять и войти</button>
       </div>
     </div>
   </div>
-  <script src="../js/core.js" defer></script>
   <script>
-    document.addEventListener('DOMContentLoaded', () => {
-      if (typeof AC === 'undefined') return;
-      AC.applyTheme();
-      if (AC.getSession()) { location.replace('dashboard.html'); return; }
-      const video = document.getElementById('video');
-      const canvas = document.getElementById('canvas');
-      const preview = document.getElementById('preview');
-      const frame = document.getElementById('frame');
-      const btnReady = document.getElementById('btnReady');
-      const btnRetake = document.getElementById('btnRetake');
-      const hint = document.getElementById('hint');
-      const err = document.getElementById('err');
-      let stream = null, photoData = null, step = 0;
+  (function () {
+    function enter(name, photo) {
+      name = (name || 'Гость').trim().slice(0, 32) || 'Гость';
+      var key = 'photo_' + name.toLowerCase().replace(/\s+/g, '_').replace(/[^a-z0-9_]/gi, '');
+      if (!key || key === 'photo_') key = 'u_' + Date.now();
+      try {
+        var users = {};
+        try { users = JSON.parse(localStorage.getItem('aicraft_users') || '{}'); } catch (e) {}
+        if (!users[key]) users[key] = { photoAuth: true, sites: [], name: name, photo: photo || null };
+        else { users[key].name = name; if (photo) users[key].photo = photo; }
+        localStorage.setItem('aicraft_users', JSON.stringify(users));
+        localStorage.setItem('aicraft_session', JSON.stringify({ login: key, name: name, photoAuth: true }));
+        if (photo) localStorage.setItem('aicraft_identity', JSON.stringify({ name: name, photo: photo, at: Date.now() }));
+      } catch (e) {
+        alert('Не удалось сохранить сессию. Разрешите localStorage.');
+        return;
+      }
+      location.href = 'dashboard.html?v=3';
+    }
 
-      async function startCam() {
-        try {
-          if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) throw new Error('no cam');
-          stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user' }, audio: false });
-          video.srcObject = stream;
-          await video.play().catch(() => {});
-          hint.textContent = 'Смотрите в камеру и нажмите «Готово»';
-          btnReady.disabled = false;
-        } catch (e) {
-          hint.textContent = 'Камера недоступна — войдите без фото';
-          err.textContent = 'Нет доступа к камере (HTTPS или разрешение).';
-          err.classList.add('show');
-        }
+    var video = document.getElementById('video');
+    var canvas = document.getElementById('canvas');
+    var preview = document.getElementById('preview');
+    var frame = document.getElementById('frame');
+    var stream = null;
+    var photoData = null;
+
+    document.getElementById('btnGuest').onclick = function () {
+      enter(document.getElementById('name').value, null);
+    };
+
+    document.getElementById('btnCam').onclick = async function () {
+      var err = document.getElementById('err');
+      err.classList.remove('show');
+      try {
+        if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) throw new Error('no');
+        stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user' }, audio: false });
+        video.srcObject = stream;
+        await video.play().catch(function () {});
+        document.getElementById('hint').textContent = 'Смотрите в камеру и нажмите «Снять и войти»';
+        document.getElementById('btnReady').style.display = 'block';
+        document.getElementById('btnReady').disabled = false;
+        document.getElementById('btnCam').style.display = 'none';
+      } catch (e) {
+        err.textContent = 'Камера недоступна. Используйте «Войти без фото».';
+        err.classList.add('show');
       }
-      function stopCam() {
-        if (stream) stream.getTracks().forEach(t => t.stop());
-        stream = null;
+    };
+
+    document.getElementById('btnReady').onclick = function () {
+      if (!stream) return;
+      var w = video.videoWidth || 480, h = video.videoHeight || 480;
+      canvas.width = w; canvas.height = h;
+      canvas.getContext('2d').drawImage(video, 0, 0, w, h);
+      photoData = canvas.toDataURL('image/jpeg', 0.8);
+      preview.src = photoData;
+      frame.classList.add('shot');
+      if (stream) stream.getTracks().forEach(function (t) { t.stop(); });
+      stream = null;
+      enter(document.getElementById('name').value, photoData);
+    };
+
+    // already logged in?
+    try {
+      if (JSON.parse(localStorage.getItem('aicraft_session') || 'null')) {
+        location.href = 'dashboard.html?v=3';
       }
-      function capture() {
-        const w = video.videoWidth || 480, h = video.videoHeight || 480;
-        canvas.width = w; canvas.height = h;
-        canvas.getContext('2d').drawImage(video, 0, 0, w, h);
-        photoData = canvas.toDataURL('image/jpeg', 0.8);
-        preview.src = photoData;
-        frame.classList.add('shot');
-        stopCam();
-        step = 1;
-      }
-      function enter(withPhoto) {
-        const name = document.getElementById('name').value.trim() || 'Гость';
-        AC.enterWithPhoto({ name, photoDataUrl: withPhoto ? photoData : null });
-        location.replace('dashboard.html');
-      }
-      btnReady.onclick = () => {
-        if (step === 0) {
-          if (!stream) { AC.toast('Камера не готова'); return; }
-          capture();
-          btnRetake.hidden = false;
-          btnReady.textContent = 'Подтвердить вход';
-          hint.textContent = 'Фото снято. Нажмите ещё раз, чтобы войти';
-          return;
-        }
-        btnReady.disabled = true;
-        btnReady.textContent = 'Входим…';
-        enter(true);
-      };
-      btnRetake.onclick = () => {
-        photoData = null; step = 0;
-        frame.classList.remove('shot');
-        btnRetake.hidden = true;
-        btnReady.disabled = true;
-        btnReady.textContent = 'Готово — войти';
-        startCam();
-      };
-      document.getElementById('btnGuest').onclick = () => { stopCam(); enter(false); };
-      startCam();
-    });
+    } catch (e) {}
+  })();
   </script>
 </body>
 </html>
