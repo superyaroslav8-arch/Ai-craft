@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Ai-craft</title>
+  <meta name="description" content="Создание сайтов по описанию с помощью искусственного интеллекта и создание доменов и ссылок для сайтов полностью бесплатно.">
+  <link rel="stylesheet" href="css/app.css">
+</head>
+<body>
+<div id="gate" class="wrap center" style="display:none">
+  <p class="badge">100% бесплатно</p>
+  <h1>Ai-craft</h1>
+  <p class="lead">Вход без пароля. Введите имя и нажмите «Войти».</p>
+  <div style="max-width:320px;margin:0 auto;text-align:left">
+    <label>Как вас зовут</label>
+    <input id="gateName" value="Гость" maxlength="32" autocomplete="name">
+    <button class="btn" id="gateGo" type="button" style="width:100%;margin-top:16px">Войти бесплатно</button>
+  </div>
+  <footer class="foot"><a href="tel:+79002373222">+7 (900) 237-32-22</a> · <a href="mailto:superyaroslav8@iCloud.com">superyaroslav8@iCloud.com</a></footer>
+</div>
+<div class="app" id="shell" style="display:none">
+  <aside class="side">
+    <div class="brand">Ai-craft</div>
+    <p class="tag">Сайты по описанию · бесплатно</p>
+    <nav>
+      <a href="#sites" data-page="sites">Мои сайты</a>
+      <a href="#create" data-page="create">Собрать сайт</a>
+      <a href="#media" data-page="media">Медиа AI</a>
+      <a href="#neuro" data-page="neuro">Нейро</a>
+      <a href="#links" data-page="links">Ссылки</a>
+      <a href="#settings" data-page="settings">Настройки</a>
+    </nav>
+    <div class="user"><strong id="who">—</strong><br><a href="#" id="logout">Выйти</a></div>
+  </aside>
+  <main class="main">
+    <section class="page" id="page-sites">
+      <h2>Мои сайты</h2>
+      <p class="sub">Сайты по вашему описанию <span class="free-note">бесплатно</span></p>
+      <a class="btn" href="#create">+ Собрать сайт</a>
+      <div id="siteList" style="margin-top:22px"></div>
+    </section>
+    <section class="page" id="page-create">
+      <h2>Собрать сайт</h2>
+      <p class="sub">Напишите, какой сайт нужен — соберём структуру и тексты</p>
+      <div class="grid">
+        <div>
+          <label>Описание сайта</label>
+          <textarea id="idea" placeholder="Например: сайт кофейни — уют, меню, о нас, контакты"></textarea>
+          <button class="btn" id="btnBuild" type="button" style="margin-top:12px">Собрать по описанию</button>
+          <div id="addrBox" style="display:none;margin-top:20px">
+            <label>Адрес сайта</label>
+            <div class="chips">
+              <span class="chip on" data-mode="sub">Поддомен</span>
+              <span class="chip" data-mode="custom">Свой домен</span>
+            </div>
+            <div id="subRow">
+              <input id="sub" placeholder="имя" style="margin-bottom:8px">
+              <select id="tld">
+                <option value="ai_craft.ru">.ai_craft.ru</option>
+                <option value="ai_craft.com">.ai_craft.com</option>
+                <option value="ai_craft.dev">.ai_craft.dev</option>
+              </select>
+            </div>
+            <div id="customRow" style="display:none">
+              <input id="customDomain" placeholder="мой-сайт.ru">
+            </div>
+            <p class="sub" style="margin:10px 0 0;font-size:12px">Адрес в кабинете. Кнопка «Открыть» покажет сайт.</p>
+            <button class="btn" id="btnSave" type="button" style="margin-top:14px">Сохранить бесплатно</button>
+          </div>
+        </div>
+        <div><div class="preview"><iframe id="preview" title="Превью"></iframe></div></div>
+      </div>
+    </section>
+    <section class="page" id="page-media">
+      <h2>Медиа AI</h2>
+      <p class="sub">Фото по тексту — бесплатно</p>
+      <label>Что нарисовать</label>
+      <textarea id="mediaPrompt" placeholder="Уютная кофейня, тёплый свет"></textarea>
+      <button class="btn" id="btnMedia" type="button" style="margin-top:12px">Сгенерировать фото</button>
+      <p id="mediaStatus" class="sub" style="margin-top:10px"></p>
+      <div id="mediaResult" class="card" style="margin-top:12px;min-height:140px"></div>
+    </section>
+    <section class="page" id="page-neuro">
+      <h2>Нейро</h2>
+      <p class="sub">Помощник Ai-craft</p>
+      <div id="chat"></div>
+      <form class="chat-form" id="chatForm">
+        <input id="chatInput" placeholder="Напишите вопрос…" autocomplete="off">
+        <button class="btn" type="submit">Отправить</button>
+      </form>
+    </section>
+    <section class="page" id="page-links">
+      <h2>Ссылки</h2>
+      <p class="sub">Короткие ссылки <span class="free-note">бесплатно</span></p>
+      <label>Название</label><input id="linkTitle" placeholder="Мой проект">
+      <label>Полный URL</label><input id="linkUrl" placeholder="https://…">
+      <button class="btn" id="btnLink" type="button" style="margin-top:14px">Создать ссылку</button>
+      <div id="linkList" style="margin-top:18px"></div>
+    </section>
+    <section class="page" id="page-settings">
+      <h2>Настройки</h2>
+      <p class="sub">Всё бесплатно. Данные в вашем браузере.</p>
+      <div class="row"><div><strong>Язык</strong></div>
+        <div class="chips" id="lang"><span class="chip" data-v="ru">Русский</span><span class="chip" data-v="en">English</span></div></div>
+      <div class="row"><div><strong>Тема</strong></div>
+        <div class="chips" id="theme"><span class="chip" data-v="dark">Тёмная</span><span class="chip" data-v="light">Светлая</span></div></div>
+      <div class="row" style="flex-wrap:wrap"><div><strong>Цвет</strong></div>
+        <div class="chips" id="accent">
+          <span class="chip" data-v="#8b5cf6" style="background:#8b5cf6;color:#fff">●</span>
+          <span class="chip" data-v="#3b82f6" style="background:#3b82f6;color:#fff">●</span>
+          <span class="chip" data-v="#10b981" style="background:#10b981;color:#fff">●</span>
+          <span class="chip" data-v="#f59e0b" style="background:#f59e0b;color:#fff">●</span>
+          <span class="chip" data-v="#ef4444" style="background:#ef4444;color:#fff">●</span>
+        </div></div>
+      <p class="sub" style="margin-top:28px">Поддержка: <a href="tel:+79002373222">+7 (900) 237-32-22</a> · <a href="mailto:superyaroslav8@iCloud.com">superyaroslav8@iCloud.com</a></p>
+    </section>
+  </main>
+</div>
+<nav class="mob">
+  <a href="#sites" data-page="sites">Сайты</a>
+  <a href="#create" data-page="create">Собрать</a>
+  <a href="#media" data-page="media">Медиа</a>
+  <a href="#settings" data-page="settings">Ещё</a>
+</nav>
+<script src="js/app.js"></script>
+<script>
+(function () {
+  if (typeof AK === 'undefined') {
+    document.body.innerHTML = '<div class="wrap center"><h1>Ai-craft</h1><p class="lead">Обновите страницу (Ctrl+F5).</p></div>';
+    return;
+  }
+  AK.applyTheme();
+  var session = AK.session();
+  var built = null, mode = 'sub';
+  function showGate() {
+    document.getElementById('gate').style.display = 'block';
+    document.getElementById('shell').style.display = 'none';
+  }
+  function showApp() {
+    document.getElementById('gate').style.display = 'none';
+    document.getElementById('shell').style.display = 'flex';
+    document.getElementById('who').textContent = session.name;
+    route();
+  }
+  document.getElementById('gateGo').onclick = function () {
+    session = AK.enter(document.getElementById('gateName').value);
+    showApp(); location.hash = 'sites';
+  };
+  document.getElementById('logout').onclick = function (e) {
+    e.preventDefault(); AK.clearSession(); session = null; showGate();
+  };
+  function route() {
+    var page = (location.hash || '#sites').replace('#', '') || 'sites';
+    document.querySelectorAll('.page').forEach(function (p) { p.classList.toggle('on', p.id === 'page-' + page); });
+    document.querySelectorAll('[data-page]').forEach(function (a) { a.classList.toggle('on', a.getAttribute('data-page') === page); });
+    if (page === 'sites') renderSites();
+    if (page === 'links') renderLinks();
+    if (page === 'settings') syncSettings();
+  }
+  window.addEventListener('hashchange', route);
+  function renderSites() {
+    var list = AK.sites(session.login);
+    var el = document.getElementById('siteList');
+    if (!list.length) {
+      el.innerHTML = '<div class="empty"><p>Пока нет сайтов</p><a class="btn" href="#create" style="margin-top:16px">Собрать первый сайт</a></div>';
+      return;
+    }
+    el.innerHTML = list.map(function (s) {
+      var addr = s.customDomain || ((s.subdomain || 'site') + '.' + (s.domain || 'ai_craft.ru'));
+      return '<div class="card"><h3>' + AK.esc(s.name) + '</h3><div class="meta">' + AK.esc(addr) + '</div><p style="color:var(--muted);font-size:13px">' +
+        AK.esc((s.description || '').slice(0, 140)) + '</p><div class="actions">' +
+        '<button type="button" data-open="' + s.id + '">Открыть</button>' +
+        '<button type="button" data-del="' + s.id + '">Удалить</button></div></div>';
+    }).join('');
+    el.querySelectorAll('[data-open]').forEach(function (b) {
+      b.onclick = function () {
+        var s = AK.sites(session.login).find(function (x) { return x.id === b.getAttribute('data-open'); });
+        if (!s || !s.html) return AK.toast('Нет содержимого');
+        var doc = s.html;
+        if (doc.indexOf('</head>') !== -1) doc = doc.replace('</head>', '<style>' + (s.css || '') + '</style></head>');
+        else doc = '<style>' + (s.css || '') + '</style>' + doc;
+        var w = window.open('', '_blank');
+        if (!w) return AK.toast('Разрешите всплывающие окна');
+        w.document.write(doc); w.document.close();
+      };
+    });
+    el.querySelectorAll('[data-del]').forEach(function (b) {
+      b.onclick = function () {
+        if (!confirm('Удалить сайт?')) return;
+        AK.saveSites(session.login, AK.sites(session.login).filter(function (s) { return s.id !== b.getAttribute('data-del'); }));
+        renderSites(); AK.toast('Удалено');
+      };
+    });
+  }
+  function showPreview(html, css) {
+    var doc = html;
+    if (doc.indexOf('</head>') !== -1) doc = doc.replace('</head>', '<style>' + css + '</style></head>');
+    else doc = '<style>' + css + '</style>' + doc;
+    document.getElementById('preview').srcdoc = doc;
+  }
+  document.getElementById('btnBuild').onclick = function () {
+    var idea = document.getElementById('idea').value.trim();
+    if (idea.length < 5) return AK.toast('Напишите описание подробнее');
+    var btn = document.getElementById('btnBuild');
+    btn.disabled = true; btn.textContent = 'Собираем…';
+    setTimeout(function () {
+      var p = AK.parse(idea);
+      var html = AK.buildHTML(idea, p.title);
+      var css = AK.buildCSS(p.tone);
+      built = { name: p.title, description: idea, html: html, css: css };
+      showPreview(html, css);
+      document.getElementById('addrBox').style.display = 'block';
+      if (!document.getElementById('sub').value) {
+        document.getElementById('sub').value = (p.title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 16)) || 'site';
+      }
+      btn.disabled = false; btn.textContent = 'Собрать по описанию';
+      AK.toast('Сайт собран');
+    }, 350);
+  };
+  document.querySelectorAll('#addrBox .chip').forEach(function (c) {
+    c.onclick = function () {
+      mode = c.getAttribute('data-mode');
+      document.querySelectorAll('#addrBox .chip').forEach(function (x) { x.classList.toggle('on', x === c); });
+      document.getElementById('subRow').style.display = mode === 'sub' ? 'block' : 'none';
+      document.getElementById('customRow').style.display = mode === 'custom' ? 'block' : 'none';
+    };
+  });
+  document.getElementById('btnSave').onclick = function () {
+    if (!built) return AK.toast('Сначала нажмите «Собрать»');
+    var subdomain, domain, customDomain = '';
+    if (mode === 'custom') {
+      customDomain = document.getElementById('customDomain').value.trim().toLowerCase().replace(/^https?:\/\//, '');
+      if (!customDomain || customDomain.indexOf('.') < 0) return AK.toast('Пример: shop.ru');
+      subdomain = customDomain.split('.')[0]; domain = customDomain;
+    } else {
+      subdomain = document.getElementById('sub').value.trim().toLowerCase().replace(/[^a-z0-9-]/g, '');
+      domain = document.getElementById('tld').value;
+      if (subdomain.length < 2) return AK.toast('Укажите имя поддомена');
+    }
+    var list = AK.sites(session.login);
+    list.unshift({ id: 's_' + Date.now(), name: built.name, description: built.description, subdomain: subdomain, domain: domain, customDomain: customDomain, html: built.html, css: built.css, createdAt: new Date().toISOString() });
+    AK.saveSites(session.login, list);
+    AK.toast('Сохранено бесплатно');
+    location.hash = 'sites';
+  };
+  document.getElementById('btnMedia').onclick = function () {
+    var prompt = document.getElementById('mediaPrompt').value.trim();
+    if (!prompt) return AK.toast('Опишите картинку');
+    var st = document.getElementById('mediaStatus'), box = document.getElementById('mediaResult'), btn = document.getElementById('btnMedia');
+    btn.disabled = true; st.textContent = 'Генерация… 5–20 сек';
+    var img = new Image(); img.className = 'gen';
+    img.onload = function () { box.innerHTML = ''; box.appendChild(img); st.textContent = 'Готово'; btn.disabled = false; AK.toast('Готово'); };
+    img.onerror = function () { st.textContent = 'Ошибка сети. Ещё раз.'; btn.disabled = false; };
+    box.innerHTML = '<p style="color:var(--muted)">Загрузка…</p>';
+    img.src = AK.imageUrl(prompt) + '&t=' + Date.now();
+  };
+  function addChat(role, text) {
+    var el = document.createElement('div');
+    el.className = 'msg ' + (role === 'me' ? 'me' : 'bot');
+    el.textContent = text;
+    document.getElementById('chat').appendChild(el);
+    document.getElementById('chat').scrollTop = 99999;
+  }
+  addChat('bot', 'Я Нейро из Ai-craft. Помогу собрать сайт, ссылку или фото. Всё бесплатно.');
+  document.getElementById('chatForm').onsubmit = function (e) {
+    e.preventDefault();
+    var t = document.getElementById('chatInput').value.trim();
+    if (!t) return;
+    document.getElementById('chatInput').value = '';
+    addChat('me', t);
+    setTimeout(function () {
+      var low = t.toLowerCase(), a = 'Откройте раздел слева: «Собрать сайт», «Медиа» или «Ссылки».';
+      if (/сайт|собрать|лендинг/.test(low)) a = '1) Собрать сайт 2) описание 3) Собрать 4) адрес 5) Сохранить.';
+      if (/фото|медиа|картин/.test(low)) a = 'Медиа AI → описание → Сгенерировать фото.';
+      if (/ссылк|домен/.test(low)) a = 'Ссылки — короткие метки. Адрес — при сохранении сайта.';
+      if (/бесплат|плат|цен/.test(low)) a = 'Ai-craft полностью бесплатный. Оплаты нет.';
+      if (/привет|hello|здрав/.test(low)) a = 'Привет! Чем помочь в Ai-craft?';
+      addChat('bot', a);
+    }, 350);
+  };
+  function renderLinks() {
+    var links = AK.links(session.login), el = document.getElementById('linkList');
+    if (!links.length) { el.innerHTML = '<p class="sub">Пока нет ссылок</p>'; return; }
+    el.innerHTML = links.map(function (l) {
+      return '<div class="card"><div class="meta">ai-craft/' + AK.esc(l.slug) + '</div><div style="font-size:13px">' + AK.esc(l.url) +
+        '</div><div class="actions"><button type="button" data-copy="ai-craft/' + AK.esc(l.slug) + '">Копировать</button>' +
+        '<button type="button" data-ldel="' + l.id + '">Удалить</button></div></div>';
+    }).join('');
+    el.querySelectorAll('[data-copy]').forEach(function (b) {
+      b.onclick = function () { navigator.clipboard.writeText(b.getAttribute('data-copy')).then(function () { AK.toast('Скопировано'); }); };
+    });
+    el.querySelectorAll('[data-ldel]').forEach(function (b) {
+      b.onclick = function () {
+        AK.saveLinks(session.login, AK.links(session.login).filter(function (l) { return l.id !== b.getAttribute('data-ldel'); }));
+        renderLinks();
+      };
+    });
+  }
+  document.getElementById('btnLink').onclick = function () {
+    var url = document.getElementById('linkUrl').value.trim();
+    if (!url) return AK.toast('Укажите URL');
+    var slug = Math.random().toString(36).slice(2, 8);
+    var links = AK.links(session.login);
+    links.unshift({ id: 'l_' + Date.now(), title: document.getElementById('linkTitle').value.trim() || slug, url: url, slug: slug });
+    AK.saveLinks(session.login, links);
+    document.getElementById('linkTitle').value = ''; document.getElementById('linkUrl').value = '';
+    renderLinks(); AK.toast('Ссылка создана');
+  };
+  function syncSettings() {
+    var s = AK.settings();
+    document.querySelectorAll('#lang .chip').forEach(function (c) { c.classList.toggle('on', c.getAttribute('data-v') === s.lang); });
+    document.querySelectorAll('#theme .chip').forEach(function (c) { c.classList.toggle('on', c.getAttribute('data-v') === s.theme); });
+    document.querySelectorAll('#accent .chip').forEach(function (c) { c.classList.toggle('on', c.getAttribute('data-v') === s.accent); });
+  }
+  document.querySelectorAll('#lang .chip').forEach(function (c) {
+    c.onclick = function () { AK.saveSettings({ lang: c.getAttribute('data-v') }); syncSettings(); AK.toast('Сохранено'); };
+  });
+  document.querySelectorAll('#theme .chip').forEach(function (c) {
+    c.onclick = function () { AK.saveSettings({ theme: c.getAttribute('data-v') }); syncSettings(); AK.toast('Сохранено'); };
+  });
+  document.querySelectorAll('#accent .chip').forEach(function (c) {
+    c.onclick = function () { AK.saveSettings({ accent: c.getAttribute('data-v') }); syncSettings(); AK.toast('Сохранено'); };
+  });
+  showPreview(AK.buildHTML('Здесь появится ваш сайт.', 'Ai-craft'), AK.buildCSS('neutral'));
+  if (session) showApp(); else showGate();
+})();
+</script>
+</body>
+</html>
