@@ -1,42 +1,95 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Нейро — Ai крафт</title>
   <link rel="stylesheet" href="../css/style.css">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@600;700&display=swap" rel="stylesheet">
+  <style>
+    body{overflow:hidden}
+    .gpt-app{display:flex;height:100vh;background:var(--bg)}
+    .gpt-side{width:260px;background:#171717;border-right:1px solid #2f2f2f;display:flex;flex-direction:column;flex-shrink:0}
+    [data-theme="light"] .gpt-side{background:#f9f9f9;border-color:#e5e5e5}
+    .gpt-side-top{padding:12px;display:flex;flex-direction:column;gap:8px}
+    .gpt-new{display:flex;align-items:center;gap:10px;width:100%;padding:10px 12px;border:1px solid #2f2f2f;border-radius:10px;font-size:14px;color:var(--text);text-align:left}
+    .gpt-new:hover{background:rgba(255,255,255,.05)}
+    [data-theme="light"] .gpt-new{border-color:#ddd}
+    .gpt-chats{flex:1;overflow:auto;padding:8px}
+    .gpt-chat-item{width:100%;text-align:left;padding:10px 12px;border-radius:10px;font-size:13px;color:var(--text-muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:2px}
+    .gpt-chat-item:hover,.gpt-chat-item.active{background:rgba(255,255,255,.08);color:var(--text)}
+    .gpt-side-foot{padding:12px;border-top:1px solid #2f2f2f;font-size:12px;color:var(--text-muted)}
+    .gpt-main{flex:1;display:flex;flex-direction:column;min-width:0;position:relative}
+    .gpt-top{height:52px;display:flex;align-items:center;justify-content:space-between;padding:0 16px;border-bottom:1px solid var(--border);font-size:14px;color:var(--text-muted)}
+    .gpt-messages{flex:1;overflow:auto;padding:24px 16px 140px}
+    .gpt-center{max-width:768px;margin:0 auto;width:100%}
+    .gpt-welcome{text-align:center;padding:48px 16px 24px}
+    .gpt-welcome h1{font-family:var(--display);font-size:28px;margin-bottom:8px;font-weight:600}
+    .gpt-welcome p{color:var(--text-muted);font-size:15px;margin-bottom:28px}
+    .gpt-suggestions{display:grid;grid-template-columns:1fr 1fr;gap:10px;max-width:640px;margin:0 auto}
+    .gpt-sug{text-align:left;padding:14px 16px;border:1px solid var(--border);border-radius:14px;background:var(--surface);font-size:13px;color:var(--text)}
+    .gpt-sug:hover{border-color:var(--accent);background:var(--accent-soft)}
+    .gpt-sug small{display:block;color:var(--text-muted);margin-top:4px;font-size:12px}
+    .gpt-row{display:flex;gap:14px;padding:18px 0}
+    .gpt-avatar{width:32px;height:32px;border-radius:50%;flex-shrink:0;display:grid;place-items:center;font-size:13px;font-weight:700;color:#fff}
+    .gpt-avatar.user{background:#5b5bd6}
+    .gpt-avatar.bot{background:linear-gradient(135deg,#10a37f,#1a7f64)}
+    .gpt-bubble{flex:1;min-width:0;font-size:15px;line-height:1.65;padding-top:4px;white-space:pre-wrap;word-break:break-word}
+    .gpt-actions{display:flex;gap:4px;margin-top:8px;opacity:0;transition:.15s}
+    .gpt-row:hover .gpt-actions{opacity:1}
+    .gpt-actions button{padding:4px 8px;border-radius:6px;font-size:11px;color:var(--text-muted)}
+    .gpt-composer-wrap{position:absolute;left:0;right:0;bottom:0;padding:12px 16px 20px;background:linear-gradient(transparent,var(--bg) 30%)}
+    .gpt-composer{max-width:768px;margin:0 auto;background:var(--surface);border:1px solid var(--border);border-radius:24px;padding:10px 12px 10px 16px;display:flex;align-items:flex-end;gap:8px;box-shadow:0 8px 30px rgba(0,0,0,.2)}
+    .gpt-composer textarea{flex:1;border:0;background:transparent;color:var(--text);resize:none;outline:none;max-height:160px;min-height:24px;line-height:1.5;font-size:15px;padding:6px 0}
+    .gpt-send{width:36px;height:36px;border-radius:50%;background:var(--accent);color:#fff;display:grid;place-items:center;flex-shrink:0}
+    .gpt-tools{display:flex;gap:6px;flex-wrap:wrap;max-width:768px;margin:0 auto 8px}
+    .gpt-tool{padding:6px 12px;border-radius:999px;border:1px solid var(--border);font-size:12px;color:var(--text-muted);background:var(--bg)}
+    .gpt-tool.active,.gpt-tool:hover{border-color:var(--accent);color:var(--accent);background:var(--accent-soft)}
+    .gpt-hint{text-align:center;font-size:11px;color:var(--text-muted);margin-top:8px}
+    .typing span{display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--text-muted);margin:0 2px;animation:blink 1.2s infinite}
+    @keyframes blink{0%,80%,100%{opacity:.3}40%{opacity:1}}
+    @media(max-width:800px){.gpt-side{display:none}.gpt-suggestions{grid-template-columns:1fr}}
+  </style>
 </head>
 <body>
-<div class="app">
-  <aside class="sidebar">
-    <a href="../index.html" class="logo"><span class="logo-mark">✦</span> Ai крафт</a>
-    <nav class="side-nav">
-      <a href="dashboard.html">Проекты</a>
-      <a href="create.html">Создать сайт</a>
-      <a href="editor.html">Редактор кода</a>
-      <a href="links.html">Ссылки</a>
-      <a href="neuro.html" class="active">Нейро</a>
-      <a href="settings.html">Настройки</a>
-      <a href="media.html">Медиа AI</a>
-    </nav>
-    <div class="side-user"><strong id="userLogin">—</strong><a href="#" id="logout">Выйти</a></div>
-  </aside>
-  <main class="main">
-    <div class="page-head"><h1>Нейро</h1></div>
-    <div class="neuro-layout">
-      <div class="card">
-        <h3>Чем может помочь</h3>
-        <p style="margin:12px 0;color:var(--text-muted);font-size:14px">Создание сайтов, код, ссылки, деплой, настройки. Или просто поболтать.</p>
-        <ul style="font-size:14px;color:var(--text-muted);line-height:1.8;padding-left:18px">
-          <li>«Как создать сайт?»</li>
-          <li>«Как сменить тему?»</li>
-          <li>«Как сделать короткую ссылку?»</li>
-          <li>«Как опубликовать проект?»</li>
-        </ul>
-      </div>
-      <div id="neuroRoot"></div>
+<div class="gpt-app">
+  <aside class="gpt-side">
+    <div class="gpt-side-top">
+      <button class="gpt-new" id="newChat" type="button">＋ Новый чат</button>
+      <a class="gpt-new" href="dashboard.html" style="text-decoration:none">← К проектам</a>
     </div>
-  </main>
+    <div class="gpt-chats" id="chatList"></div>
+    <div class="gpt-side-foot">
+      <div id="userLogin">—</div>
+      <a href="settings.html">Настройки</a> · <a href="#" id="logout">Выйти</a>
+    </div>
+  </aside>
+  <div class="gpt-main">
+    <div class="gpt-top"><span>Нейро · Ai крафт</span><span><a href="create.html">Создать сайт</a> · <a href="editor.html">Код</a></span></div>
+    <div class="gpt-messages" id="messages">
+      <div class="gpt-center" id="welcome">
+        <div class="gpt-welcome">
+          <h1>Чем могу помочь?</h1>
+          <p>Нейро — помощник Ai крафт. Сайты, код, ссылки или просто разговор.</p>
+          <div class="gpt-suggestions" id="sugs"></div>
+        </div>
+      </div>
+      <div class="gpt-center" id="thread" style="display:none"></div>
+    </div>
+    <div class="gpt-composer-wrap">
+      <div class="gpt-tools" id="tools">
+        <button type="button" class="gpt-tool active" data-mode="chat">Чат</button>
+        <button type="button" class="gpt-tool" data-mode="code">Код</button>
+        <button type="button" class="gpt-tool" data-mode="site">Сайт</button>
+        <button type="button" class="gpt-tool" data-mode="explain">Объясни</button>
+      </div>
+      <form class="gpt-composer" id="form">
+        <textarea id="input" rows="1" placeholder="Спросите что угодно…" autofocus></textarea>
+        <button class="gpt-send" type="submit" id="send">↑</button>
+      </form>
+      <div class="gpt-hint">Нейро может ошибаться. Проверяйте важные ответы.</div>
+    </div>
+  </div>
 </div>
 <script src="../js/core.js"></script>
 <script src="../js/neuro.js"></script>
@@ -45,7 +98,89 @@
   AC.applyTheme();
   document.getElementById('userLogin').textContent = session.login;
   document.getElementById('logout').onclick = e => { e.preventDefault(); AC.clearSession(); location.href='../index.html'; };
-  Neuro.mount(document.getElementById('neuroRoot'), session.login);
+  const SUGS = [
+    { t: 'Помоги создать сайт', s: 'landing для кофейни' },
+    { t: 'Напиши HTML блок', s: 'карточка товара' },
+    { t: 'Как опубликовать', s: 'поддомен ai_craft' },
+    { t: 'Поболтаем', s: 'расскажи анекдот' }
+  ];
+  document.getElementById('sugs').innerHTML = SUGS.map(x =>
+    `<button type="button" class="gpt-sug" data-q="${AC.escapeHtml(x.t + ': ' + x.s)}"><strong>${AC.escapeHtml(x.t)}</strong><small>${AC.escapeHtml(x.s)}</small></button>`
+  ).join('');
+  document.querySelectorAll('.gpt-sug').forEach(b => b.onclick = () => send(b.dataset.q));
+  let mode = 'chat';
+  document.querySelectorAll('.gpt-tool').forEach(b => {
+    b.onclick = () => {
+      mode = b.dataset.mode;
+      document.querySelectorAll('.gpt-tool').forEach(x => x.classList.toggle('active', x === b));
+      const ph = { chat: 'Спросите что угодно…', code: 'Опишите код…', site: 'Опишите сайт…', explain: 'Вставьте код или вопрос…' };
+      document.getElementById('input').placeholder = ph[mode] || ph.chat;
+    };
+  });
+  const KEY = 'aicraft_gpt_chats_' + session.login;
+  function loadChats() { try { return JSON.parse(localStorage.getItem(KEY) || '[]'); } catch { return []; } }
+  function saveChats(list) { localStorage.setItem(KEY, JSON.stringify(list)); }
+  let chats = loadChats();
+  let currentId = chats[0]?.id || null;
+  function renderChatList() {
+    const el = document.getElementById('chatList');
+    if (!chats.length) { el.innerHTML = '<div style="padding:12px;font-size:12px;color:var(--text-muted)">Нет чатов</div>'; return; }
+    el.innerHTML = chats.map(c => `<button type="button" class="gpt-chat-item ${c.id === currentId ? 'active' : ''}" data-id="${c.id}">${AC.escapeHtml(c.title || 'Чат')}</button>`).join('');
+    el.querySelectorAll('[data-id]').forEach(b => b.onclick = () => { currentId = b.dataset.id; renderThread(); renderChatList(); });
+  }
+  function renderThread() {
+    const chat = chats.find(c => c.id === currentId);
+    const welcome = document.getElementById('welcome');
+    const thread = document.getElementById('thread');
+    if (!chat || !chat.messages.length) { welcome.style.display = ''; thread.style.display = 'none'; thread.innerHTML = ''; return; }
+    welcome.style.display = 'none'; thread.style.display = '';
+    thread.innerHTML = chat.messages.map(m => `<div class="gpt-row"><div class="gpt-avatar ${m.role === 'user' ? 'user' : 'bot'}">${m.role === 'user' ? 'Я' : 'N'}</div><div class="gpt-bubble ${m.role}">${AC.escapeHtml(m.text)}${m.role === 'bot' ? '<div class="gpt-actions"><button type="button" data-copy>Копировать</button></div>' : ''}</div></div>`).join('');
+    thread.querySelectorAll('[data-copy]').forEach(btn => btn.onclick = () => {
+      const text = btn.closest('.gpt-bubble').childNodes[0].textContent.trim();
+      navigator.clipboard.writeText(text).then(() => AC.toast('Скопировано'));
+    });
+    document.getElementById('messages').scrollTop = 99999;
+  }
+  function ensureChat() {
+    if (currentId && chats.find(c => c.id === currentId)) return chats.find(c => c.id === currentId);
+    const id = 'c_' + Date.now();
+    const chat = { id, title: 'Новый чат', messages: [], createdAt: Date.now() };
+    chats.unshift(chat); currentId = id; saveChats(chats); return chat;
+  }
+  function replyFor(text) {
+    const t = text.toLowerCase();
+    if (mode === 'code' || /код|html|css|js|typescript|python|функци/.test(t)) return Neuro.answerCode(text) || Neuro.reply('code', text);
+    if (mode === 'site' || /сайт|лендинг|страниц|домен/.test(t)) return Neuro.reply('site', text);
+    if (mode === 'explain' || /объясни|что делает|как работает/.test(t)) return Neuro.reply('explain', text);
+    return Neuro.reply('general', text);
+  }
+  function send(text) {
+    text = (text || '').trim();
+    if (!text) return;
+    const chat = ensureChat();
+    if (chat.messages.length === 0) chat.title = text.slice(0, 40) + (text.length > 40 ? '…' : '');
+    chat.messages.push({ role: 'user', text }); saveChats(chats); renderChatList(); renderThread();
+    document.getElementById('input').value = ''; autoSize();
+    const thread = document.getElementById('thread');
+    document.getElementById('welcome').style.display = 'none'; thread.style.display = '';
+    const typing = document.createElement('div');
+    typing.className = 'gpt-row'; typing.id = 'typing';
+    typing.innerHTML = '<div class="gpt-avatar bot">N</div><div class="gpt-bubble"><span class="typing"><span></span><span></span><span></span></span></div>';
+    thread.appendChild(typing);
+    document.getElementById('messages').scrollTop = 99999;
+    setTimeout(() => {
+      typing.remove();
+      chat.messages.push({ role: 'bot', text: replyFor(text) });
+      saveChats(chats); renderThread(); renderChatList();
+    }, 600 + Math.min(text.length * 8, 1200));
+  }
+  document.getElementById('form').onsubmit = e => { e.preventDefault(); send(document.getElementById('input').value); };
+  document.getElementById('newChat').onclick = () => { currentId = null; ensureChat(); renderChatList(); renderThread(); document.getElementById('input').focus(); };
+  const input = document.getElementById('input');
+  function autoSize() { input.style.height = 'auto'; input.style.height = Math.min(input.scrollHeight, 160) + 'px'; }
+  input.addEventListener('input', autoSize);
+  input.addEventListener('keydown', e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); send(input.value); } });
+  renderChatList(); renderThread();
 </script>
 </body>
 </html>
