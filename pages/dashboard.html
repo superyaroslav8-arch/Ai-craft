@@ -1,15 +1,16 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Кабинет — Ai крафт</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Проекты — Ai крафт</title>
   <link rel="stylesheet" href="../css/style.css">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@600;700&display=swap" rel="stylesheet">
 </head>
 <body>
 <div class="app">
   <aside class="sidebar">
-    <a href="../index.html" class="logo"><span class="logo-mark">✦</span> Ai крафт</a>
+    <a href="../index.html" class="logo">Ai крафт</a>
     <nav class="side-nav">
       <a href="dashboard.html" class="active">Проекты</a>
       <a href="create.html">Создать сайт</a>
@@ -19,48 +20,60 @@
       <a href="settings.html">Настройки</a>
       <a href="media.html">Медиа AI</a>
     </nav>
-    <div class="side-user">
-      <strong id="userLogin">—</strong>
-      <a href="#" id="logout">Выйти</a>
-      <div style="margin-top:12px;line-height:1.5">Поддержка<br><a href="tel:+79002373222">+7 (900) 237-32-22</a><br><a href="mailto:superyaroslav8@iCloud.com">superyaroslav8@iCloud.com</a></div>
-    </div>
+    <div class="side-user"><strong id="userLogin">—</strong><a href="#" id="logout">Выйти</a></div>
   </aside>
   <main class="main">
     <div class="page-head"><h1>Мои проекты</h1><a class="btn-primary" href="create.html">+ Новый сайт</a></div>
     <div id="list"></div>
   </main>
 </div>
+<nav class="mobile-nav">
+  <a href="dashboard.html" class="active">Проекты</a>
+  <a href="create.html">Создать</a>
+  <a href="editor.html">Код</a>
+  <a href="neuro.html">Нейро</a>
+  <a href="settings.html">Ещё</a>
+</nav>
 <script src="../js/core.js"></script>
 <script>
   const session = AC.requireAuth();
   AC.applyTheme();
   document.getElementById('userLogin').textContent = session.login;
-  document.getElementById('logout').onclick = e => { e.preventDefault(); AC.clearSession(); location.href='../index.html'; };
+  document.getElementById('logout').onclick = e => { e.preventDefault(); AC.clearSession(); location.href = '../index.html'; };
+  function openSite(id) {
+    const site = AC.getUserSites(session.login).find(x => x.id === id);
+    if (!site || !site.files) return AC.toast('Нет содержимого');
+    const html = site.files['index.html'] || '';
+    const css = site.files['style.css'] || '';
+    const js = site.files['script.js'] || '';
+    let doc = html;
+    if (doc.includes('</head>')) doc = doc.replace('</head>', '<style>' + css + '</style></head>');
+    else doc = '<style>' + css + '</style>' + doc;
+    if (doc.includes('script.js')) doc = doc.replace(/<script src="script\.js"><\/script>/, '<script>' + js + '<\/script>');
+    else doc += '<script>' + js + '<\/script>';
+    const w = window.open('', '_blank');
+    w.document.write(doc);
+    w.document.close();
+  }
   function render() {
     const sites = AC.getUserSites(session.login);
     const el = document.getElementById('list');
     if (!sites.length) {
-      el.innerHTML = `<div class="empty"><h3>Пока нет проектов</h3><p>Опиши идею — соберём сайт как на host-ai.</p><a class="btn-primary" href="create.html" style="margin-top:16px">Создать сайт</a></div>`;
+      el.innerHTML = '<div class="empty"><h3>Пока нет проектов</h3><p>Опиши идею — соберём сайт.</p><a class="btn-primary" href="create.html" style="margin-top:16px">Создать сайт</a></div>';
       return;
     }
-    el.innerHTML = `<div class="grid-cards">${sites.map(s => `
+    el.innerHTML = '<div class="grid-cards">' + sites.map(s => `
       <div class="card"><h3>${AC.escapeHtml(s.name)}</h3>
       <div class="meta">${AC.escapeHtml(s.subdomain)}.${AC.escapeHtml(s.domain)}</div>
-      <p>${AC.escapeHtml((s.description||'').slice(0,120))}</p>
+      <p>${AC.escapeHtml((s.description || '').slice(0, 120))}</p>
       <div class="card-actions">
         <a href="editor.html?id=${s.id}">Код</a>
-        <a href="#" data-open="${s.id}">Открыть</a>
-        <button data-del="${s.id}">Удалить</button>
-      </div></div>`).join('')}</div>`;
-    el.querySelectorAll('[data-del]').forEach(b => b.onclick = () => { if (confirm('Удалить?')) { AC.deleteSite(session.login, b.dataset.del); render(); }});
-    el.querySelectorAll('[data-open]').forEach(a => a.onclick = e => {
-      e.preventDefault();
-      const site = AC.getUserSites(session.login).find(x => x.id === a.dataset.open);
-      if (!site?.files?.['index.html']) return alert('Нет содержимого');
-      const w = window.open('', '_blank');
-      let full = site.files['index.html'];
-      if (full.includes('</head>')) full = full.replace('</head>', `<style>${site.files['style.css']||''}</style></head>`).replace('<script src="script.js"></script>', `<script>${site.files['script.js']||''}<\/script>`);
-      w.document.write(full); w.document.close();
+        <button type="button" data-open="${s.id}">Открыть</button>
+        <button type="button" data-del="${s.id}">Удалить</button>
+      </div></div>`).join('') + '</div>';
+    el.querySelectorAll('[data-open]').forEach(b => b.onclick = () => openSite(b.dataset.open));
+    el.querySelectorAll('[data-del]').forEach(b => b.onclick = () => {
+      if (confirm('Удалить проект?')) { AC.deleteSite(session.login, b.dataset.del); AC.toast('Удалено'); render(); }
     });
   }
   render();

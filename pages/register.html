@@ -1,7 +1,8 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Регистрация — Ai крафт</title>
   <link rel="stylesheet" href="../css/style.css">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@600;700&display=swap" rel="stylesheet">
@@ -9,13 +10,13 @@
 <body>
   <div class="auth-page">
     <div class="auth-card">
-      <a href="../index.html" class="logo" style="justify-content:center"><span class="logo-mark">✦</span> Ai крафт</a>
+      <a href="../index.html" class="logo" style="justify-content:center;display:flex">Ai крафт</a>
       <h1>Регистрация</h1>
       <p class="sub">Без email, SMS и капч</p>
       <div class="auth-error" id="err"></div>
       <form id="form">
-        <div class="form-group"><label>Логин</label><input id="login" required minlength="3"></div>
-        <div class="form-group"><label>Пароль</label><input id="pass" type="password" required minlength="4"></div>
+        <div class="form-group"><label>Логин</label><input id="login" required minlength="3" autocomplete="username"></div>
+        <div class="form-group"><label>Пароль</label><input id="pass" type="password" required minlength="4" autocomplete="new-password"></div>
         <button class="btn-primary btn-block" type="submit">Создать аккаунт</button>
       </form>
       <p class="auth-foot">Уже есть аккаунт? <a href="login.html">Войти</a></p>
@@ -31,6 +32,8 @@
       const pass = document.getElementById('pass').value;
       const err = document.getElementById('err');
       const users = AC.getUsers();
+      if (login.length < 3) { err.textContent = 'Логин минимум 3 символа'; err.classList.add('show'); return; }
+      if (pass.length < 4) { err.textContent = 'Пароль минимум 4 символа'; err.classList.add('show'); return; }
       if (users[login]) { err.textContent = 'Логин занят'; err.classList.add('show'); return; }
       users[login] = { password: pass, sites: [] };
       AC.saveUsers(users);

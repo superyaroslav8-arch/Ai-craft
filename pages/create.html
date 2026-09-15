@@ -1,7 +1,8 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Создать сайт — Ai крафт</title>
   <link rel="stylesheet" href="../css/style.css">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@600;700&display=swap" rel="stylesheet">
@@ -9,7 +10,7 @@
 <body>
 <div class="app">
   <aside class="sidebar">
-    <a href="../index.html" class="logo"><span class="logo-mark">✦</span> Ai крафт</a>
+    <a href="../index.html" class="logo">Ai крафт</a>
     <nav class="side-nav">
       <a href="dashboard.html">Проекты</a>
       <a href="create.html" class="active">Создать сайт</a>
@@ -26,15 +27,15 @@
     <div class="create-layout">
       <div class="prompt-box">
         <h2>Ваша идея</h2>
-        <p class="hint">Как на host-ai: обычными словами. Ниша, стиль, что должно быть на сайте.</p>
-        <div class="form-group"><label>Описание</label><textarea id="desc" placeholder="Сайт небольшой кофейни. Много воздуха, тёплый свет и ощущение паузы."></textarea></div>
-        <div class="form-group"><label>Поддомен</label><input id="sub" placeholder="pauza"></div>
+        <p class="hint">Обычными словами: ниша, стиль, что на сайте.</p>
+        <div class="form-group"><label>Описание</label><textarea id="desc" placeholder="Сайт кофейни. Тёплый свет, меню, контакты."></textarea></div>
+        <div class="form-group"><label>Поддомен</label><input id="sub" placeholder="pauza" autocomplete="off"></div>
         <div class="domain-row" id="domains">
           <span class="chip active" data-d="ai_craft.ru">.ai_craft.ru</span>
           <span class="chip" data-d="ai_craft.com">.ai_craft.com</span>
           <span class="chip" data-d="ai_craft.dev">.ai_craft.dev</span>
         </div>
-        <button class="btn-primary" id="build">Собрать сайт</button>
+        <button class="btn-primary" id="build" type="button">Собрать сайт</button>
       </div>
       <div class="preview-panel">
         <div class="preview-bar"><span class="dot r"></span><span class="dot y"></span><span class="dot g"></span><span id="prevUrl">предпросмотр</span></div>
@@ -43,42 +44,51 @@
     </div>
   </main>
 </div>
+<nav class="mobile-nav">
+  <a href="dashboard.html">Проекты</a><a href="create.html" class="active">Создать</a>
+  <a href="editor.html">Код</a><a href="neuro.html">Нейро</a><a href="settings.html">Ещё</a>
+</nav>
 <script src="../js/core.js"></script>
 <script>
   const session = AC.requireAuth();
   AC.applyTheme();
   document.getElementById('userLogin').textContent = session.login;
-  document.getElementById('logout').onclick = e => { e.preventDefault(); AC.clearSession(); location.href='../index.html'; };
+  document.getElementById('logout').onclick = e => { e.preventDefault(); AC.clearSession(); location.href = '../index.html'; };
   let domain = 'ai_craft.ru';
   document.querySelectorAll('#domains .chip').forEach(c => c.onclick = () => {
     document.querySelectorAll('#domains .chip').forEach(x => x.classList.remove('active'));
-    c.classList.add('active'); domain = c.dataset.d;
+    c.classList.add('active'); domain = c.dataset.d; live();
   });
   function live() {
     const desc = document.getElementById('desc').value.trim() || 'Ваша идея уже обретает форму.';
     const sub = document.getElementById('sub').value.trim() || 'project';
     const html = AC.generateSiteHTML(desc, sub);
     const css = AC.generateSiteCSS();
-    document.getElementById('preview').srcdoc = html.replace('</head>', `<style>${css}</style></head>`).replace('<script src="script.js"></script>','');
-    document.getElementById('prevUrl').textContent = `${sub}.${domain}`;
+    document.getElementById('preview').srcdoc = html.replace('</head>', '<style>' + css + '</style></head>').replace('<script src="script.js"><\/script>', '');
+    document.getElementById('prevUrl').textContent = sub + '.' + domain;
   }
   document.getElementById('desc').oninput = live;
   document.getElementById('sub').oninput = live;
   live();
   document.getElementById('build').onclick = () => {
     const desc = document.getElementById('desc').value.trim();
-    let sub = document.getElementById('sub').value.trim().toLowerCase().replace(/[^a-z0-9-]/g,'');
-    if (!desc) return alert('Опиши идею сайта');
-    if (sub.length < 3) return alert('Поддомен минимум 3 символа');
+    let sub = document.getElementById('sub').value.trim().toLowerCase().replace(/[^a-z0-9-]/g, '');
+    if (!desc) { AC.toast('Опиши идею сайта'); return; }
+    if (sub.length < 3) { AC.toast('Поддомен минимум 3 символа'); return; }
     const btn = document.getElementById('build');
     btn.disabled = true; btn.textContent = 'Собираем…';
     setTimeout(() => {
       const site = AC.createSite(session.login, {
         name: sub, subdomain: sub, domain, description: desc,
-        files: { 'index.html': AC.generateSiteHTML(desc, sub), 'style.css': AC.generateSiteCSS(), 'script.js': 'console.log("ready");' }
+        files: {
+          'index.html': AC.generateSiteHTML(desc, sub),
+          'style.css': AC.generateSiteCSS(),
+          'script.js': 'console.log("Ai крафт");'
+        }
       });
+      AC.toast('Сайт готов');
       location.href = 'editor.html?id=' + site.id;
-    }, 1200);
+    }, 900);
   };
 </script>
 </body>
