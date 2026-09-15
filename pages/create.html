@@ -1,164 +1,85 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Создать сайт — Ai крафт</title>
   <link rel="stylesheet" href="../css/style.css">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@600;700&display=swap" rel="stylesheet">
 </head>
 <body>
-  <div class="dashboard">
-    <aside class="dash-sidebar">
-      <div class="dash-logo">
-        <span class="logo-icon">✦</span> Ai крафт
-      </div>
-      <nav class="dash-nav">
-        <a href="dashboard.html">Мои сайты</a>
-        <a href="create.html" class="active">Создать сайт</a>
-        <a href="builder.html">Визуальный редактор</a>
-        <a href="code-editor.html">Редактор кода</a>
-      </nav>
-      <div class="dash-user">
-        <strong id="userLogin">—</strong>
-        <a href="#" onclick="logout(); return false;" style="color:var(--text-muted);font-size:13px;">Выйти</a>
-      </div>
-    </aside>
-
-    <main class="dash-main">
-      <div class="dash-header">
-        <h1>Создать сайт</h1>
-      </div>
-
-      <div class="create-page">
-        <div class="create-tabs">
-          <div class="create-tab active" data-tab="tab-ai">AI-описание</div>
-          <div class="create-tab" data-tab="tab-upload">Загрузить файлы</div>
-          <div class="create-tab" data-tab="tab-blank">С чистого листа</div>
+<div class="app">
+  <aside class="sidebar">
+    <a href="../index.html" class="logo"><span class="logo-mark">✦</span> Ai крафт</a>
+    <nav class="side-nav">
+      <a href="dashboard.html">Проекты</a>
+      <a href="create.html" class="active">Создать сайт</a>
+      <a href="editor.html">Редактор кода</a>
+      <a href="links.html">Ссылки</a>
+      <a href="neuro.html">Нейро</a>
+      <a href="settings.html">Настройки</a>
+      <a href="media.html">Медиа AI</a>
+    </nav>
+    <div class="side-user"><strong id="userLogin">—</strong><a href="#" id="logout">Выйти</a></div>
+  </aside>
+  <main class="main">
+    <div class="page-head"><h1>Опиши идею — соберём сайт</h1></div>
+    <div class="create-layout">
+      <div class="prompt-box">
+        <h2>Ваша идея</h2>
+        <p class="hint">Как на host-ai: обычными словами. Ниша, стиль, что должно быть на сайте.</p>
+        <div class="form-group"><label>Описание</label><textarea id="desc" placeholder="Сайт небольшой кофейни. Много воздуха, тёплый свет и ощущение паузы."></textarea></div>
+        <div class="form-group"><label>Поддомен</label><input id="sub" placeholder="pauza"></div>
+        <div class="domain-row" id="domains">
+          <span class="chip active" data-d="ai_craft.ru">.ai_craft.ru</span>
+          <span class="chip" data-d="ai_craft.com">.ai_craft.com</span>
+          <span class="chip" data-d="ai_craft.dev">.ai_craft.dev</span>
         </div>
-
-        <!-- AI -->
-        <div class="tab-panel" id="tab-ai">
-          <form class="create-form" onsubmit="handleCreateSite(event)">
-            <div class="form-group">
-              <label>Опиши идею сайта</label>
-              <textarea id="siteDescription" placeholder="Например: Лендинг небольшой кофейни. Много воздуха, тёплый свет, меню с ценами, форма бронирования столика, контакты и карта."></textarea>
-            </div>
-            <div class="form-group">
-              <label>Поддомен</label>
-              <input type="text" id="subdomain" placeholder="moy-sait" pattern="[a-z0-9\-]{3,40}" required style="width:100%;padding:14px 16px;background:var(--bg);border:1px solid var(--border);border-radius:10px;color:var(--text);font-size:15px;">
-            </div>
-            <div class="form-group">
-              <label>Домен</label>
-              <div class="domain-select">
-                <label class="domain-option selected">
-                  <input type="radio" name="domain" value="ai_craft.ru" checked>
-                  .ai_craft.ru
-                </label>
-                <label class="domain-option">
-                  <input type="radio" name="domain" value="ai_craft.com">
-                  .ai_craft.com
-                </label>
-                <label class="domain-option">
-                  <input type="radio" name="domain" value="ai_craft.dev">
-                  .ai_craft.dev
-                </label>
-              </div>
-            </div>
-            <button type="submit" class="btn-primary btn-lg" style="width:100%;">Собрать сайт с AI</button>
-          </form>
-        </div>
-
-        <!-- Upload -->
-        <div class="tab-panel" id="tab-upload" style="display:none;">
-          <div class="form-group">
-            <label>Загрузи HTML, CSS, JS или ZIP</label>
-            <div style="border:2px dashed var(--border);border-radius:12px;padding:48px 24px;text-align:center;color:var(--text-muted);">
-              <p style="margin-bottom:12px;">Перетащи файлы сюда или</p>
-              <input type="file" id="uploadFiles" multiple accept=".html,.css,.js,.zip,.htm" style="display:none;">
-              <button class="btn-ghost" onclick="document.getElementById('uploadFiles').click()">Выбрать файлы</button>
-              <p style="margin-top:16px;font-size:13px;">После загрузки сайт появится в кабинете</p>
-            </div>
-          </div>
-          <p style="color:var(--text-muted);font-size:14px;margin-top:16px;">
-            Функция загрузки в этой демо-версии сохраняет метаданные. Для полноценного хостинга файлов нужен бэкенд.
-          </p>
-        </div>
-
-        <!-- Blank -->
-        <div class="tab-panel" id="tab-blank" style="display:none;">
-          <p style="color:var(--text-muted);margin-bottom:24px;">Создай пустой проект и собери его в визуальном редакторе или в коде.</p>
-          <form onsubmit="createBlank(event)">
-            <div class="form-group">
-              <label>Поддомен</label>
-              <input type="text" id="blankSubdomain" placeholder="novyi-proekt" required style="width:100%;padding:14px 16px;background:var(--bg);border:1px solid var(--border);border-radius:10px;color:var(--text);font-size:15px;">
-            </div>
-            <div class="form-group">
-              <label>Домен</label>
-              <div class="domain-select">
-                <label class="domain-option selected">
-                  <input type="radio" name="domain-blank" value="ai_craft.ru" checked>
-                  .ai_craft.ru
-                </label>
-                <label class="domain-option">
-                  <input type="radio" name="domain-blank" value="ai_craft.com">
-                  .ai_craft.com
-                </label>
-                <label class="domain-option">
-                  <input type="radio" name="domain-blank" value="ai_craft.dev">
-                  .ai_craft.dev
-                </label>
-              </div>
-            </div>
-            <button type="submit" class="btn-primary btn-lg" style="width:100%;">Создать пустой проект</button>
-          </form>
-        </div>
+        <button class="btn-primary" id="build">Собрать сайт</button>
       </div>
-    </main>
-  </div>
-
-  <script src="../js/main.js"></script>
-  <script>
-    const session = requireAuth();
-    document.getElementById('userLogin').textContent = session.login;
-
-    function createBlank(e) {
-      e.preventDefault();
-      const subdomain = document.getElementById('blankSubdomain').value.trim().toLowerCase().replace(/[^a-z0-9-]/g, '');
-      const domainEl = document.querySelector('input[name="domain-blank"]:checked');
-      const domain = domainEl ? domainEl.value : 'ai_craft.ru';
-      if (subdomain.length < 3) {
-        alert('Поддомен минимум 3 символа');
-        return;
-      }
-      createSite(session.login, {
-        name: subdomain,
-        subdomain,
-        domain,
-        description: 'Пустой проект',
-        content: {
-          html: `<!DOCTYPE html><html lang="ru"><head><meta charset="UTF-8"><title>${subdomain}</title></head><body><h1>Новый проект</h1><p>Начни редактировать в визуальном редакторе или в коде.</p></body></html>`,
-          css: '',
-          js: ''
-        }
+      <div class="preview-panel">
+        <div class="preview-bar"><span class="dot r"></span><span class="dot y"></span><span class="dot g"></span><span id="prevUrl">предпросмотр</span></div>
+        <iframe class="preview-frame" id="preview" title="preview"></iframe>
+      </div>
+    </div>
+  </main>
+</div>
+<script src="../js/core.js"></script>
+<script>
+  const session = AC.requireAuth();
+  AC.applyTheme();
+  document.getElementById('userLogin').textContent = session.login;
+  document.getElementById('logout').onclick = e => { e.preventDefault(); AC.clearSession(); location.href='../index.html'; };
+  let domain = 'ai_craft.ru';
+  document.querySelectorAll('#domains .chip').forEach(c => c.onclick = () => {
+    document.querySelectorAll('#domains .chip').forEach(x => x.classList.remove('active'));
+    c.classList.add('active'); domain = c.dataset.d;
+  });
+  function live() {
+    const desc = document.getElementById('desc').value.trim() || 'Ваша идея уже обретает форму.';
+    const sub = document.getElementById('sub').value.trim() || 'project';
+    const html = AC.generateSiteHTML(desc, sub);
+    const css = AC.generateSiteCSS();
+    document.getElementById('preview').srcdoc = html.replace('</head>', `<style>${css}</style></head>`).replace('<script src="script.js"></script>','');
+    document.getElementById('prevUrl').textContent = `${sub}.${domain}`;
+  }
+  document.getElementById('desc').oninput = live;
+  document.getElementById('sub').oninput = live;
+  live();
+  document.getElementById('build').onclick = () => {
+    const desc = document.getElementById('desc').value.trim();
+    let sub = document.getElementById('sub').value.trim().toLowerCase().replace(/[^a-z0-9-]/g,'');
+    if (!desc) return alert('Опиши идею сайта');
+    if (sub.length < 3) return alert('Поддомен минимум 3 символа');
+    const btn = document.getElementById('build');
+    btn.disabled = true; btn.textContent = 'Собираем…';
+    setTimeout(() => {
+      const site = AC.createSite(session.login, {
+        name: sub, subdomain: sub, domain, description: desc,
+        files: { 'index.html': AC.generateSiteHTML(desc, sub), 'style.css': AC.generateSiteCSS(), 'script.js': 'console.log("ready");' }
       });
-      window.location.href = 'dashboard.html';
-    }
-
-    document.getElementById('uploadFiles')?.addEventListener('change', (e) => {
-      const files = e.target.files;
-      if (!files.length) return;
-      const name = files[0].name.replace(/\.[^.]+$/, '').toLowerCase().replace(/[^a-z0-9-]/g, '') || 'upload';
-      createSite(session.login, {
-        name,
-        subdomain: name + '-' + Date.now().toString(36).slice(-4),
-        domain: 'ai_craft.ru',
-        description: 'Загруженный проект: ' + Array.from(files).map(f => f.name).join(', '),
-        content: { html: '<h1>Загруженный проект</h1><p>Файлы: ' + Array.from(files).map(f => f.name).join(', ') + '</p>', css: '', js: '' }
-      });
-      alert('Проект добавлен в кабинет (демо-режим)');
-      window.location.href = 'dashboard.html';
-    });
-  </script>
+      location.href = 'editor.html?id=' + site.id;
+    }, 1200);
+  };
+</script>
 </body>
 </html>
