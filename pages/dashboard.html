@@ -46,16 +46,16 @@
 <script src="../js/core.js" defer></script>
 <script>
 document.addEventListener('DOMContentLoaded', () => {
-  const session = AC.requireAuth('../index.html');
+  const session = AC.requireAuth('auth.html');
   if (!session) return;
   AC.applyTheme();
   document.getElementById('userLogin').textContent = session.name || session.login;
-  const id = AC.getIdentity();
+  const id = AC.getIdentity && AC.getIdentity();
   if (id && id.photo) {
     const img = document.getElementById('avatar');
     img.src = id.photo; img.style.display = 'block';
   }
-  document.getElementById('logout').onclick = e => { e.preventDefault(); AC.clearSession(); location.href = '../index.html'; };
+  document.getElementById('logout').onclick = e => { e.preventDefault(); AC.clearSession(); location.href = 'auth.html'; };
   function addr(s) {
     if (s.customDomain) return s.customDomain;
     return (s.subdomain || 'site') + '.' + (s.domain || 'ai_craft.ru');
