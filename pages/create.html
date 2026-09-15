@@ -14,7 +14,7 @@
     .ai-steps{display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap}
     .ai-step{padding:6px 12px;border-radius:999px;font-size:12px;border:1px solid var(--border);color:var(--text-muted)}
     .ai-step.on{background:var(--accent-soft);border-color:var(--accent);color:var(--accent);font-weight:600}
-    .ai-compose textarea{min-height:100px;border-radius:14px;border:1px solid var(--border);background:var(--bg);color:var(--text);padding:14px;width:100%;resize:vertical;outline:none;margin-bottom:10px}
+    .ai-compose textarea,.ai-panel textarea{min-height:100px;border-radius:14px;border:1px solid var(--border);background:var(--bg);color:var(--text);padding:14px;width:100%;resize:vertical;outline:none;margin-bottom:10px}
     .domain-box{margin-top:12px;padding:14px;border-radius:14px;background:var(--bg);border:1px solid var(--border)}
     .domain-mode{display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap}
     .addr-row{display:flex;gap:8px;flex-wrap:wrap}
@@ -89,11 +89,11 @@
 <script src="../js/core.js" defer></script>
 <script>
 document.addEventListener('DOMContentLoaded', () => {
-  const session = AC.requireAuth('../index.html');
+  const session = AC.requireAuth('auth.html');
   if (!session) return;
   AC.applyTheme();
   document.getElementById('userLogin').textContent = session.name || session.login;
-  document.getElementById('logout').onclick = e => { e.preventDefault(); AC.clearSession(); location.href = '../index.html'; };
+  document.getElementById('logout').onclick = e => { e.preventDefault(); AC.clearSession(); location.href = 'auth.html'; };
   let mode = 'sub', built = null;
   function setStep(n) { [1,2,3].forEach(i => document.getElementById('s'+i).classList.toggle('on', i <= n)); }
   document.querySelectorAll('.domain-mode .chip').forEach(c => c.onclick = () => {
@@ -111,7 +111,11 @@ document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('tld').onchange = updateUrl;
   document.getElementById('customDomain').oninput = updateUrl;
   function showPreview(html, css) {
-    document.getElementById('preview').srcdoc = html.replace('</head>', '<style>' + css + '</style></head>').replace(/<script[^>]*script\.js[^>]*><\/script>/i, '');
+    let doc = html;
+    if (doc.includes('</head>')) doc = doc.replace('</head>', '<style>' + css + '</style></head>');
+    else doc = '<style>' + css + '</style>' + doc;
+    doc = doc.replace(/<script[^>]*script\.js[^>]*><\/script>/gi, '');
+    document.getElementById('preview').srcdoc = doc;
   }
   document.getElementById('btnBuild').onclick = () => {
     const idea = document.getElementById('idea').value.trim();
@@ -127,12 +131,13 @@ document.addEventListener('DOMContentLoaded', () => {
       document.getElementById('domainBox').hidden = false;
       setStep(2);
       if (!document.getElementById('sub').value) {
-        document.getElementById('sub').value = (parsed.title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 20)) || 'site';
+        const slug = (parsed.title.toLowerCase().replace(/[^a-z0-9а-яё]+/gi, '-').replace(/^-|-$/g, '').slice(0, 20)) || 'site';
+        document.getElementById('sub').value = slug.replace(/[^a-z0-9-]/g, '') || 'site';
       }
       updateUrl();
       btn.disabled = false; btn.textContent = 'Собрать снова';
-      AC.toast('Собрано по описанию');
-    }, 400);
+      AC.toast('Собрано');
+    }, 300);
   };
   document.getElementById('btnPublish').onclick = () => {
     if (!built) { AC.toast('Сначала соберите сайт'); return; }
@@ -154,7 +159,7 @@ document.addEventListener('DOMContentLoaded', () => {
       published: true
     });
     setStep(3); AC.toast('Сайт сохранён');
-    setTimeout(() => location.href = 'dashboard.html', 700);
+    setTimeout(() => location.href = 'dashboard.html', 600);
   };
   showPreview(AC.generateSiteHTML('Здесь появится сайт по описанию.', 'Ai крафт'), AC.generateSiteCSS('neutral'));
 });
