@@ -30,7 +30,7 @@
     <div class="page-head">
       <div>
         <h1>Мои сайты</h1>
-        <p style="color:var(--text-muted);font-size:14px;margin-top:4px">По вашему описанию. Откройте или создайте новый.</p>
+        <p style="color:var(--text-muted);font-size:14px;margin-top:4px">Собранные по описанию. Нажмите «Открыть».</p>
       </div>
       <a class="btn-primary" href="create.html">Собрать сайт</a>
     </div>
@@ -53,16 +53,24 @@ document.addEventListener('DOMContentLoaded', () => {
   const id = AC.getIdentity && AC.getIdentity();
   if (id && id.photo) {
     const img = document.getElementById('avatar');
-    img.src = id.photo; img.style.display = 'block';
+    img.src = id.photo;
+    img.style.display = 'block';
   }
-  document.getElementById('logout').onclick = e => { e.preventDefault(); AC.clearSession(); location.href = 'auth.html'; };
+  document.getElementById('logout').onclick = e => {
+    e.preventDefault();
+    AC.clearSession();
+    location.href = 'auth.html';
+  };
   function addr(s) {
     if (s.customDomain) return s.customDomain;
     return (s.subdomain || 'site') + '.' + (s.domain || 'ai_craft.ru');
   }
   function openPreview(id) {
     const site = AC.getUserSites(session.login).find(x => x.id === id);
-    if (!site?.files?.['index.html']) return AC.toast('Нет содержимого');
+    if (!site || !site.files || !site.files['index.html']) {
+      AC.toast('Нет содержимого');
+      return;
+    }
     let doc = site.files['index.html'];
     const css = site.files['style.css'] || '';
     const js = site.files['script.js'] || '';
@@ -70,25 +78,32 @@ document.addEventListener('DOMContentLoaded', () => {
     else doc = '<style>' + css + '</style>' + doc;
     doc = doc.replace(/<script\s+src=["']script\.js["']\s*><\/script>/i, '<script>' + js + '<\/script>');
     const w = window.open('', '_blank');
-    w.document.write(doc); w.document.close();
+    if (!w) { AC.toast('Разрешите всплывающие окна'); return; }
+    w.document.open();
+    w.document.write(doc);
+    w.document.close();
   }
   function render() {
     const sites = AC.getUserSites(session.login);
     const el = document.getElementById('list');
     if (!sites.length) {
-      el.innerHTML = '<div class="empty"><h3>Пока нет сайтов</h3><p>Опишите идею — соберём структуру под описание.</p><a class="btn-primary" href="create.html" style="margin-top:16px">Собрать первый сайт</a></div>';
+      el.innerHTML = '<div class="empty"><h3>Пока нет сайтов</h3><p>Опишите идею — соберём структуру.</p><a class="btn-primary" href="create.html" style="margin-top:16px">Собрать первый сайт</a></div>';
       return;
     }
     el.innerHTML = '<div class="grid-cards">' + sites.map(s =>
-      '<div class="card"><h3>' + AC.escapeHtml(s.name) + '</h3><div class="meta">' + AC.escapeHtml(addr(s)) + '</div><p>' +
-      AC.escapeHtml((s.description || '').slice(0, 140)) + '</p><div class="card-actions">' +
+      '<div class="card"><h3>' + AC.escapeHtml(s.name) + '</h3><div class="meta">' + AC.escapeHtml(addr(s)) +
+      '</div><p>' + AC.escapeHtml((s.description || '').slice(0, 140)) + '</p><div class="card-actions">' +
       '<button type="button" data-open="' + s.id + '">Открыть</button>' +
       '<a href="create.html">Ещё сайт</a>' +
       '<button type="button" data-del="' + s.id + '">Удалить</button></div></div>'
     ).join('') + '</div>';
     el.querySelectorAll('[data-open]').forEach(b => b.onclick = () => openPreview(b.dataset.open));
     el.querySelectorAll('[data-del]').forEach(b => b.onclick = () => {
-      if (confirm('Удалить сайт?')) { AC.deleteSite(session.login, b.dataset.del); render(); AC.toast('Удалено'); }
+      if (confirm('Удалить сайт?')) {
+        AC.deleteSite(session.login, b.dataset.del);
+        render();
+        AC.toast('Удалено');
+      }
     });
   }
   render();
