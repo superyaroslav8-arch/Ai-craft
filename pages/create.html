@@ -5,25 +5,19 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Собрать сайт — Ai крафт</title>
   <link rel="stylesheet" href="../css/style.css">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@600;700&display=swap" rel="stylesheet">
   <style>
     .ai-grid{display:grid;grid-template-columns:1fr 1.1fr;gap:20px;min-height:calc(100vh - 100px)}
     @media(max-width:960px){.ai-grid{grid-template-columns:1fr}}
     .ai-panel{background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:24px;display:flex;flex-direction:column}
-    .ai-panel h1{font-family:var(--display);font-size:24px;margin-bottom:6px}
-    .ai-panel .lead{color:var(--text-muted);font-size:14px;margin-bottom:16px}
+    .ai-panel h1{font-size:22px;margin-bottom:6px}
+    .lead{color:var(--text-muted);font-size:14px;margin-bottom:16px}
     .ai-steps{display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap}
     .ai-step{padding:6px 12px;border-radius:999px;font-size:12px;border:1px solid var(--border);color:var(--text-muted)}
     .ai-step.on{background:var(--accent-soft);border-color:var(--accent);color:var(--accent);font-weight:600}
-    .ai-chat{flex:1;overflow:auto;min-height:100px;margin-bottom:12px;display:flex;flex-direction:column;gap:10px}
-    .ai-msg{padding:12px 14px;border-radius:14px;font-size:14px;line-height:1.5;max-width:95%}
-    .ai-msg.bot{background:var(--surface-2);align-self:flex-start}
-    .ai-msg.user{background:var(--accent);color:#fff;align-self:flex-end}
-    .ai-compose textarea{min-height:90px;border-radius:14px;border:1px solid var(--border);background:var(--bg);color:var(--text);padding:14px;width:100%;resize:vertical;outline:none;margin-bottom:10px}
+    .ai-compose textarea{min-height:100px;border-radius:14px;border:1px solid var(--border);background:var(--bg);color:var(--text);padding:14px;width:100%;resize:vertical;outline:none;margin-bottom:10px}
     .domain-box{margin-top:12px;padding:14px;border-radius:14px;background:var(--bg);border:1px solid var(--border)}
-    .domain-box label{font-size:12px;color:var(--text-muted);display:block;margin-bottom:8px}
     .domain-mode{display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap}
-    .addr-row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+    .addr-row{display:flex;gap:8px;flex-wrap:wrap}
     .addr-row input,.addr-row select{flex:1;min-width:110px;padding:10px 12px;border-radius:10px;border:1px solid var(--border);background:var(--surface);color:var(--text)}
     .preview-shell{background:var(--surface);border:1px solid var(--border);border-radius:20px;overflow:hidden;display:flex;flex-direction:column;min-height:460px}
     .preview-top{display:flex;align-items:center;gap:10px;padding:10px 14px;background:var(--surface-2);border-bottom:1px solid var(--border);font-size:12px;color:var(--text-muted)}
@@ -50,21 +44,16 @@
         <div class="ai-steps">
           <span class="ai-step on" id="s1">1. Идея</span>
           <span class="ai-step" id="s2">2. Адрес</span>
-          <span class="ai-step" id="s3">3. Публикация</span>
+          <span class="ai-step" id="s3">3. Готово</span>
         </div>
-        <h1>Опишите идею</h1>
-        <p class="lead">Без кода. Обычными словами — структура, тексты и вид. Потом выберите адрес.</p>
-        <div class="ai-chat" id="chat">
-          <div class="ai-msg bot">Здравствуйте. Какой сайт нужен: для кого, о чём, какой тон?</div>
-        </div>
-        <div class="ai-compose">
-          <textarea id="idea" placeholder="Сайт кофейни. Тёплый свет, меню, контакты."></textarea>
-          <button type="button" class="btn-primary" id="btnBuild">Собрать сайт</button>
-        </div>
+        <h1>Опишите сайт</h1>
+        <p class="lead">Обычными словами. Разделы подстроятся под текст.</p>
+        <textarea id="idea" placeholder="Сайт кофейни: тёплый свет, меню, о нас, контакты."></textarea>
+        <button type="button" class="btn-primary" id="btnBuild">Собрать по описанию</button>
         <div class="domain-box" id="domainBox" hidden>
-          <label>Адрес сайта</label>
+          <label style="font-size:12px;color:var(--text-muted);display:block;margin-bottom:8px">Адрес</label>
           <div class="domain-mode">
-            <button type="button" class="chip active" data-mode="sub">Поддомен Ai крафт</button>
+            <button type="button" class="chip active" data-mode="sub">Поддомен</button>
             <button type="button" class="chip" data-mode="custom">Свой домен</button>
           </div>
           <div id="subFields" class="addr-row">
@@ -78,8 +67,7 @@
           <div id="customFields" class="addr-row" hidden>
             <input id="customDomain" placeholder="мой-сайт.ru" style="flex:1">
           </div>
-          <p id="customHint" hidden style="font-size:12px;color:var(--text-muted);margin-top:8px">Домен, которым владеете. DNS можно настроить позже.</p>
-          <button type="button" class="btn-primary btn-block" id="btnPublish" style="margin-top:12px">Опубликовать</button>
+          <button type="button" class="btn-primary btn-block" id="btnPublish" style="margin-top:12px">Сохранить сайт</button>
         </div>
       </div>
       <div class="preview-shell">
@@ -87,7 +75,7 @@
           <span class="dot r"></span><span class="dot y"></span><span class="dot g"></span>
           <span id="prevUrl">предпросмотр</span>
         </div>
-        <iframe id="preview" title="Предпросмотр"></iframe>
+        <iframe id="preview" title="Превью"></iframe>
       </div>
     </div>
   </main>
@@ -98,25 +86,21 @@
   <a href="neuro.html">Нейро</a>
   <a href="settings.html">Ещё</a>
 </nav>
-<script src="../js/core.js"></script>
+<script src="../js/core.js" defer></script>
 <script>
-  const session = AC.requireAuth(); AC.applyTheme();
-  document.getElementById('userLogin').textContent = session.login;
-  document.getElementById('logout').onclick = e => { e.preventDefault(); AC.clearSession(); location.href='../index.html'; };
+document.addEventListener('DOMContentLoaded', () => {
+  const session = AC.requireAuth('../index.html');
+  if (!session) return;
+  AC.applyTheme();
+  document.getElementById('userLogin').textContent = session.name || session.login;
+  document.getElementById('logout').onclick = e => { e.preventDefault(); AC.clearSession(); location.href = '../index.html'; };
   let mode = 'sub', built = null;
-  function addMsg(role, text) {
-    const el = document.createElement('div');
-    el.className = 'ai-msg ' + role; el.textContent = text;
-    document.getElementById('chat').appendChild(el);
-    document.getElementById('chat').scrollTop = 9999;
-  }
   function setStep(n) { [1,2,3].forEach(i => document.getElementById('s'+i).classList.toggle('on', i <= n)); }
   document.querySelectorAll('.domain-mode .chip').forEach(c => c.onclick = () => {
     mode = c.dataset.mode;
     document.querySelectorAll('.domain-mode .chip').forEach(x => x.classList.toggle('active', x === c));
     document.getElementById('subFields').hidden = mode !== 'sub';
     document.getElementById('customFields').hidden = mode !== 'custom';
-    document.getElementById('customHint').hidden = mode !== 'custom';
     updateUrl();
   });
   function updateUrl() {
@@ -126,41 +110,41 @@
   document.getElementById('sub').oninput = updateUrl;
   document.getElementById('tld').onchange = updateUrl;
   document.getElementById('customDomain').oninput = updateUrl;
-  function live(desc, name) {
-    const html = AC.generateSiteHTML(desc, name);
-    const css = AC.generateSiteCSS();
-    document.getElementById('preview').srcdoc = html.replace('</head>', '<style>'+css+'</style></head>').replace(/<script[^>]*script\.js[^>]*><\/script>/i, '');
+  function showPreview(html, css) {
+    document.getElementById('preview').srcdoc = html.replace('</head>', '<style>' + css + '</style></head>').replace(/<script[^>]*script\.js[^>]*><\/script>/i, '');
   }
-  document.getElementById('idea').addEventListener('input', () => {
-    const t = document.getElementById('idea').value.trim();
-    if (t.length > 20) live(t, 'Сайт');
-  });
   document.getElementById('btnBuild').onclick = () => {
     const idea = document.getElementById('idea').value.trim();
-    if (idea.length < 10) { AC.toast('Опишите идею чуть подробнее'); return; }
-    addMsg('user', idea);
+    if (idea.length < 8) { AC.toast('Опишите подробнее'); return; }
     const btn = document.getElementById('btnBuild');
     btn.disabled = true; btn.textContent = 'Собираем…';
     setTimeout(() => {
-      const title = idea.split(/[.!?]/)[0].slice(0, 40) || 'Мой сайт';
-      built = { description: idea, name: title, html: AC.generateSiteHTML(idea, title), css: AC.generateSiteCSS(), js: 'console.log("Ai крафт");' };
-      live(idea, title);
-      addMsg('bot', 'Готово. Справа — предпросмотр. Выберите адрес и нажмите «Опубликовать».');
-      document.getElementById('domainBox').hidden = false; setStep(2);
-      btn.disabled = false; btn.textContent = 'Собрать снова'; updateUrl(); AC.toast('Сайт собран');
-    }, 900);
+      const parsed = AC.parseIdea(idea);
+      const html = AC.generateSiteHTML(idea, parsed.title);
+      const css = AC.generateSiteCSS(parsed.tone);
+      built = { description: idea, name: parsed.title, html, css, js: '', tone: parsed.tone };
+      showPreview(html, css);
+      document.getElementById('domainBox').hidden = false;
+      setStep(2);
+      if (!document.getElementById('sub').value) {
+        document.getElementById('sub').value = (parsed.title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 20)) || 'site';
+      }
+      updateUrl();
+      btn.disabled = false; btn.textContent = 'Собрать снова';
+      AC.toast('Собрано по описанию');
+    }, 400);
   };
   document.getElementById('btnPublish').onclick = () => {
     if (!built) { AC.toast('Сначала соберите сайт'); return; }
     let subdomain, domain, customDomain = '';
     if (mode === 'custom') {
-      customDomain = document.getElementById('customDomain').value.trim().toLowerCase().replace(/^https?:\/\//,'').replace(/\/$/,'');
-      if (!customDomain || !customDomain.includes('.')) { AC.toast('Укажите домен, например shop.ru'); return; }
+      customDomain = document.getElementById('customDomain').value.trim().toLowerCase().replace(/^https?:\/\//, '').replace(/\/$/, '');
+      if (!customDomain.includes('.')) { AC.toast('Укажите домен, например shop.ru'); return; }
       subdomain = customDomain.split('.')[0]; domain = customDomain;
     } else {
-      subdomain = document.getElementById('sub').value.trim().toLowerCase().replace(/[^a-z0-9-]/g,'');
+      subdomain = document.getElementById('sub').value.trim().toLowerCase().replace(/[^a-z0-9-]/g, '');
       domain = document.getElementById('tld').value;
-      if (subdomain.length < 3) { AC.toast('Поддомен: минимум 3 символа латиницей'); return; }
+      if (subdomain.length < 2) { AC.toast('Укажите поддомен'); return; }
     }
     AC.createSite(session.login, {
       name: built.name, subdomain, domain,
@@ -169,12 +153,11 @@
       files: { 'index.html': built.html, 'style.css': built.css, 'script.js': built.js },
       published: true
     });
-    setStep(3);
-    addMsg('bot', mode === 'custom' ? 'Сохранено с доменом ' + customDomain : 'Опубликовано: ' + subdomain + '.' + domain);
-    AC.toast('Опубликовано');
-    setTimeout(() => location.href = 'dashboard.html', 1000);
+    setStep(3); AC.toast('Сайт сохранён');
+    setTimeout(() => location.href = 'dashboard.html', 700);
   };
-  live('Ваша идея уже обретает форму.', 'Ai крафт');
+  showPreview(AC.generateSiteHTML('Здесь появится сайт по описанию.', 'Ai крафт'), AC.generateSiteCSS('neutral'));
+});
 </script>
 </body>
 </html>
