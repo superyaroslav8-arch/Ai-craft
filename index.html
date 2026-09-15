@@ -2,107 +2,51 @@
 <html lang="ru">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Ai-Craft — AI Website Builder</title>
-  
-  <link rel="manifest" href="./manifest.json">
-  <meta name="theme-color" content="#0d1117">
-  
-  <!-- Точный относительный путь к CSS -->
-  <link rel="stylesheet" href="./style.css">
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.38.0/min/vs/loader.min.js"></script>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Ai крафт — создай сайт с ИИ</title>
+  <meta name="description" content="Опиши идею — получи сайт. Редактор кода, ссылки, деплой, помощник Нейро. Всё бесплатно.">
+  <link rel="stylesheet" href="css/style.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
 </head>
-<body data-theme="dark">
-
-  <div class="app-container nav-bottom" id="app">
-    
-    <main class="main-content">
-      <header class="top-bar">
-        <div class="logo">Ai-Craft 🚀</div>
-        <div class="actions">
-          <button class="btn btn-primary" onclick="generateSite()">⚡ Сгенерировать AI</button>
-          <button class="btn btn-secondary" onclick="createPreviewLink()">🔗 Ссылка</button>
-          
-          <div id="user-profile" class="user-profile" style="display: none;">
-            <span id="username-display"></span>
-            <button class="btn btn-danger" onclick="logout()">Выйти</button>
-          </div>
-        </div>
-      </header>
-
-      <div class="workspace">
-        <section class="editor-section">
-          <div class="section-header">Код сайта (HTML/CSS)</div>
-          <div id="editor-container"></div>
-        </section>
-
-        <aside class="chat-section">
-          <div class="section-header">AI-Помощник «Нейро»</div>
-          <div class="chat-messages" id="chat-messages">
-            <div class="message neuro">Привет! Я **Нейро**. Помогу сгенерировать сайт или ответить на вопросы. Напиши, что сделать!</div>
-          </div>
-          <div class="chat-input-area">
-            <input type="text" id="chat-input" placeholder="Спроси Нейро или опиши сайт...">
-            <button class="btn btn-primary" id="send-btn">Отправить</button>
-          </div>
-        </aside>
+<body>
+  <header class="header">
+    <div class="container header-inner">
+      <a href="index.html" class="logo"><span class="logo-mark">✦</span> Ai крафт</a>
+      <nav class="nav">
+        <a href="#features">Возможности</a>
+        <a href="pages/create.html">Создать сайт</a>
+        <a href="pages/neuro.html">Нейро</a>
+      </nav>
+      <div class="header-actions">
+        <a class="btn-ghost" href="pages/login.html">Войти</a>
+        <a class="btn-primary" href="pages/register.html">Начать</a>
       </div>
-    </main>
-
-    <nav class="navbar" id="navbar">
-      <button class="nav-btn active">💻 Редактор</button>
-      <button class="nav-btn">🤖 Нейрочат</button>
-      <button class="nav-btn" onclick="toggleSettingsModal()">⚙️ Настройки</button>
-    </nav>
-
-  </div>
-
-  <!-- Модальное окно авторизации (скрыто по умолчанию через inline style) -->
-  <div class="modal" id="auth-modal" style="display: none;">
-    <div class="modal-content auth-box">
-      <h2>Вход в Ai-Craft 🚀</h2>
-      <form onsubmit="handleAuth(event)">
-        <div class="input-group">
-          <label for="auth-username">Имя пользователя:</label>
-          <input type="text" id="auth-username" placeholder="Введите имя..." required>
-        </div>
-        <button type="submit" class="btn btn-primary btn-full">Войти в систему</button>
-      </form>
     </div>
-  </div>
+  </header>
 
-  <!-- Модальное окно настроек -->
-  <div class="modal" id="settings-modal" style="display: none;">
-    <div class="modal-content">
-      <h3>Настройки Ai-Craft</h3>
-      
-      <div class="setting-item">
-        <label>Тема оформления:</label>
-        <select id="theme-select" onchange="changeTheme(this.value)">
-          <option value="dark">Тёмная</option>
-          <option value="light">Светлая</option>
-        </select>
-      </div>
-
-      <div class="setting-item">
-        <label>Расположение панели:</label>
-        <select id="nav-pos-select" onchange="changeNavPosition(this.value)">
-          <option value="bottom">Внизу (По умолчанию)</option>
-          <option value="top">Наверху</option>
-        </select>
-      </div>
-
-      <div class="setting-item">
-        <label>Акцентный цвет:</label>
-        <input type="color" id="accent-color-picker" value="#238636" onchange="changeAccentColor(this.value)">
-      </div>
-
-      <button class="btn btn-secondary" onclick="toggleSettingsModal()">Закрыть</button>
+  <section class="hero container">
+    <div class="hero-badge">Как host-ai, только полностью бесплатно</div>
+    <h1>Опиши идею.<br>Собери сайт.</h1>
+    <p>ИИ помогает со структурой и текстами. Ты правишь в визуальном режиме или в коде как в GitHub. Публикуешь за минуту.</p>
+    <div class="hero-cta">
+      <a class="btn-primary" href="pages/register.html">Собрать сайт</a>
+      <a class="btn-ghost" href="pages/neuro.html">Спросить Нейро</a>
     </div>
-  </div>
+  </section>
 
-  <!-- Точные пути к JS файлам -->
-  <script src="./auth.js"></script>
-  <script src="./script.js"></script>
+  <section class="container features" id="features">
+    <div class="feature"><div class="feature-ico">✨</div><h3>Создание как на host-ai</h3><p>Пишешь идею своими словами — получаешь готовый каркас сайта с текстами и структурой.</p></div>
+    <div class="feature"><div class="feature-ico">⌨️</div><h3>Код как в GitHub</h3><p>Вкладки HTML/CSS/JS, позиция сверху или снизу, live-preview. Тема и акцент настраиваются.</p></div>
+    <div class="feature"><div class="feature-ico">🔗</div><h3>Свои ссылки</h3><p>Короткие ссылки aicraft.link/… для проектов и деплоя. Копируй и делись.</p></div>
+    <div class="feature"><div class="feature-ico">✦</div><h3>Нейро</h3><p>Помощник всегда рядом: подскажет по сайту, коду, настройкам или просто поболтает.</p></div>
+    <div class="feature"><div class="feature-ico">🎨</div><h3>Темы</h3><p>Тёмная и светлая, свой акцентный цвет. Весь кабинет подстраивается под тебя.</p></div>
+    <div class="feature"><div class="feature-ico">🚀</div><h3>Деплой</h3><p>Поддомены *.ai_craft.ru / .com / .dev. SSL и публикация без лишних шагов.</p></div>
+  </section>
+
+  <footer class="container footer-mini">
+    <span>© 2026 Ai крафт</span>
+    <span>Поддержка: <a href="tel:+79002373222">+7 (900) 237-32-22</a> · <a href="mailto:superyaroslav8@iCloud.com">superyaroslav8@iCloud.com</a></span>
+  </footer>
+  <script src="js/core.js"></script>
 </body>
 </html>

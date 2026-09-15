@@ -1,43 +1,42 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Регистрация — Ai крафт</title>
   <link rel="stylesheet" href="../css/style.css">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@600;700&display=swap" rel="stylesheet">
 </head>
 <body>
   <div class="auth-page">
-    <div class="hero-bg" style="position:fixed;inset:0;pointer-events:none;">
-      <div class="orb orb-1" style="opacity:0.3;"></div>
-      <div class="orb orb-2" style="opacity:0.25;"></div>
-    </div>
     <div class="auth-card">
-      <a href="../index.html" class="logo" style="justify-content:center;margin-bottom:24px;">
-        <span class="logo-icon">✦</span>
-        <span class="logo-text">Ai крафт</span>
-      </a>
+      <a href="../index.html" class="logo" style="justify-content:center"><span class="logo-mark">✦</span> Ai крафт</a>
       <h1>Регистрация</h1>
-      <p class="subtitle">Логин + пароль. Без email, SMS и капч.</p>
-      <div class="auth-error" id="authError"></div>
-      <form onsubmit="handleRegister(event)">
-        <div class="form-group">
-          <label for="login">Логин</label>
-          <input type="text" id="login" name="login" placeholder="придумай_логин" autocomplete="username" required minlength="3">
-        </div>
-        <div class="form-group">
-          <label for="password">Пароль</label>
-          <input type="password" id="password" name="password" placeholder="минимум 4 символа" autocomplete="new-password" required minlength="4">
-        </div>
-        <button type="submit" class="btn-primary auth-submit">Создать аккаунт</button>
+      <p class="sub">Без email, SMS и капч</p>
+      <div class="auth-error" id="err"></div>
+      <form id="form">
+        <div class="form-group"><label>Логин</label><input id="login" required minlength="3"></div>
+        <div class="form-group"><label>Пароль</label><input id="pass" type="password" required minlength="4"></div>
+        <button class="btn-primary btn-block" type="submit">Создать аккаунт</button>
       </form>
-      <p class="auth-footer">Уже есть аккаунт? <a href="login.html">Войти</a></p>
+      <p class="auth-foot">Уже есть аккаунт? <a href="login.html">Войти</a></p>
     </div>
   </div>
-  <script src="../js/main.js"></script>
+  <script src="../js/core.js"></script>
   <script>
-    if (getSession()) window.location.href = 'dashboard.html';
+    AC.applyTheme();
+    if (AC.getSession()) location.href = 'dashboard.html';
+    document.getElementById('form').onsubmit = e => {
+      e.preventDefault();
+      const login = document.getElementById('login').value.trim();
+      const pass = document.getElementById('pass').value;
+      const err = document.getElementById('err');
+      const users = AC.getUsers();
+      if (users[login]) { err.textContent = 'Логин занят'; err.classList.add('show'); return; }
+      users[login] = { password: pass, sites: [] };
+      AC.saveUsers(users);
+      AC.setSession({ login });
+      location.href = 'dashboard.html';
+    };
   </script>
 </body>
 </html>
