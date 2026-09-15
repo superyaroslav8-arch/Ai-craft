@@ -12,13 +12,12 @@
   <aside class="sidebar">
     <a href="../index.html" class="logo">Ai крафт</a>
     <nav class="side-nav">
-      <a href="dashboard.html">Проекты</a>
-      <a href="create.html">Создать сайт</a>
-      <a href="editor.html">Редактор кода</a>
-      <a href="links.html" class="active">Ссылки</a>
+      <a href="dashboard.html">Мои сайты</a>
+      <a href="create.html">Собрать сайт</a>
       <a href="neuro.html">Нейро</a>
+      <a href="media.html">Медиа</a>
+      <a href="links.html" class="active">Ссылки</a>
       <a href="settings.html">Настройки</a>
-      <a href="media.html">Медиа AI</a>
     </nav>
     <div class="side-user"><strong id="userLogin">—</strong><a href="#" id="logout">Выйти</a></div>
   </aside>
@@ -27,7 +26,7 @@
     <div class="create-layout">
       <div class="prompt-box">
         <h2>Новая ссылка</h2>
-        <div class="form-group"><label>Название</label><input id="title" placeholder="Мой лендинг"></div>
+        <div class="form-group"><label>Название</label><input id="title" placeholder="Мой сайт"></div>
         <div class="form-group"><label>URL</label><input id="url" placeholder="https://..."></div>
         <div class="form-group"><label>Слаг</label><input id="slug" placeholder="my-site"></div>
         <button class="btn-primary" type="button" id="create">Создать</button>
@@ -36,7 +35,12 @@
     </div>
   </main>
 </div>
-<nav class="mobile-nav"><a href="dashboard.html">Проекты</a><a href="create.html">Создать</a><a href="editor.html">Код</a><a href="neuro.html">Нейро</a><a href="settings.html">Ещё</a></nav>
+<nav class="mobile-nav">
+  <a href="dashboard.html">Сайты</a>
+  <a href="create.html">Собрать</a>
+  <a href="neuro.html">Нейро</a>
+  <a href="settings.html">Ещё</a>
+</nav>
 <script src="../js/core.js"></script>
 <script>
   const session = AC.requireAuth(); AC.applyTheme();
@@ -47,7 +51,7 @@
     const el = document.getElementById('list');
     if (!links.length) { el.innerHTML = '<p style="color:var(--text-muted);font-size:13px">Пока нет ссылок</p>'; return; }
     el.innerHTML = '<table class="table"><thead><tr><th>Короткая</th><th>Куда</th><th></th></tr></thead><tbody>' +
-      links.map(l => `<tr><td><code>${AC.escapeHtml(l.shortUrl)}</code></td><td>${AC.escapeHtml(l.url)}</td><td><button type="button" data-copy="${AC.escapeHtml(l.shortUrl)}">Копировать</button> <button type="button" data-del="${l.id}">Удалить</button></td></tr>`).join('') + '</tbody></table>';
+      links.map(l => '<tr><td><code>'+AC.escapeHtml(l.shortUrl)+'</code></td><td>'+AC.escapeHtml(l.url)+'</td><td><button type="button" data-copy="'+AC.escapeHtml(l.shortUrl)+'">Копировать</button> <button type="button" data-del="'+l.id+'">Удалить</button></td></tr>').join('') + '</tbody></table>';
     el.querySelectorAll('[data-copy]').forEach(b => b.onclick = () => navigator.clipboard.writeText(b.dataset.copy).then(() => AC.toast('Скопировано')));
     el.querySelectorAll('[data-del]').forEach(b => b.onclick = () => { if (confirm('Удалить?')) { AC.deleteLink(session.login, b.dataset.del); render(); } });
   }
@@ -55,10 +59,10 @@
     const title = document.getElementById('title').value.trim();
     const url = document.getElementById('url').value.trim();
     const slug = document.getElementById('slug').value.trim();
-    if (!url) { AC.toast('Укажи URL'); return; }
+    if (!url) { AC.toast('Укажите URL'); return; }
     AC.createLink(session.login, { title, url, slug });
     document.getElementById('title').value=''; document.getElementById('url').value=''; document.getElementById('slug').value='';
-    render(); AC.toast('Ссылка создана');
+    render(); AC.toast('Создано');
   };
   render();
 </script>
