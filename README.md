@@ -1,39 +1,30 @@
 # Ai крафт
 
-**Сайт онлайн:** [https://superyaroslav8-arch.github.io/Ai-craft/](https://superyaroslav8-arch.github.io/Ai-craft/)
+**Сайт:** https://superyaroslav8-arch.github.io/Ai-craft/
 
-**Репозиторий:** [https://github.com/superyaroslav8-arch/Ai-craft](https://github.com/superyaroslav8-arch/Ai-craft)
+**Репозиторий:** https://github.com/superyaroslav8-arch/Ai-craft
 
-Создание сайтов по описанию: идея → сборка → адрес (поддомен или свой домен). Без обязательного кода.
+## Как работает
 
-## Как пользоваться
+1. **Вход по фото** на главной (камера) или «Войти без фото» — без логина и пароля
+2. **Собрать сайт** — описание → разделы и тексты под идею → поддомен или свой домен
+3. **Медиа** — реальное фото по тексту (бесплатная генерация)
+4. Нейро, ссылки, настройки
 
-1. Откройте сайт → **Начать** / **Регистрация** (логин + пароль)
-2. **Собрать сайт** — опишите идею
-3. Выберите **поддомен** (`*.ai_craft.ru` / `.com` / `.dev`) или **свой домен**
-4. **Опубликовать** → сайт в разделе «Мои сайты»
+Всё бесплатно. Данные на устройстве (localStorage).
 
-Дополнительно: Нейро, Медиа, Ссылки, Настройки (тема).
-
-## Структура проекта
+## Структура
 
 ```
-index.html           — главная
-css/style.css        — стили
-js/core.js           — логика (аккаунт, сайты, настройки)
-js/neuro.js          — ответы помощника
-pages/
-  create.html        — собрать сайт
-  dashboard.html     — мои сайты
-  login.html         — вход
-  register.html      — регистрация
-  neuro.html         — Нейро
-  media.html         — медиа
-  links.html         — короткие ссылки
-  settings.html      — настройки
+index.html          — вход по фото
+js/core.js          — логика
+css/style.css
+pages/dashboard.html
+pages/create.html
+pages/media.html
+pages/neuro.html
+pages/links.html
+pages/settings.html
 ```
 
-## Поддержка
-
-+7 (900) 237-32-22  
-superyaroslav8@iCloud.com
+Поддержка: +7 (900) 237-32-22 · superyaroslav8@iCloud.com
