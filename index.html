@@ -3,60 +3,79 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Ai крафт — опишите идею, соберём сайт</title>
-  <meta name="description" content="Создайте и разместите сайт с помощью ИИ. Без кода. Поддомен или свой домен.">
+  <title>Ai крафт — вход по фото</title>
+  <meta name="description" content="Войдите по фото и соберите сайт. Бесплатно.">
   <link rel="stylesheet" href="css/style.css">
+  <style>
+    .gate{min-height:100vh;display:grid;place-items:center;padding:24px;background:var(--bg)}
+    .gate-card{width:100%;max-width:420px;background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:28px 24px;box-shadow:var(--shadow)}
+    .gate-card h1{font-size:22px;text-align:center;margin:12px 0 6px;font-weight:700}
+    .gate-card .lead{text-align:center;color:var(--text-muted);font-size:14px;margin-bottom:20px}
+    .cam-box{position:relative;aspect-ratio:4/3;background:#111;border-radius:16px;overflow:hidden;margin-bottom:14px;border:1px solid var(--border)}
+    .cam-box video,.cam-box img{width:100%;height:100%;object-fit:cover;display:block}
+    .cam-box .ph{position:absolute;inset:0;display:grid;place-items:center;color:#888;font-size:14px;padding:16px;text-align:center}
+    .gate-actions{display:flex;flex-direction:column;gap:8px}
+    .gate-alt{text-align:center;margin-top:16px;font-size:13px;color:var(--text-muted)}
+    .check{display:none;text-align:center;padding:12px;border-radius:12px;background:rgba(52,211,153,.12);color:var(--ok);font-size:14px;margin-bottom:12px}
+    .check.on{display:block}
+  </style>
 </head>
 <body>
-  <header class="header">
-    <div class="container header-inner">
-      <a href="index.html" class="logo">Ai крафт</a>
-      <nav class="nav">
-        <a href="#how">Как это работает</a>
-        <a href="#features">Возможности</a>
-      </nav>
-      <div class="header-actions">
-        <a class="btn-ghost" href="pages/login.html">Войти</a>
-        <a class="btn-primary" href="pages/register.html">Начать</a>
+  <div class="gate" id="gate">
+    <div class="gate-card">
+      <div class="logo" style="justify-content:center;display:flex">Ai крафт</div>
+      <h1>Вход по фото</h1>
+      <p class="lead">Камера сфотографирует вас — и вы сразу в работе. Без логина и пароля.</p>
+      <div class="check" id="check">Проверено. Открываем кабинет…</div>
+      <div class="cam-box" id="camBox">
+        <video id="video" autoplay playsinline muted></video>
+        <img id="shot" alt="" hidden>
+        <div class="ph" id="ph">Разрешите камеру или войдите без фото</div>
       </div>
-    </div>
-  </header>
-  <section class="hero container">
-    <div class="hero-glow" aria-hidden="true"></div>
-    <div class="hero-badge">Бесплатно · Без кода</div>
-    <h1>Опишите идею.<br>Соберём сайт.</h1>
-    <p>Не нужно знать программирование. Напишите, какой сайт хотите — ИИ поможет со структурой, текстами и видом. Поддомен Ai крафт или ваш домен.</p>
-    <div class="hero-cta">
-      <a class="btn-primary" href="pages/register.html">Собрать сайт</a>
-      <a class="btn-ghost" href="pages/login.html">Войти</a>
-    </div>
-  </section>
-  <section class="container steps" id="how">
-    <div class="steps-grid">
-      <div class="step"><div class="step-n">1</div><h3>Идея словами</h3><p>Для кого сайт, о чём, какой характер.</p></div>
-      <div class="step"><div class="step-n">2</div><h3>Сборка</h3><p>Структура, тексты, оформление. Сразу предпросмотр.</p></div>
-      <div class="step"><div class="step-n">3</div><h3>Адрес</h3><p>Поддомен *.ai_craft.ru / .com / .dev или свой домен.</p></div>
-    </div>
-  </section>
-  <section class="container features" id="features">
-    <div class="feature"><div class="feature-ico">1</div><h3>Без кода</h3><p>Сайт начинается с ваших слов.</p></div>
-    <div class="feature"><div class="feature-ico">2</div><h3>Свой домен</h3><p>Поддомен Ai крафт или ваш домен.</p></div>
-    <div class="feature"><div class="feature-ico">3</div><h3>Нейро</h3><p>Помощник по идее и публикации.</p></div>
-    <div class="feature"><div class="feature-ico">4</div><h3>Медиа</h3><p>Фото, видео, музыка к проекту.</p></div>
-    <div class="feature"><div class="feature-ico">5</div><h3>Ссылки</h3><p>Короткие ссылки для шаринга.</p></div>
-    <div class="feature"><div class="feature-ico">6</div><h3>Бесплатно</h3><p>Только логин и пароль.</p></div>
-  </section>
-  <div class="container">
-    <div class="cta-block">
-      <h2>Теперь ваша очередь</h2>
-      <p>Всё начинается с нескольких слов.</p>
-      <a class="btn-primary" href="pages/register.html">Создать сайт</a>
+      <div class="form-group">
+        <label>Как к вам обращаться</label>
+        <input id="name" placeholder="Имя" autocomplete="name">
+      </div>
+      <div class="gate-actions">
+        <button type="button" class="btn-primary btn-block" id="btnSnap">Сфотографировать и войти</button>
+        <button type="button" class="btn-ghost btn-block" id="btnSkip" style="justify-content:center">Войти без фото</button>
+      </div>
+      <p class="gate-alt">Фото только на этом устройстве</p>
     </div>
   </div>
-  <footer class="container footer-mini">
-    <span>© 2026 Ai крафт</span>
-    <span><a href="tel:+79002373222">+7 (900) 237-32-22</a> · <a href="mailto:superyaroslav8@iCloud.com">superyaroslav8@iCloud.com</a></span>
-  </footer>
   <script src="js/core.js" defer></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', async () => {
+      AC.applyTheme();
+      if (AC.getSession()) { location.href = 'pages/dashboard.html'; return; }
+      const video = document.getElementById('video');
+      const shot = document.getElementById('shot');
+      const ph = document.getElementById('ph');
+      let stream = null, photoData = null;
+      try {
+        stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user' }, audio: false });
+        video.srcObject = stream; ph.hidden = true;
+      } catch (e) { ph.textContent = 'Камера недоступна — можно войти без фото'; }
+      function stopCam() { if (stream) stream.getTracks().forEach(t => t.stop()); }
+      function enter(withPhoto) {
+        const name = document.getElementById('name').value.trim() || 'Гость';
+        document.getElementById('check').classList.add('on');
+        AC.enterWithPhoto({ name, photoDataUrl: withPhoto ? photoData : null });
+        stopCam();
+        setTimeout(() => { location.href = 'pages/dashboard.html'; }, 500);
+      }
+      document.getElementById('btnSnap').onclick = () => {
+        if (stream && video.videoWidth) {
+          const c = document.createElement('canvas');
+          c.width = video.videoWidth; c.height = video.videoHeight;
+          c.getContext('2d').drawImage(video, 0, 0);
+          photoData = c.toDataURL('image/jpeg', 0.85);
+          shot.src = photoData; shot.hidden = false; video.hidden = true; ph.hidden = true;
+        }
+        enter(!!photoData);
+      };
+      document.getElementById('btnSkip').onclick = () => enter(false);
+    });
+  </script>
 </body>
 </html>
