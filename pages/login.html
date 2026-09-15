@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Вход — Ai крафт</title>
   <link rel="stylesheet" href="../css/style.css">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@600;700&display=swap" rel="stylesheet">
 </head>
 <body>
   <div class="auth-page">
@@ -22,24 +21,26 @@
       <p class="auth-foot">Нет аккаунта? <a href="register.html">Регистрация</a></p>
     </div>
   </div>
-  <script src="../js/core.js"></script>
+  <script src="../js/core.js" defer></script>
   <script>
-    AC.applyTheme();
-    if (AC.getSession()) location.href = 'dashboard.html';
-    document.getElementById('form').onsubmit = e => {
-      e.preventDefault();
-      const login = document.getElementById('login').value.trim();
-      const pass = document.getElementById('pass').value;
-      const err = document.getElementById('err');
-      const u = AC.getUsers()[login];
-      if (!u || u.password !== pass) {
-        err.textContent = 'Неверный логин или пароль';
-        err.classList.add('show');
-        return;
-      }
-      AC.setSession({ login });
-      location.href = 'dashboard.html';
-    };
+    document.addEventListener('DOMContentLoaded', () => {
+      AC.applyTheme();
+      if (AC.getSession()) location.href = 'dashboard.html';
+      document.getElementById('form').onsubmit = e => {
+        e.preventDefault();
+        const login = document.getElementById('login').value.trim();
+        const pass = document.getElementById('pass').value;
+        const err = document.getElementById('err');
+        const u = AC.getUsers()[login];
+        if (!u || u.password !== pass) {
+          err.textContent = 'Неверный логин или пароль';
+          err.classList.add('show');
+          return;
+        }
+        AC.setSession({ login });
+        location.href = 'dashboard.html';
+      };
+    });
   </script>
 </body>
 </html>
