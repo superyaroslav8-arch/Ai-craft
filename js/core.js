@@ -72,11 +72,15 @@ const AC = {
     const sites = this.getUserSites(login);
     const id = 'site_' + Date.now();
     const site = {
-      id, name: data.name || 'Новый сайт', subdomain: data.subdomain,
-      domain: data.domain || 'ai_craft.ru', description: data.description || '',
+      id,
+      name: data.name || 'Новый сайт',
+      subdomain: data.subdomain,
+      domain: data.domain || 'ai_craft.ru',
+      customDomain: data.customDomain || '',
+      description: data.description || '',
       createdAt: new Date().toISOString(),
       files: data.files || { 'index.html': data.html || '', 'style.css': data.css || '', 'script.js': data.js || '' },
-      published: false
+      published: !!data.published
     };
     sites.unshift(site);
     this.saveUserSites(login, sites);
