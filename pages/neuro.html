@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Нейро — Ai крафт</title>
+  <link rel="stylesheet" href="../css/style.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+<div class="app">
+  <aside class="sidebar">
+    <a href="../index.html" class="logo"><span class="logo-mark">✦</span> Ai крафт</a>
+    <nav class="side-nav">
+      <a href="dashboard.html">Проекты</a>
+      <a href="create.html">Создать сайт</a>
+      <a href="editor.html">Редактор кода</a>
+      <a href="links.html">Ссылки</a>
+      <a href="neuro.html" class="active">Нейро</a>
+      <a href="settings.html">Настройки</a>
+      <a href="media.html">Медиа AI</a>
+    </nav>
+    <div class="side-user"><strong id="userLogin">—</strong><a href="#" id="logout">Выйти</a></div>
+  </aside>
+  <main class="main">
+    <div class="page-head"><h1>Нейро</h1></div>
+    <div class="neuro-layout">
+      <div class="card">
+        <h3>Чем может помочь</h3>
+        <p style="margin:12px 0;color:var(--text-muted);font-size:14px">Создание сайтов, код, ссылки, деплой, настройки. Или просто поболтать.</p>
+        <ul style="font-size:14px;color:var(--text-muted);line-height:1.8;padding-left:18px">
+          <li>«Как создать сайт?»</li>
+          <li>«Как сменить тему?»</li>
+          <li>«Как сделать короткую ссылку?»</li>
+          <li>«Как опубликовать проект?»</li>
+        </ul>
+      </div>
+      <div id="neuroRoot"></div>
+    </div>
+  </main>
+</div>
+<script src="../js/core.js"></script>
+<script src="../js/neuro.js"></script>
+<script>
+  const session = AC.requireAuth();
+  AC.applyTheme();
+  document.getElementById('userLogin').textContent = session.login;
+  document.getElementById('logout').onclick = e => { e.preventDefault(); AC.clearSession(); location.href='../index.html'; };
+  Neuro.mount(document.getElementById('neuroRoot'), session.login);
+</script>
+</body>
+</html>
