@@ -8,13 +8,25 @@ const AC = {
     neuro: 'aicraft_neuro_history'
   },
   FILE_TYPES: [
-    { ext: 'html', name: 'HTML' }, { ext: 'css', name: 'CSS' }, { ext: 'js', name: 'JavaScript' },
-    { ext: 'ts', name: 'TypeScript' }, { ext: 'jsx', name: 'JSX' }, { ext: 'tsx', name: 'TSX' },
-    { ext: 'json', name: 'JSON' }, { ext: 'md', name: 'Markdown' }, { ext: 'txt', name: 'Text' },
-    { ext: 'svg', name: 'SVG' }, { ext: 'xml', name: 'XML' }, { ext: 'py', name: 'Python' },
-    { ext: 'php', name: 'PHP' }, { ext: 'sql', name: 'SQL' }, { ext: 'yml', name: 'YAML' },
-    { ext: 'yaml', name: 'YAML' }, { ext: 'scss', name: 'SCSS' }, { ext: 'less', name: 'LESS' },
-    { ext: 'vue', name: 'Vue' }, { ext: 'svelte', name: 'Svelte' }
+    { ext: 'html', name: 'HTML' }, { ext: 'htm', name: 'HTML' },
+    { ext: 'css', name: 'CSS' }, { ext: 'scss', name: 'SCSS' }, { ext: 'sass', name: 'Sass' }, { ext: 'less', name: 'LESS' },
+    { ext: 'js', name: 'JavaScript' }, { ext: 'mjs', name: 'JS Module' }, { ext: 'cjs', name: 'CommonJS' },
+    { ext: 'ts', name: 'TypeScript' }, { ext: 'tsx', name: 'TSX' }, { ext: 'jsx', name: 'JSX' },
+    { ext: 'json', name: 'JSON' }, { ext: 'jsonc', name: 'JSONC' },
+    { ext: 'md', name: 'Markdown' }, { ext: 'mdx', name: 'MDX' }, { ext: 'txt', name: 'Text' },
+    { ext: 'svg', name: 'SVG' }, { ext: 'xml', name: 'XML' },
+    { ext: 'py', name: 'Python' }, { ext: 'ipynb', name: 'Jupyter' },
+    { ext: 'php', name: 'PHP' }, { ext: 'rb', name: 'Ruby' }, { ext: 'go', name: 'Go' }, { ext: 'rs', name: 'Rust' },
+    { ext: 'java', name: 'Java' }, { ext: 'kt', name: 'Kotlin' }, { ext: 'swift', name: 'Swift' },
+    { ext: 'c', name: 'C' }, { ext: 'h', name: 'C Header' }, { ext: 'cpp', name: 'C++' }, { ext: 'cs', name: 'C#' },
+    { ext: 'sql', name: 'SQL' }, { ext: 'graphql', name: 'GraphQL' },
+    { ext: 'yml', name: 'YAML' }, { ext: 'yaml', name: 'YAML' }, { ext: 'toml', name: 'TOML' }, { ext: 'ini', name: 'INI' }, { ext: 'env', name: 'Env' },
+    { ext: 'sh', name: 'Shell' }, { ext: 'bash', name: 'Bash' }, { ext: 'ps1', name: 'PowerShell' },
+    { ext: 'vue', name: 'Vue' }, { ext: 'svelte', name: 'Svelte' }, { ext: 'astro', name: 'Astro' },
+    { ext: 'wasm', name: 'WebAssembly' }, { ext: 'dockerfile', name: 'Dockerfile' },
+    { ext: 'csv', name: 'CSV' }, { ext: 'r', name: 'R' }, { ext: 'lua', name: 'Lua' }, { ext: 'dart', name: 'Dart' },
+    { ext: 'zig', name: 'Zig' }, { ext: 'ex', name: 'Elixir' }, { ext: 'scala', name: 'Scala' },
+    { ext: 'gitignore', name: 'Gitignore' }, { ext: 'editorconfig', name: 'EditorConfig' }
   ],
   defaultSettings: {
     theme: 'dark', accent: '#8b5cf6', tabsPosition: 'bottom', fontSize: 14,
