@@ -18,12 +18,23 @@
       <a href="links.html">Ссылки</a>
       <a href="neuro.html">Нейро</a>
       <a href="settings.html">Настройки</a>
-      <a href="media.html">Медиа AI</a>
+      <a href="media.html">Медиа</a>
     </nav>
     <div class="side-user"><strong id="userLogin">—</strong><a href="#" id="logout">Выйти</a></div>
   </aside>
   <main class="main">
-    <div class="page-head"><h1>Мои проекты</h1><a class="btn-primary" href="create.html">+ Новый сайт</a></div>
+    <div class="page-head">
+      <div>
+        <h1>Проекты</h1>
+        <p style="color:var(--text-muted);font-size:14px;margin-top:4px">Все ваши сайты в одном месте</p>
+      </div>
+      <a class="btn-primary" href="create.html">Создать сайт</a>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:28px" class="quick-help">
+      <div class="card" style="padding:16px"><div style="font-size:12px;color:var(--text-muted);margin-bottom:4px">Шаг 1</div><strong style="font-size:14px">Создать</strong><p style="font-size:13px;color:var(--text-muted);margin-top:6px">Опишите идею — получите каркас сайта.</p></div>
+      <div class="card" style="padding:16px"><div style="font-size:12px;color:var(--text-muted);margin-bottom:4px">Шаг 2</div><strong style="font-size:14px">Править код</strong><p style="font-size:13px;color:var(--text-muted);margin-top:6px">Файлы слева, код по центру, сайт справа.</p></div>
+      <div class="card" style="padding:16px"><div style="font-size:12px;color:var(--text-muted);margin-bottom:4px">Шаг 3</div><strong style="font-size:14px">Открыть</strong><p style="font-size:13px;color:var(--text-muted);margin-top:6px">Просмотр в новой вкладке.</p></div>
+    </div>
     <div id="list"></div>
   </main>
 </div>
@@ -59,16 +70,16 @@
     const sites = AC.getUserSites(session.login);
     const el = document.getElementById('list');
     if (!sites.length) {
-      el.innerHTML = '<div class="empty"><h3>Пока нет проектов</h3><p>Опиши идею — соберём сайт.</p><a class="btn-primary" href="create.html" style="margin-top:16px">Создать сайт</a></div>';
+      el.innerHTML = '<div class="empty"><h3>Пока нет проектов</h3><p>Нажмите «Создать сайт» — опишите идею обычными словами.</p><a class="btn-primary" href="create.html" style="margin-top:16px">Создать первый сайт</a></div>';
       return;
     }
     el.innerHTML = '<div class="grid-cards">' + sites.map(s => `
       <div class="card"><h3>${AC.escapeHtml(s.name)}</h3>
       <div class="meta">${AC.escapeHtml(s.subdomain)}.${AC.escapeHtml(s.domain)}</div>
-      <p>${AC.escapeHtml((s.description || '').slice(0, 120))}</p>
+      <p>${AC.escapeHtml((s.description || 'Без описания').slice(0, 100))}</p>
       <div class="card-actions">
-        <a href="editor.html?id=${s.id}">Код</a>
-        <button type="button" data-open="${s.id}">Открыть</button>
+        <a href="editor.html?id=${s.id}">Открыть в редакторе</a>
+        <button type="button" data-open="${s.id}">Посмотреть сайт</button>
         <button type="button" data-del="${s.id}">Удалить</button>
       </div></div>`).join('') + '</div>';
     el.querySelectorAll('[data-open]').forEach(b => b.onclick = () => openSite(b.dataset.open));
@@ -78,5 +89,6 @@
   }
   render();
 </script>
+<style>@media(max-width:800px){.quick-help{grid-template-columns:1fr !important}}</style>
 </body>
 </html>
