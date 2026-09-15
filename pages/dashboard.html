@@ -17,8 +17,8 @@
       <a href="editor.html">Редактор кода</a>
       <a href="links.html">Ссылки</a>
       <a href="neuro.html">Нейро</a>
-      <a href="settings.html">Настройки</a>
       <a href="media.html">Медиа</a>
+      <a href="settings.html">Настройки</a>
     </nav>
     <div class="side-user"><strong id="userLogin">—</strong><a href="#" id="logout">Выйти</a></div>
   </aside>
@@ -26,14 +26,9 @@
     <div class="page-head">
       <div>
         <h1>Проекты</h1>
-        <p style="color:var(--text-muted);font-size:14px;margin-top:4px">Все ваши сайты в одном месте</p>
+        <p style="color:var(--text-muted);font-size:14px;margin-top:4px">Ваши сайты. Откройте в редакторе или в новой вкладке.</p>
       </div>
       <a class="btn-primary" href="create.html">Создать сайт</a>
-    </div>
-    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:28px" class="quick-help">
-      <div class="card" style="padding:16px"><div style="font-size:12px;color:var(--text-muted);margin-bottom:4px">Шаг 1</div><strong style="font-size:14px">Создать</strong><p style="font-size:13px;color:var(--text-muted);margin-top:6px">Опишите идею — получите каркас сайта.</p></div>
-      <div class="card" style="padding:16px"><div style="font-size:12px;color:var(--text-muted);margin-bottom:4px">Шаг 2</div><strong style="font-size:14px">Править код</strong><p style="font-size:13px;color:var(--text-muted);margin-top:6px">Файлы слева, код по центру, сайт справа.</p></div>
-      <div class="card" style="padding:16px"><div style="font-size:12px;color:var(--text-muted);margin-bottom:4px">Шаг 3</div><strong style="font-size:14px">Открыть</strong><p style="font-size:13px;color:var(--text-muted);margin-top:6px">Просмотр в новой вкладке.</p></div>
     </div>
     <div id="list"></div>
   </main>
@@ -51,16 +46,16 @@
   AC.applyTheme();
   document.getElementById('userLogin').textContent = session.login;
   document.getElementById('logout').onclick = e => { e.preventDefault(); AC.clearSession(); location.href = '../index.html'; };
-  function openSite(id) {
+  function openPreview(id) {
     const site = AC.getUserSites(session.login).find(x => x.id === id);
-    if (!site || !site.files) return AC.toast('Нет содержимого');
+    if (!site?.files) return AC.toast('Нет файлов');
     const html = site.files['index.html'] || '';
     const css = site.files['style.css'] || '';
     const js = site.files['script.js'] || '';
     let doc = html;
     if (doc.includes('</head>')) doc = doc.replace('</head>', '<style>' + css + '</style></head>');
     else doc = '<style>' + css + '</style>' + doc;
-    if (doc.includes('script.js')) doc = doc.replace(/<script src="script\.js"><\/script>/, '<script>' + js + '<\/script>');
+    if (/script\.js/.test(doc)) doc = doc.replace(/<script\s+src=["']script\.js["']\s*><\/script>/i, '<script>' + js + '<\/script>');
     else doc += '<script>' + js + '<\/script>';
     const w = window.open('', '_blank');
     w.document.write(doc);
@@ -70,25 +65,20 @@
     const sites = AC.getUserSites(session.login);
     const el = document.getElementById('list');
     if (!sites.length) {
-      el.innerHTML = '<div class="empty"><h3>Пока нет проектов</h3><p>Нажмите «Создать сайт» — опишите идею обычными словами.</p><a class="btn-primary" href="create.html" style="margin-top:16px">Создать первый сайт</a></div>';
+      el.innerHTML = '<div class="empty"><h3>Пока нет проектов</h3><p>Нажмите «Создать сайт», опишите идею — получите каркас с HTML, CSS и JS.</p><a class="btn-primary" href="create.html" style="margin-top:16px">Создать первый сайт</a></div>';
       return;
     }
-    el.innerHTML = '<div class="grid-cards">' + sites.map(s => `
-      <div class="card"><h3>${AC.escapeHtml(s.name)}</h3>
-      <div class="meta">${AC.escapeHtml(s.subdomain)}.${AC.escapeHtml(s.domain)}</div>
-      <p>${AC.escapeHtml((s.description || 'Без описания').slice(0, 100))}</p>
-      <div class="card-actions">
-        <a href="editor.html?id=${s.id}">Открыть в редакторе</a>
-        <button type="button" data-open="${s.id}">Посмотреть сайт</button>
-        <button type="button" data-del="${s.id}">Удалить</button>
-      </div></div>`).join('') + '</div>';
-    el.querySelectorAll('[data-open]').forEach(b => b.onclick = () => openSite(b.dataset.open));
+    el.innerHTML = '<div class="grid-cards">' + sites.map(s => {
+      const date = s.createdAt ? new Date(s.createdAt).toLocaleDateString('ru-RU') : '';
+      const filesCount = s.files ? Object.keys(s.files).length : 0;
+      return '<div class="card"><h3>' + AC.escapeHtml(s.name) + '</h3><div class="meta">' + AC.escapeHtml(s.subdomain) + '.' + AC.escapeHtml(s.domain) + '</div><p>' + AC.escapeHtml((s.description || 'Без описания').slice(0, 140)) + '</p><p style="font-size:12px;color:var(--text-muted);margin-bottom:12px">' + filesCount + ' файл(ов) · ' + date + '</p><div class="card-actions"><a href="editor.html?id=' + s.id + '">Открыть в редакторе</a><button type="button" data-open="' + s.id + '">Посмотреть сайт</button><button type="button" data-del="' + s.id + '">Удалить</button></div></div>';
+    }).join('') + '</div>';
+    el.querySelectorAll('[data-open]').forEach(b => b.onclick = () => openPreview(b.dataset.open));
     el.querySelectorAll('[data-del]').forEach(b => b.onclick = () => {
-      if (confirm('Удалить проект?')) { AC.deleteSite(session.login, b.dataset.del); AC.toast('Удалено'); render(); }
+      if (confirm('Удалить проект безвозвратно?')) { AC.deleteSite(session.login, b.dataset.del); AC.toast('Удалено'); render(); }
     });
   }
   render();
 </script>
-<style>@media(max-width:800px){.quick-help{grid-template-columns:1fr !important}}</style>
 </body>
 </html>
