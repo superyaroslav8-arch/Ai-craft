@@ -1,15 +1,16 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Медиа AI — Ai крафт</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Медиа — Ai крафт</title>
   <link rel="stylesheet" href="../css/style.css">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@600;700&display=swap" rel="stylesheet">
 </head>
 <body>
 <div class="app">
   <aside class="sidebar">
-    <a href="../index.html" class="logo"><span class="logo-mark">✦</span> Ai крафт</a>
+    <a href="../index.html" class="logo">Ai крафт</a>
     <nav class="side-nav">
       <a href="dashboard.html">Проекты</a>
       <a href="create.html">Создать сайт</a>
@@ -22,47 +23,80 @@
     <div class="side-user"><strong id="userLogin">—</strong><a href="#" id="logout">Выйти</a></div>
   </aside>
   <main class="main">
-    <div class="page-head"><h1>Генерация медиа</h1></div>
-    <div class="grid-cards">
-      <div class="card">
-        <h3>🖼️ Фото</h3>
-        <div class="form-group" style="margin-top:12px"><label>Промпт</label><textarea id="photoP" placeholder="Минималистичный офис, мягкий свет"></textarea></div>
-        <button class="btn-primary btn-sm" id="photoBtn">Сгенерировать</button>
-        <div id="photoOut" style="margin-top:12px;font-size:13px;color:var(--text-muted)"></div>
+    <div class="page-head"><h1>Медиа AI</h1></div>
+    <div class="domain-row" id="tabs" style="margin-bottom:20px">
+      <button type="button" class="chip active" data-tab="photo">Фото</button>
+      <button type="button" class="chip" data-tab="video">Видео</button>
+      <button type="button" class="chip" data-tab="music">Музыка</button>
+    </div>
+    <div class="create-layout">
+      <div class="prompt-box">
+        <h2 id="tabTitle">Сгенерировать фото</h2>
+        <p class="hint" id="tabHint">Опиши изображение — получишь превью для сайта.</p>
+        <div class="form-group"><label>Описание</label><textarea id="prompt" placeholder="Минималистичный логотип кофейни"></textarea></div>
+        <div class="form-group" id="styleRow"><label>Стиль</label>
+          <select id="style"><option value="realistic">Реализм</option><option value="illustration">Иллюстрация</option><option value="3d">3D</option><option value="minimal">Минимализм</option></select>
+        </div>
+        <button class="btn-primary" type="button" id="gen">Сгенерировать</button>
+        <p id="status" style="margin-top:12px;font-size:13px;color:var(--text-muted)"></p>
       </div>
       <div class="card">
-        <h3>🎬 Видео</h3>
-        <div class="form-group" style="margin-top:12px"><label>Промпт</label><textarea id="videoP" placeholder="Пролёт над городом на закате"></textarea></div>
-        <button class="btn-primary btn-sm" id="videoBtn">Сгенерировать</button>
-        <div id="videoOut" style="margin-top:12px;font-size:13px;color:var(--text-muted)"></div>
-      </div>
-      <div class="card">
-        <h3>🎵 Музыка</h3>
-        <div class="form-group" style="margin-top:12px"><label>Промпт</label><textarea id="musicP" placeholder="Спокойный lo-fi для лендинга"></textarea></div>
-        <button class="btn-primary btn-sm" id="musicBtn">Сгенерировать</button>
-        <div id="musicOut" style="margin-top:12px;font-size:13px;color:var(--text-muted)"></div>
+        <h3 style="margin-bottom:12px">Результат</h3>
+        <div id="result" style="min-height:220px;display:grid;place-items:center;background:var(--bg);border-radius:12px;border:1px dashed var(--border);color:var(--text-muted);font-size:13px;padding:16px">Здесь появится превью</div>
+        <div class="card-actions" style="margin-top:14px" id="actions" hidden>
+          <button type="button" id="copyPrompt">Копировать описание</button>
+        </div>
       </div>
     </div>
+    <div class="settings-section" style="margin-top:28px"><h2>История</h2><div id="history" class="grid-cards"></div></div>
   </main>
 </div>
+<nav class="mobile-nav"><a href="dashboard.html">Проекты</a><a href="create.html">Создать</a><a href="editor.html">Код</a><a href="neuro.html">Нейро</a><a href="settings.html">Ещё</a></nav>
 <script src="../js/core.js"></script>
 <script>
-  const session = AC.requireAuth();
-  AC.applyTheme();
+  const session = AC.requireAuth(); AC.applyTheme();
   document.getElementById('userLogin').textContent = session.login;
   document.getElementById('logout').onclick = e => { e.preventDefault(); AC.clearSession(); location.href='../index.html'; };
-  function gen(btn, out, type) {
-    const prompt = document.getElementById(type + 'P').value.trim();
-    if (!prompt) return alert('Опиши, что нужно');
-    btn.disabled = true; btn.textContent = 'Генерация…'; out.textContent = '';
-    setTimeout(() => {
-      out.innerHTML = `Готово (превью): <strong>${AC.escapeHtml(prompt.slice(0,80))}</strong><br>Подключи API нейросети для реальной генерации.`;
-      btn.disabled = false; btn.textContent = 'Сгенерировать';
-    }, 1500);
+  const KEY = 'aicraft_media_' + session.login;
+  let tab = 'photo'; let history = [];
+  try { history = JSON.parse(localStorage.getItem(KEY) || '[]'); } catch { history = []; }
+  const titles = { photo: ['Сгенерировать фото', 'Опиши изображение.'], video: ['Сгенерировать видео', 'Опиши ролик.'], music: ['Сгенерировать музыку', 'Жанр и настроение.'] };
+  document.querySelectorAll('#tabs .chip').forEach(c => c.onclick = () => {
+    tab = c.dataset.tab;
+    document.querySelectorAll('#tabs .chip').forEach(x => x.classList.remove('active'));
+    c.classList.add('active');
+    document.getElementById('tabTitle').textContent = titles[tab][0];
+    document.getElementById('tabHint').textContent = titles[tab][1];
+    document.getElementById('styleRow').style.display = tab === 'photo' ? '' : 'none';
+  });
+  function gradient(seed) {
+    let h = 0; for (let i = 0; i < seed.length; i++) h = (h * 31 + seed.charCodeAt(i)) >>> 0;
+    return `linear-gradient(135deg,hsl(${h%360},70%,45%),hsl(${(h*7)%360},65%,35%))`;
   }
-  document.getElementById('photoBtn').onclick = function(){ gen(this, document.getElementById('photoOut'), 'photo'); };
-  document.getElementById('videoBtn').onclick = function(){ gen(this, document.getElementById('videoOut'), 'video'); };
-  document.getElementById('musicBtn').onclick = function(){ gen(this, document.getElementById('musicOut'), 'music'); };
+  function renderHistory() {
+    const el = document.getElementById('history');
+    if (!history.length) { el.innerHTML = '<div class="empty" style="grid-column:1/-1"><p>Пока пусто</p></div>'; return; }
+    el.innerHTML = history.slice(0,12).map(h => `<div class="card"><div style="height:100px;border-radius:10px;margin-bottom:10px;background:${h.bg}"></div><div class="meta">${h.type}</div><p>${AC.escapeHtml(h.prompt.slice(0,80))}</p></div>`).join('');
+  }
+  document.getElementById('gen').onclick = () => {
+    const prompt = document.getElementById('prompt').value.trim();
+    if (!prompt) { AC.toast('Опиши, что нужно'); return; }
+    const btn = document.getElementById('gen'); const status = document.getElementById('status');
+    btn.disabled = true; status.textContent = 'Генерация…';
+    setTimeout(() => {
+      const style = document.getElementById('style').value;
+      const bg = gradient(prompt + tab + style);
+      history.unshift({ type: tab, prompt, style, bg, at: Date.now() });
+      localStorage.setItem(KEY, JSON.stringify(history.slice(0,40)));
+      const result = document.getElementById('result');
+      if (tab === 'photo') result.innerHTML = `<div style="width:100%;aspect-ratio:16/10;border-radius:12px;background:${bg};display:grid;place-items:center;color:#fff;font-weight:600;padding:16px">${AC.escapeHtml(prompt.slice(0,60))}</div>`;
+      else if (tab === 'video') result.innerHTML = `<div style="width:100%;aspect-ratio:16/9;border-radius:12px;background:${bg};display:grid;place-items:center;color:#fff;padding:16px">▶ Видео<br><small>${AC.escapeHtml(prompt.slice(0,50))}</small></div>`;
+      else result.innerHTML = `<div style="padding:28px;border-radius:12px;background:${bg};color:#fff"><strong>Трек</strong><p style="margin-top:8px">${AC.escapeHtml(prompt)}</p><p style="margin-top:12px;font-size:12px">♪ 2:40</p></div>`;
+      document.getElementById('actions').hidden = false; status.textContent = 'Готово'; btn.disabled = false; renderHistory(); AC.toast('Готово');
+    }, 900);
+  };
+  document.getElementById('copyPrompt').onclick = () => navigator.clipboard.writeText(document.getElementById('prompt').value).then(() => AC.toast('Скопировано'));
+  renderHistory();
 </script>
 </body>
 </html>

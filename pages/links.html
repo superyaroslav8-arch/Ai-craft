@@ -1,7 +1,8 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Ссылки — Ai крафт</title>
   <link rel="stylesheet" href="../css/style.css">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@600;700&display=swap" rel="stylesheet">
@@ -9,7 +10,7 @@
 <body>
 <div class="app">
   <aside class="sidebar">
-    <a href="../index.html" class="logo"><span class="logo-mark">✦</span> Ai крафт</a>
+    <a href="../index.html" class="logo">Ai крафт</a>
     <nav class="side-nav">
       <a href="dashboard.html">Проекты</a>
       <a href="create.html">Создать сайт</a>
@@ -22,49 +23,42 @@
     <div class="side-user"><strong id="userLogin">—</strong><a href="#" id="logout">Выйти</a></div>
   </aside>
   <main class="main">
-    <div class="page-head"><h1>Свои ссылки</h1></div>
-    <div class="card" style="margin-bottom:20px;max-width:560px">
-      <h3 style="margin-bottom:12px">Создать ссылку</h3>
-      <div class="form-group"><label>Название</label><input id="title" placeholder="Мой лендинг"></div>
-      <div class="form-group"><label>URL</label><input id="url" placeholder="https://..."></div>
-      <div class="form-group"><label>Slug</label><input id="slug" placeholder="my-site"></div>
-      <button class="btn-primary" id="create">Создать</button>
-    </div>
-    <div class="card">
-      <table class="table">
-        <thead><tr><th>Название</th><th>Короткая</th><th>Куда</th><th></th></tr></thead>
-        <tbody id="tbody"></tbody>
-      </table>
+    <div class="page-head"><h1>Короткие ссылки</h1></div>
+    <div class="create-layout">
+      <div class="prompt-box">
+        <h2>Новая ссылка</h2>
+        <div class="form-group"><label>Название</label><input id="title" placeholder="Мой лендинг"></div>
+        <div class="form-group"><label>URL</label><input id="url" placeholder="https://..."></div>
+        <div class="form-group"><label>Слаг</label><input id="slug" placeholder="my-site"></div>
+        <button class="btn-primary" type="button" id="create">Создать</button>
+      </div>
+      <div class="card"><h3 style="margin-bottom:12px">Ваши ссылки</h3><div id="list"></div></div>
     </div>
   </main>
 </div>
+<nav class="mobile-nav"><a href="dashboard.html">Проекты</a><a href="create.html">Создать</a><a href="editor.html">Код</a><a href="neuro.html">Нейро</a><a href="settings.html">Ещё</a></nav>
 <script src="../js/core.js"></script>
 <script>
-  const session = AC.requireAuth();
-  AC.applyTheme();
+  const session = AC.requireAuth(); AC.applyTheme();
   document.getElementById('userLogin').textContent = session.login;
   document.getElementById('logout').onclick = e => { e.preventDefault(); AC.clearSession(); location.href='../index.html'; };
   function render() {
     const links = AC.getLinks(session.login);
-    const tb = document.getElementById('tbody');
-    if (!links.length) { tb.innerHTML = '<tr><td colspan="4" style="color:var(--text-muted)">Пока нет ссылок</td></tr>'; return; }
-    tb.innerHTML = links.map(l => `<tr>
-      <td>${AC.escapeHtml(l.title)}</td>
-      <td><code>${AC.escapeHtml(l.shortUrl)}</code></td>
-      <td style="max-width:180px;overflow:hidden;text-overflow:ellipsis">${AC.escapeHtml(l.url)}</td>
-      <td><button data-copy="${l.shortUrl}">Копировать</button> <button data-del="${l.id}">Удалить</button></td>
-    </tr>`).join('');
-    tb.querySelectorAll('[data-del]').forEach(b => b.onclick = () => { AC.deleteLink(session.login, b.dataset.del); render(); });
-    tb.querySelectorAll('[data-copy]').forEach(b => b.onclick = async () => {
-      try { await navigator.clipboard.writeText('https://' + b.dataset.copy); b.textContent = 'Скопировано'; setTimeout(()=>b.textContent='Копировать',1000);} catch { alert(b.dataset.copy); }
-    });
+    const el = document.getElementById('list');
+    if (!links.length) { el.innerHTML = '<p style="color:var(--text-muted);font-size:13px">Пока нет ссылок</p>'; return; }
+    el.innerHTML = '<table class="table"><thead><tr><th>Короткая</th><th>Куда</th><th></th></tr></thead><tbody>' +
+      links.map(l => `<tr><td><code>${AC.escapeHtml(l.shortUrl)}</code></td><td>${AC.escapeHtml(l.url)}</td><td><button type="button" data-copy="${AC.escapeHtml(l.shortUrl)}">Копировать</button> <button type="button" data-del="${l.id}">Удалить</button></td></tr>`).join('') + '</tbody></table>';
+    el.querySelectorAll('[data-copy]').forEach(b => b.onclick = () => navigator.clipboard.writeText(b.dataset.copy).then(() => AC.toast('Скопировано')));
+    el.querySelectorAll('[data-del]').forEach(b => b.onclick = () => { if (confirm('Удалить?')) { AC.deleteLink(session.login, b.dataset.del); render(); } });
   }
   document.getElementById('create').onclick = () => {
+    const title = document.getElementById('title').value.trim();
     const url = document.getElementById('url').value.trim();
-    if (!url) return alert('Укажи URL');
-    AC.createLink(session.login, { title: document.getElementById('title').value.trim(), url, slug: document.getElementById('slug').value.trim() });
-    document.getElementById('title').value = ''; document.getElementById('url').value = ''; document.getElementById('slug').value = '';
-    render();
+    const slug = document.getElementById('slug').value.trim();
+    if (!url) { AC.toast('Укажи URL'); return; }
+    AC.createLink(session.login, { title, url, slug });
+    document.getElementById('title').value=''; document.getElementById('url').value=''; document.getElementById('slug').value='';
+    render(); AC.toast('Ссылка создана');
   };
   render();
 </script>
