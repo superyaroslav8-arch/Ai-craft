@@ -30,16 +30,14 @@
     <div class="create-layout">
       <div class="prompt-box">
         <h2 id="tabTitle">Сгенерировать фото</h2>
-        <p class="hint" id="tabHint">Реальная картинка по вашему тексту (бесплатно).</p>
-        <div class="form-group"><label>Описание</label>
-          <textarea id="prompt" placeholder="Уютная кофейня, тёплый свет, чашка капучино"></textarea>
-        </div>
+        <p class="hint">Опишите, что нужно — получите изображение по запросу. Бесплатно.</p>
+        <div class="form-group"><label>Описание</label><textarea id="prompt" placeholder="Уютная кофейня, тёплый свет, утро"></textarea></div>
         <button class="btn-primary" type="button" id="gen">Сгенерировать</button>
         <p id="status" style="margin-top:12px;font-size:13px;color:var(--text-muted)"></p>
       </div>
       <div class="card">
         <h3 style="margin-bottom:12px">Результат</h3>
-        <div id="result" style="min-height:220px;display:grid;place-items:center;background:var(--bg);border-radius:12px;border:1px dashed var(--border);color:var(--text-muted);padding:12px">Превью</div>
+        <div id="result" style="min-height:220px;display:grid;place-items:center;background:var(--bg);border-radius:12px;border:1px dashed var(--border);color:var(--text-muted);padding:12px">Здесь появится результат</div>
       </div>
     </div>
     <div style="margin-top:24px"><h2 style="font-size:14px;color:var(--text-muted);margin-bottom:12px">История</h2><div id="history" class="grid-cards"></div></div>
@@ -54,11 +52,11 @@
 <script src="../js/core.js" defer></script>
 <script>
 document.addEventListener('DOMContentLoaded', () => {
-  const session = AC.requireAuth('../index.html');
+  const session = AC.requireAuth('auth.html');
   if (!session) return;
   AC.applyTheme();
   document.getElementById('userLogin').textContent = session.name || session.login;
-  document.getElementById('logout').onclick = e => { e.preventDefault(); AC.clearSession(); location.href = '../index.html'; };
+  document.getElementById('logout').onclick = e => { e.preventDefault(); AC.clearSession(); location.href = 'auth.html'; };
   const KEY = 'aicraft_media_' + session.login;
   let tab = 'photo', history = [];
   try { history = JSON.parse(localStorage.getItem(KEY) || '[]'); } catch (e) {}
@@ -66,20 +64,14 @@ document.addEventListener('DOMContentLoaded', () => {
     tab = c.dataset.tab;
     document.querySelectorAll('#tabs .chip').forEach(x => x.classList.remove('active'));
     c.classList.add('active');
-    const map = {
-      photo: ['Сгенерировать фото', 'Реальная картинка по тексту.'],
-      video: ['Сценарий видео', 'Текст сценария.'],
-      music: ['Описание трека', 'Жанр и настроение.']
-    };
-    document.getElementById('tabTitle').textContent = map[tab][0];
-    document.getElementById('tabHint').textContent = map[tab][1];
+    document.getElementById('tabTitle').textContent = tab === 'photo' ? 'Сгенерировать фото' : tab === 'video' ? 'Кадр для видео' : 'Идея для музыки';
   });
   function renderHistory() {
     const el = document.getElementById('history');
     if (!history.length) { el.innerHTML = '<p style="color:var(--text-muted);font-size:13px">Пока пусто</p>'; return; }
     el.innerHTML = history.slice(0, 12).map(h => h.url
-      ? '<div class="card"><img src="' + h.url + '" alt="" loading="lazy" style="width:100%;height:120px;object-fit:cover;border-radius:10px;margin-bottom:8px"><p style="font-size:12px">' + AC.escapeHtml(h.prompt.slice(0, 80)) + '</p></div>'
-      : '<div class="card"><div class="meta">' + h.type + '</div><p>' + AC.escapeHtml((h.text || h.prompt || '').slice(0, 120)) + '</p></div>'
+      ? '<div class="card"><img src="'+h.url+'" alt="" loading="lazy" style="width:100%;height:100px;object-fit:cover;border-radius:10px;margin-bottom:8px"><div class="meta">'+h.type+'</div><p>'+AC.escapeHtml((h.prompt||'').slice(0,70))+'</p></div>'
+      : '<div class="card"><div class="meta">'+h.type+'</div><p>'+AC.escapeHtml((h.prompt||'').slice(0,90))+'</p></div>'
     ).join('');
   }
   document.getElementById('gen').onclick = () => {
@@ -88,33 +80,36 @@ document.addEventListener('DOMContentLoaded', () => {
     const btn = document.getElementById('gen');
     const status = document.getElementById('status');
     const result = document.getElementById('result');
-    btn.disabled = true; status.textContent = 'Генерация…';
-    if (tab === 'photo') {
-      const url = AC.imageUrl(prompt, { width: 768, height: 512 });
-      const img = new Image();
-      img.onload = () => {
-        result.innerHTML = ''; img.style.width = '100%'; img.style.borderRadius = '12px'; img.alt = prompt;
-        result.appendChild(img);
-        history.unshift({ type: 'photo', prompt, url, at: Date.now() });
-        localStorage.setItem(KEY, JSON.stringify(history.slice(0, 40)));
-        status.textContent = 'Готово'; btn.disabled = false; renderHistory(); AC.toast('Фото готово');
-      };
-      img.onerror = () => { status.textContent = 'Ошибка загрузки. Попробуйте снова.'; btn.disabled = false; };
-      img.src = url;
-      result.innerHTML = '<p style="color:var(--text-muted)">Загрузка…</p>';
-    } else if (tab === 'video') {
-      const text = 'Сценарий\n\n1. Заставка: ' + prompt + '\n2. Основная сцена\n3. Финал\n\n15–30 сек.';
-      result.innerHTML = '<pre style="white-space:pre-wrap;font-size:13px;text-align:left;width:100%">' + AC.escapeHtml(text) + '</pre>';
-      history.unshift({ type: 'video', prompt, text, at: Date.now() });
-      localStorage.setItem(KEY, JSON.stringify(history.slice(0, 40)));
-      status.textContent = 'Готово'; btn.disabled = false; renderHistory();
-    } else {
-      const text = 'Трек: ' + prompt + '\n\nЖанр по описанию\nТемп: средний\nДля сайта / ролика';
-      result.innerHTML = '<pre style="white-space:pre-wrap;font-size:13px;text-align:left;width:100%">' + AC.escapeHtml(text) + '</pre>';
-      history.unshift({ type: 'music', prompt, text, at: Date.now() });
-      localStorage.setItem(KEY, JSON.stringify(history.slice(0, 40)));
-      status.textContent = 'Готово'; btn.disabled = false; renderHistory();
+    btn.disabled = true;
+    status.textContent = 'Генерация… подождите несколько секунд';
+    if (tab === 'music') {
+      setTimeout(() => {
+        result.innerHTML = '<p style="line-height:1.6">Трек по запросу: «'+AC.escapeHtml(prompt.slice(0,100))+'». Для прослушивания: Pixabay Music / FMA с этим описанием.</p>';
+        history.unshift({ type: 'music', prompt, at: Date.now() });
+        localStorage.setItem(KEY, JSON.stringify(history.slice(0,40)));
+        status.textContent = 'Готово'; btn.disabled = false; renderHistory();
+      }, 400);
+      return;
     }
+    const url = (AC.imageUrl ? AC.imageUrl(tab === 'video' ? 'cinematic film still, ' + prompt : prompt) : 'https://image.pollinations.ai/prompt/' + encodeURIComponent(prompt) + '?width=768&height=512&nologo=true');
+    const img = new Image();
+    img.onload = () => {
+      result.innerHTML = '';
+      img.style.cssText = 'width:100%;border-radius:12px;display:block';
+      result.appendChild(img);
+      history.unshift({ type: tab, prompt, url, at: Date.now() });
+      localStorage.setItem(KEY, JSON.stringify(history.slice(0,40)));
+      status.textContent = 'Готово';
+      btn.disabled = false;
+      renderHistory();
+      AC.toast('Готово');
+    };
+    img.onerror = () => {
+      status.textContent = 'Не удалось загрузить. Нажмите ещё раз.';
+      btn.disabled = false;
+    };
+    result.innerHTML = '<p>Загрузка…</p>';
+    img.src = url;
   };
   renderHistory();
 });

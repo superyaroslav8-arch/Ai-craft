@@ -9,17 +9,20 @@
     .auth-wrap{min-height:100vh;display:grid;place-items:center;padding:24px;background:var(--bg)}
     .auth-box{width:100%;max-width:420px;background:var(--surface);border:1px solid var(--border);border-radius:24px;padding:28px 24px;text-align:center}
     .auth-box h1{font-size:22px;margin:12px 0 6px}
-    .auth-box .sub{color:var(--text-muted);font-size:14px;margin-bottom:20px;line-height:1.5}
-    .cam-frame{position:relative;width:100%;aspect-ratio:1;max-height:320px;border-radius:20px;overflow:hidden;background:#111;margin:0 auto 16px;border:1px solid var(--border)}
+    .auth-box .sub{color:var(--text-muted);font-size:14px;margin-bottom:16px;line-height:1.5}
+    .cam-frame{position:relative;width:100%;aspect-ratio:1;max-height:300px;border-radius:20px;overflow:hidden;background:#111;margin:0 auto 14px;border:1px solid var(--border)}
     .cam-frame video,.cam-frame canvas,.cam-frame img{width:100%;height:100%;object-fit:cover;display:block}
     .cam-frame canvas,.cam-frame img{display:none}
     .cam-frame.shot video{display:none}
-    .cam-frame.shot canvas,.cam-frame.shot img{display:block}
-    .hint{font-size:12px;color:var(--text-muted);margin-bottom:14px}
+    .cam-frame.shot img{display:block}
+    .name-row{margin-bottom:12px;text-align:left}
+    .name-row label{display:block;font-size:12px;color:var(--text-muted);margin-bottom:6px}
+    .name-row input{width:100%;padding:12px 14px;border-radius:12px;border:1px solid var(--border);background:var(--bg);color:var(--text)}
+    .hint{font-size:12px;color:var(--text-muted);margin-bottom:12px}
     .err{display:none;color:var(--danger);font-size:13px;margin-bottom:10px}
     .err.show{display:block}
     .actions{display:flex;flex-direction:column;gap:10px}
-    .or{font-size:12px;color:var(--text-muted);margin:8px 0}
+    .or{font-size:12px;color:var(--text-muted);margin:6px 0}
   </style>
 </head>
 <body>
@@ -27,7 +30,8 @@
     <div class="auth-box">
       <a href="../index.html" class="logo" style="justify-content:center;display:flex">Ai крафт</a>
       <h1>Вход по фото</h1>
-      <p class="sub">Наведите камеру, нажмите «Готово» — сразу в работу. Без логина и пароля.</p>
+      <p class="sub">Камера → «Готово» → сразу в кабинет. Без логина и пароля. Бесплатно.</p>
+      <div class="name-row"><label>Как к вам обращаться</label><input id="name" placeholder="Имя" maxlength="32"></div>
       <div class="cam-frame" id="frame">
         <video id="video" autoplay playsinline muted></video>
         <canvas id="canvas"></canvas>
@@ -45,7 +49,7 @@
   </div>
   <script src="../js/core.js" defer></script>
   <script>
-    document.addEventListener('DOMContentLoaded', async () => {
+    document.addEventListener('DOMContentLoaded', () => {
       AC.applyTheme();
       if (AC.getSession()) { location.href = 'dashboard.html'; return; }
       const video = document.getElementById('video');
@@ -57,6 +61,7 @@
       const hint = document.getElementById('hint');
       const err = document.getElementById('err');
       let stream = null, photoData = null;
+
       async function startCam() {
         try {
           stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user', width: { ideal: 640 }, height: { ideal: 640 } }, audio: false });
@@ -64,10 +69,9 @@
           hint.textContent = 'Смотрите в камеру и нажмите «Готово»';
           btnReady.disabled = false;
         } catch (e) {
-          hint.textContent = 'Камера недоступна — можно войти без фото';
-          err.textContent = 'Нет доступа к камере. Используйте «Продолжить без фото».';
+          hint.textContent = 'Камера недоступна — войдите без фото';
+          err.textContent = 'Нет доступа к камере.';
           err.classList.add('show');
-          btnReady.disabled = true;
         }
       }
       function stopCam() { if (stream) stream.getTracks().forEach(t => t.stop()); stream = null; }
@@ -79,32 +83,33 @@
         preview.src = photoData;
         frame.classList.add('shot');
         stopCam();
-        hint.textContent = 'Проверяем…';
       }
       function enter(withPhoto) {
-        AC.quickEnter({ photo: withPhoto ? photoData : null });
-        hint.textContent = 'Готово';
-        setTimeout(() => { location.href = 'dashboard.html'; }, 400);
+        const name = document.getElementById('name').value.trim() || 'Гость';
+        if (typeof AC.enterWithPhoto === 'function') {
+          AC.enterWithPhoto({ name, photoDataUrl: withPhoto ? photoData : null });
+        } else {
+          AC.setSession({ login: 'guest_' + Date.now(), name, photoAuth: !!withPhoto });
+        }
+        location.href = 'dashboard.html';
       }
       btnReady.onclick = () => {
         if (!photoData) {
           capture();
           btnRetake.hidden = false;
           btnReady.textContent = 'Подтвердить и войти';
-          hint.textContent = 'Фото снято. Нажмите ещё раз, чтобы войти';
+          hint.textContent = 'Фото готово. Нажмите ещё раз, чтобы войти';
           return;
         }
         btnReady.disabled = true;
         btnReady.textContent = 'Входим…';
-        setTimeout(() => enter(true), 500);
+        setTimeout(() => enter(true), 300);
       };
       btnRetake.onclick = () => {
         photoData = null;
         frame.classList.remove('shot');
         btnRetake.hidden = true;
-        btnReady.disabled = true;
         btnReady.textContent = 'Готово — войти';
-        hint.textContent = 'Запуск камеры…';
         startCam();
       };
       document.getElementById('btnGuest').onclick = () => { stopCam(); enter(false); };
