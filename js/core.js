@@ -5,39 +5,28 @@ const AC = {
     session: 'aicraft_session',
     settings: 'aicraft_settings',
     links: 'aicraft_links',
-    neuro: 'aicraft_neuro_history'
+    identity: 'aicraft_identity'
   },
-  FILE_TYPES: [
-    { ext: 'html', name: 'HTML' }, { ext: 'htm', name: 'HTML' },
-    { ext: 'css', name: 'CSS' }, { ext: 'scss', name: 'SCSS' }, { ext: 'sass', name: 'Sass' }, { ext: 'less', name: 'LESS' },
-    { ext: 'js', name: 'JavaScript' }, { ext: 'mjs', name: 'JS Module' }, { ext: 'cjs', name: 'CommonJS' },
-    { ext: 'ts', name: 'TypeScript' }, { ext: 'tsx', name: 'TSX' }, { ext: 'jsx', name: 'JSX' },
-    { ext: 'json', name: 'JSON' }, { ext: 'jsonc', name: 'JSONC' },
-    { ext: 'md', name: 'Markdown' }, { ext: 'mdx', name: 'MDX' }, { ext: 'txt', name: 'Text' },
-    { ext: 'svg', name: 'SVG' }, { ext: 'xml', name: 'XML' },
-    { ext: 'py', name: 'Python' }, { ext: 'ipynb', name: 'Jupyter' },
-    { ext: 'php', name: 'PHP' }, { ext: 'rb', name: 'Ruby' }, { ext: 'go', name: 'Go' }, { ext: 'rs', name: 'Rust' },
-    { ext: 'java', name: 'Java' }, { ext: 'kt', name: 'Kotlin' }, { ext: 'swift', name: 'Swift' },
-    { ext: 'c', name: 'C' }, { ext: 'h', name: 'C Header' }, { ext: 'cpp', name: 'C++' }, { ext: 'cs', name: 'C#' },
-    { ext: 'sql', name: 'SQL' }, { ext: 'graphql', name: 'GraphQL' },
-    { ext: 'yml', name: 'YAML' }, { ext: 'yaml', name: 'YAML' }, { ext: 'toml', name: 'TOML' }, { ext: 'ini', name: 'INI' }, { ext: 'env', name: 'Env' },
-    { ext: 'sh', name: 'Shell' }, { ext: 'bash', name: 'Bash' }, { ext: 'ps1', name: 'PowerShell' },
-    { ext: 'vue', name: 'Vue' }, { ext: 'svelte', name: 'Svelte' }, { ext: 'astro', name: 'Astro' },
-    { ext: 'wasm', name: 'WebAssembly' }, { ext: 'dockerfile', name: 'Dockerfile' },
-    { ext: 'csv', name: 'CSV' }, { ext: 'r', name: 'R' }, { ext: 'lua', name: 'Lua' }, { ext: 'dart', name: 'Dart' },
-    { ext: 'zig', name: 'Zig' }, { ext: 'ex', name: 'Elixir' }, { ext: 'scala', name: 'Scala' },
-    { ext: 'gitignore', name: 'Gitignore' }, { ext: 'editorconfig', name: 'EditorConfig' }
-  ],
-  defaultSettings: {
-    theme: 'dark', accent: '#8b5cf6', tabsPosition: 'bottom', fontSize: 14,
-    wordWrap: true, autoSave: true, showPreview: true, animations: true
-  },
+  defaultSettings: { theme: 'dark', accent: '#8b5cf6' },
   getUsers() { try { return JSON.parse(localStorage.getItem(this.KEYS.users) || '{}'); } catch { return {}; } },
   saveUsers(u) { localStorage.setItem(this.KEYS.users, JSON.stringify(u)); },
   getSession() { try { return JSON.parse(localStorage.getItem(this.KEYS.session) || 'null'); } catch { return null; } },
   setSession(s) { localStorage.setItem(this.KEYS.session, JSON.stringify(s)); },
   clearSession() { localStorage.removeItem(this.KEYS.session); },
-  requireAuth(redirect = 'login.html') {
+  getIdentity() { try { return JSON.parse(localStorage.getItem(this.KEYS.identity) || 'null'); } catch { return null; } },
+  setIdentity(id) { localStorage.setItem(this.KEYS.identity, JSON.stringify(id)); },
+  enterWithPhoto({ name, photoDataUrl }) {
+    const login = (name || 'Гость').trim().slice(0, 32) || 'Гость';
+    const key = 'photo_' + login.toLowerCase().replace(/\s+/g, '_');
+    const users = this.getUsers();
+    if (!users[key]) users[key] = { password: null, photoAuth: true, sites: [], name: login, photo: photoDataUrl || null };
+    else { users[key].photo = photoDataUrl || users[key].photo; users[key].name = login; }
+    this.saveUsers(users);
+    this.setIdentity({ name: login, photo: photoDataUrl || null, at: Date.now() });
+    this.setSession({ login: key, name: login, photoAuth: true });
+    return this.getSession();
+  },
+  requireAuth(redirect = '../index.html') {
     const s = this.getSession();
     if (!s) { location.href = redirect; return null; }
     return s;
@@ -56,15 +45,11 @@ const AC = {
     const s = settings || this.getSettings();
     document.documentElement.setAttribute('data-theme', s.theme || 'dark');
     document.documentElement.style.setProperty('--accent', s.accent || '#8b5cf6');
-    document.documentElement.setAttribute('data-tabs', s.tabsPosition || 'bottom');
-    document.documentElement.style.setProperty('--editor-font-size', (s.fontSize || 14) + 'px');
-    if (!s.animations) document.documentElement.classList.add('no-anim');
-    else document.documentElement.classList.remove('no-anim');
   },
   getUserSites(login) { return this.getUsers()[login]?.sites || []; },
   saveUserSites(login, sites) {
     const users = this.getUsers();
-    if (!users[login]) return;
+    if (!users[login]) users[login] = { sites: [], photoAuth: true };
     users[login].sites = sites;
     this.saveUsers(users);
   },
@@ -72,15 +57,10 @@ const AC = {
     const sites = this.getUserSites(login);
     const id = 'site_' + Date.now();
     const site = {
-      id,
-      name: data.name || 'Новый сайт',
-      subdomain: data.subdomain,
-      domain: data.domain || 'ai_craft.ru',
-      customDomain: data.customDomain || '',
-      description: data.description || '',
-      createdAt: new Date().toISOString(),
-      files: data.files || { 'index.html': data.html || '', 'style.css': data.css || '', 'script.js': data.js || '' },
-      published: !!data.published
+      id, name: data.name || 'Новый сайт', subdomain: data.subdomain,
+      domain: data.domain || 'ai_craft.ru', customDomain: data.customDomain || '',
+      description: data.description || '', createdAt: new Date().toISOString(),
+      files: data.files || {}, published: !!data.published
     };
     sites.unshift(site);
     this.saveUserSites(login, sites);
@@ -103,9 +83,8 @@ const AC = {
   },
   createLink(login, { title, url, slug }) {
     const links = this.getLinks(login);
-    const id = 'link_' + Date.now();
     const short = (slug || Math.random().toString(36).slice(2, 8)).toLowerCase().replace(/[^a-z0-9-]/g, '');
-    const item = { id, title: title || short, url, slug: short, shortUrl: `aicraft.link/${short}`, clicks: 0, createdAt: new Date().toISOString() };
+    const item = { id: 'link_' + Date.now(), title: title || short, url, slug: short, shortUrl: 'aicraft.link/' + short, clicks: 0, createdAt: new Date().toISOString() };
     links.unshift(item);
     this.saveLinks(login, links);
     return item;
@@ -118,13 +97,54 @@ const AC = {
     el.textContent = msg; el.classList.add('show');
     clearTimeout(el._t); el._t = setTimeout(() => el.classList.remove('show'), 2200);
   },
-  generateSiteHTML(description, name) {
-    const title = name || 'Мой сайт';
-    const desc = (description || 'Сайт создан в Ai крафт').slice(0, 400);
-    return `<!DOCTYPE html>\n<html lang="ru">\n<head>\n<meta charset="UTF-8">\n<meta name="viewport" content="width=device-width, initial-scale=1">\n<title>${title}</title>\n<link rel="stylesheet" href="style.css">\n</head>\n<body>\n<header class="header"><div class="wrap"><strong class="brand">${title}</strong><nav><a href="#about">О проекте</a><a href="#contact">Контакты</a></nav></div></header>\n<section class="hero"><div class="wrap"><h1>${title}</h1><p>${desc}</p><a class="btn" href="#contact">Связаться</a></div></section>\n<section id="about" class="section"><div class="wrap"><h2>О проекте</h2><p>${desc}</p></div></section>\n<section id="contact" class="section alt"><div class="wrap"><h2>Контакты</h2><p>Напишите нам.</p></div></section>\n<footer class="footer"><div class="wrap">© ${new Date().getFullYear()} ${title}</div></footer>\n<script src="script.js"></script>\n</body>\n</html>`;
+  imageUrl(prompt, opts) {
+    opts = opts || {};
+    const w = opts.width || 768, h = opts.height || 512;
+    const seed = opts.seed || Math.floor(Math.random() * 1e9);
+    const q = encodeURIComponent(String(prompt).slice(0, 300));
+    return 'https://image.pollinations.ai/prompt/' + q + '?width=' + w + '&height=' + h + '&seed=' + seed + '&nologo=true';
   },
-  generateSiteCSS() {
-    return `*{box-sizing:border-box;margin:0;padding:0}body{font-family:system-ui,sans-serif;line-height:1.6;color:#111;background:#fafafa}.wrap{max-width:960px;margin:0 auto;padding:0 20px}.header{border-bottom:1px solid #e5e5e5;background:#fff;position:sticky;top:0}.header .wrap{display:flex;justify-content:space-between;align-items:center;height:64px}.brand{font-size:18px}nav a{margin-left:20px;color:#555;text-decoration:none;font-size:14px}.hero{padding:80px 0;text-align:center;background:linear-gradient(180deg,#fff,#f3f0ff)}.hero h1{font-size:clamp(32px,5vw,48px);margin-bottom:16px}.hero p{color:#666;max-width:560px;margin:0 auto 28px}.btn{display:inline-block;padding:12px 24px;background:#8b5cf6;color:#fff;border-radius:999px;text-decoration:none;font-weight:600}.section{padding:64px 0}.section.alt{background:#fff}.footer{padding:24px 0;border-top:1px solid #e5e5e5;font-size:13px;color:#888}`;
+  parseIdea(description) {
+    const d = (description || '').toLowerCase();
+    const sections = [];
+    const add = (id, title) => { if (!sections.find(s => s.id === id)) sections.push({ id, title }); };
+    add('hero', 'Главная');
+    if (/о нас|о проекте|о компании|история|about/i.test(d)) add('about', 'О нас');
+    if (/услуг|service|что делаем|предлаг/i.test(d)) add('services', 'Услуги');
+    if (/меню|блюд|напит|кофе|еда|кухн/i.test(d)) add('menu', 'Меню');
+    if (/портфолио|работ|кейс|проект/i.test(d)) add('portfolio', 'Работы');
+    if (/цен|тариф|прайс|price/i.test(d)) add('pricing', 'Цены');
+    if (/отзыв|review/i.test(d)) add('reviews', 'Отзывы');
+    if (/команд|team/i.test(d)) add('team', 'Команда');
+    add('contact', 'Контакты');
+    let tone = 'neutral';
+    if (/тёпл|уют|спокой|пауза|мягк/i.test(d)) tone = 'warm';
+    if (/яркий|энерг|спорт|дерзк/i.test(d)) tone = 'bold';
+    if (/дело|бизнес|строг|премиум/i.test(d)) tone = 'business';
+    if (/миним|чист|воздух/i.test(d)) tone = 'minimal';
+    const titleMatch = description.match(/^([^.\n!?]{3,48})/);
+    const title = (titleMatch ? titleMatch[1] : 'Мой сайт').trim();
+    return { title, sections, tone, description: description || '' };
+  },
+  generateSiteHTML(description, name) {
+    const parsed = this.parseIdea(description);
+    const title = name || parsed.title;
+    const desc = this.escapeHtml(parsed.description.slice(0, 500));
+    const t = this.escapeHtml(title);
+    const sectionHtml = parsed.sections.map(s => {
+      if (s.id === 'hero') return '';
+      if (s.id === 'menu') return '<section id="menu" class="section"><div class="wrap"><h2>' + s.title + '</h2><div class="cards"><div class="item"><h3>Фирменный</h3><p>По вашему описанию.</p></div><div class="item"><h3>Классика</h3><p>Понятные позиции.</p></div><div class="item"><h3>Сезонное</h3><p>Меняется с настроением.</p></div></div></div></section>';
+      if (s.id === 'services') return '<section id="services" class="section alt"><div class="wrap"><h2>' + s.title + '</h2><div class="cards"><div class="item"><h3>Основное</h3><p>' + desc.slice(0, 120) + '</p></div><div class="item"><h3>Дополнительно</h3><p>Под аудиторию.</p></div><div class="item"><h3>Поддержка</h3><p>Связь и ответы.</p></div></div></div></section>';
+      if (s.id === 'contact') return '<section id="contact" class="section alt"><div class="wrap"><h2>' + s.title + '</h2><p>Напишите нам — ответим.</p></div></section>';
+      return '<section id="' + s.id + '" class="section"><div class="wrap"><h2>' + s.title + '</h2><p>' + desc + '</p></div></section>';
+    }).join('\n');
+    const nav = parsed.sections.filter(s => s.id !== 'hero').map(s => '<a href="#' + s.id + '">' + s.title + '</a>').join('');
+    return '<!DOCTYPE html>\n<html lang="ru">\n<head>\n<meta charset="UTF-8">\n<meta name="viewport" content="width=device-width, initial-scale=1">\n<title>' + t + '</title>\n<link rel="stylesheet" href="style.css">\n</head>\n<body data-tone="' + parsed.tone + '">\n<header class="header"><div class="wrap"><strong class="brand">' + t + '</strong><nav>' + nav + '</nav></div></header>\n<section class="hero"><div class="wrap"><h1>' + t + '</h1><p>' + desc + '</p><a class="btn" href="#contact">Связаться</a></div></section>\n' + sectionHtml + '\n<footer class="footer"><div class="wrap">© ' + new Date().getFullYear() + ' ' + t + ' · Ai крафт</div></footer>\n<script src="script.js"></script>\n</body>\n</html>';
+  },
+  generateSiteCSS(tone) {
+    const accents = { warm: '#c4a484', bold: '#ef4444', business: '#1e3a5f', minimal: '#52525b', neutral: '#8b5cf6' };
+    const a = accents[tone] || accents.neutral;
+    return '*{box-sizing:border-box;margin:0;padding:0}body{font-family:system-ui,sans-serif;line-height:1.6;color:#111;background:#fafafa}.wrap{max-width:960px;margin:0 auto;padding:0 20px}.header{border-bottom:1px solid #e5e5e5;background:#fff;position:sticky;top:0;z-index:10}.header .wrap{display:flex;justify-content:space-between;align-items:center;height:64px;gap:16px}.brand{font-size:18px;font-weight:700}nav{display:flex;flex-wrap:wrap;gap:8px 16px}nav a{color:#555;text-decoration:none;font-size:14px}.hero{padding:72px 0;text-align:center;background:linear-gradient(180deg,#fff,#f5f0ff)}.hero h1{font-size:clamp(28px,5vw,44px);margin-bottom:14px}.hero p{color:#555;max-width:540px;margin:0 auto 24px}.btn{display:inline-block;padding:12px 22px;background:' + a + ';color:#fff;border-radius:999px;text-decoration:none;font-weight:600}.section{padding:56px 0}.section.alt{background:#fff}.section h2{font-size:24px;margin-bottom:12px}.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px;margin-top:20px}.item{padding:16px;border:1px solid #eee;border-radius:12px;background:#fff}.item h3{font-size:15px;margin-bottom:6px}.item p{font-size:13px;color:#666}.footer{padding:24px 0;border-top:1px solid #e5e5e5;font-size:13px;color:#888}@media(max-width:640px){nav{display:none}}';
   }
 };
-document.addEventListener('DOMContentLoaded', () => AC.applyTheme());
+document.addEventListener('DOMContentLoaded', () => { if (typeof AC !== 'undefined') AC.applyTheme(); });
