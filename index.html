@@ -4,48 +4,76 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Ai крафт — создай сайт с ИИ</title>
-  <meta name="description" content="Опиши идею — получи сайт. Редактор кода, ссылки, деплой, помощник Нейро. Всё бесплатно.">
+  <meta name="description" content="Опиши идею — получи готовый сайт. Просто, стильно, бесплатно.">
   <link rel="stylesheet" href="css/style.css">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@600;700&display=swap" rel="stylesheet">
 </head>
 <body>
   <header class="header">
     <div class="container header-inner">
       <a href="index.html" class="logo"><span class="logo-mark">✦</span> Ai крафт</a>
       <nav class="nav">
+        <a href="#how">Как это работает</a>
         <a href="#features">Возможности</a>
-        <a href="pages/create.html">Создать сайт</a>
-        <a href="pages/neuro.html">Нейро</a>
       </nav>
       <div class="header-actions">
         <a class="btn-ghost" href="pages/login.html">Войти</a>
-        <a class="btn-primary" href="pages/register.html">Начать</a>
+        <a class="btn-primary" href="pages/register.html">Начать бесплатно</a>
       </div>
     </div>
   </header>
 
   <section class="hero container">
-    <div class="hero-badge">Как host-ai, только полностью бесплатно</div>
-    <h1>Опиши идею.<br>Собери сайт.</h1>
-    <p>ИИ помогает со структурой и текстами. Ты правишь в визуальном режиме или в коде как в GitHub. Публикуешь за минуту.</p>
+    <div class="hero-glow"></div>
+    <div class="hero-badge">✦ Бесплатно · Без лишнего</div>
+    <h1>Сайт из твоей идеи<br>за пару минут</h1>
+    <p>Пишешь, что нужно — получаешь готовый сайт. Правишь код или тексты. Публикуешь.</p>
     <div class="hero-cta">
-      <a class="btn-primary" href="pages/register.html">Собрать сайт</a>
-      <a class="btn-ghost" href="pages/neuro.html">Спросить Нейро</a>
+      <a class="btn-primary" href="pages/register.html">Создать сайт</a>
+      <a class="btn-ghost" href="pages/login.html">У меня уже есть аккаунт</a>
+    </div>
+  </section>
+
+  <section class="container steps" id="how">
+    <div class="steps-grid">
+      <div class="step">
+        <div class="step-n">1</div>
+        <h3>Опиши</h3>
+        <p>Обычными словами: кто ты, что на сайте, какой стиль.</p>
+      </div>
+      <div class="step">
+        <div class="step-n">2</div>
+        <h3>Собери</h3>
+        <p>Сразу видишь результат. Правишь тексты или код.</p>
+      </div>
+      <div class="step">
+        <div class="step-n">3</div>
+        <h3>Опубликуй</h3>
+        <p>Поддомен Ai крафт или своя ссылка. Готово.</p>
+      </div>
     </div>
   </section>
 
   <section class="container features" id="features">
-    <div class="feature"><div class="feature-ico">✨</div><h3>Создание как на host-ai</h3><p>Пишешь идею своими словами — получаешь готовый каркас сайта с текстами и структурой.</p></div>
-    <div class="feature"><div class="feature-ico">⌨️</div><h3>Код как в GitHub</h3><p>Вкладки HTML/CSS/JS, позиция сверху или снизу, live-preview. Тема и акцент настраиваются.</p></div>
-    <div class="feature"><div class="feature-ico">🔗</div><h3>Свои ссылки</h3><p>Короткие ссылки aicraft.link/… для проектов и деплоя. Копируй и делись.</p></div>
-    <div class="feature"><div class="feature-ico">✦</div><h3>Нейро</h3><p>Помощник всегда рядом: подскажет по сайту, коду, настройкам или просто поболтает.</p></div>
-    <div class="feature"><div class="feature-ico">🎨</div><h3>Темы</h3><p>Тёмная и светлая, свой акцентный цвет. Весь кабинет подстраивается под тебя.</p></div>
-    <div class="feature"><div class="feature-ico">🚀</div><h3>Деплой</h3><p>Поддомены *.ai_craft.ru / .com / .dev. SSL и публикация без лишних шагов.</p></div>
+    <div class="feature"><div class="feature-ico">✨</div><h3>Создание по описанию</h3><p>Как на host-ai: идея → структура и тексты.</p></div>
+    <div class="feature"><div class="feature-ico">⌨️</div><h3>Редактор кода</h3><p>HTML, CSS, JS во вкладках. Предпросмотр рядом.</p></div>
+    <div class="feature"><div class="feature-ico">✦</div><h3>Нейро</h3><p>Помощник в чате: подскажет или просто поболтает.</p></div>
+    <div class="feature"><div class="feature-ico">🔗</div><h3>Короткие ссылки</h3><p>Свои ссылки для проектов и шаринга.</p></div>
+    <div class="feature"><div class="feature-ico">🎨</div><h3>Свой стиль</h3><p>Тёмная / светлая тема и акцентный цвет.</p></div>
+    <div class="feature"><div class="feature-ico">🚀</div><h3>Быстрый старт</h3><p>Только логин и пароль. Без email и капч.</p></div>
   </section>
+
+  <div class="container">
+    <div class="cta-block">
+      <h2>Готов начать?</h2>
+      <p>Регистрация за 10 секунд. Сайт — следом.</p>
+      <a class="btn-primary" href="pages/register.html">Создать аккаунт</a>
+    </div>
+  </div>
 
   <footer class="container footer-mini">
     <span>© 2026 Ai крафт</span>
-    <span>Поддержка: <a href="tel:+79002373222">+7 (900) 237-32-22</a> · <a href="mailto:superyaroslav8@iCloud.com">superyaroslav8@iCloud.com</a></span>
+    <span><a href="tel:+79002373222">+7 (900) 237-32-22</a> · <a href="mailto:superyaroslav8@iCloud.com">superyaroslav8@iCloud.com</a></span>
   </footer>
   <script src="js/core.js"></script>
 </body>
