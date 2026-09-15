@@ -2,45 +2,9 @@
 <html lang="ru">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Вход — Ai крафт</title>
-  <link rel="stylesheet" href="../css/style.css">
+  <meta http-equiv="refresh" content="0;url=auth.html">
+  <title>Вход</title>
+  <script>location.replace('auth.html');</script>
 </head>
-<body>
-  <div class="auth-page">
-    <div class="auth-card">
-      <a href="../index.html" class="logo" style="justify-content:center;display:flex">Ai крафт</a>
-      <h1>Вход</h1>
-      <p class="sub">Только логин и пароль</p>
-      <div class="auth-error" id="err"></div>
-      <form id="form">
-        <div class="form-group"><label>Логин</label><input id="login" required autocomplete="username"></div>
-        <div class="form-group"><label>Пароль</label><input id="pass" type="password" required autocomplete="current-password"></div>
-        <button class="btn-primary btn-block" type="submit">Войти</button>
-      </form>
-      <p class="auth-foot">Нет аккаунта? <a href="register.html">Регистрация</a></p>
-    </div>
-  </div>
-  <script src="../js/core.js" defer></script>
-  <script>
-    document.addEventListener('DOMContentLoaded', () => {
-      AC.applyTheme();
-      if (AC.getSession()) location.href = 'dashboard.html';
-      document.getElementById('form').onsubmit = e => {
-        e.preventDefault();
-        const login = document.getElementById('login').value.trim();
-        const pass = document.getElementById('pass').value;
-        const err = document.getElementById('err');
-        const u = AC.getUsers()[login];
-        if (!u || u.password !== pass) {
-          err.textContent = 'Неверный логин или пароль';
-          err.classList.add('show');
-          return;
-        }
-        AC.setSession({ login });
-        location.href = 'dashboard.html';
-      };
-    });
-  </script>
-</body>
+<body><p><a href="auth.html">Вход по фото</a></p></body>
 </html>

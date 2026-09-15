@@ -6,43 +6,43 @@
   <title>Вход — Ai крафт</title>
   <link rel="stylesheet" href="../css/style.css">
   <style>
-    .auth-wrap{min-height:100vh;display:grid;place-items:center;padding:24px;background:var(--bg)}
-    .auth-box{width:100%;max-width:420px;background:var(--surface);border:1px solid var(--border);border-radius:24px;padding:28px 24px;text-align:center}
-    .auth-box h1{font-size:22px;margin:12px 0 6px}
-    .auth-box .sub{color:var(--text-muted);font-size:14px;margin-bottom:16px;line-height:1.5}
-    .cam-frame{position:relative;width:100%;aspect-ratio:1;max-height:300px;border-radius:20px;overflow:hidden;background:#111;margin:0 auto 14px;border:1px solid var(--border)}
-    .cam-frame video,.cam-frame canvas,.cam-frame img{width:100%;height:100%;object-fit:cover;display:block}
-    .cam-frame canvas,.cam-frame img{display:none}
+    .auth-wrap{min-height:100vh;display:grid;place-items:center;padding:20px;background:var(--bg)}
+    .auth-box{width:100%;max-width:400px;background:var(--surface);border:1px solid var(--border);border-radius:24px;padding:24px;text-align:center}
+    .auth-box h1{font-size:22px;margin:10px 0 6px}
+    .auth-box .sub{color:var(--text-muted);font-size:13px;margin-bottom:14px;line-height:1.5}
+    .cam-frame{position:relative;width:100%;aspect-ratio:1;max-height:280px;border-radius:18px;overflow:hidden;background:#0a0a0a;margin:0 auto 12px;border:1px solid var(--border)}
+    .cam-frame video,.cam-frame img{width:100%;height:100%;object-fit:cover;display:block}
+    .cam-frame img{display:none}
     .cam-frame.shot video{display:none}
     .cam-frame.shot img{display:block}
-    .name-row{margin-bottom:12px;text-align:left}
-    .name-row label{display:block;font-size:12px;color:var(--text-muted);margin-bottom:6px}
-    .name-row input{width:100%;padding:12px 14px;border-radius:12px;border:1px solid var(--border);background:var(--bg);color:var(--text)}
-    .hint{font-size:12px;color:var(--text-muted);margin-bottom:12px}
-    .err{display:none;color:var(--danger);font-size:13px;margin-bottom:10px}
+    .name-row{text-align:left;margin-bottom:10px}
+    .name-row label{display:block;font-size:12px;color:var(--text-muted);margin-bottom:5px}
+    .name-row input{width:100%;padding:11px 12px;border-radius:12px;border:1px solid var(--border);background:var(--bg);color:var(--text)}
+    .hint{font-size:12px;color:var(--text-muted);margin:0 0 10px}
+    .err{display:none;color:var(--danger,#f87171);font-size:13px;margin-bottom:8px}
     .err.show{display:block}
-    .actions{display:flex;flex-direction:column;gap:10px}
-    .or{font-size:12px;color:var(--text-muted);margin:6px 0}
+    .actions{display:flex;flex-direction:column;gap:8px}
+    .or{font-size:11px;color:var(--text-muted)}
   </style>
 </head>
 <body>
   <div class="auth-wrap">
     <div class="auth-box">
-      <a href="../index.html" class="logo" style="justify-content:center;display:flex">Ai крафт</a>
+      <a href="../index.html" class="logo" style="display:flex;justify-content:center">Ai крафт</a>
       <h1>Вход по фото</h1>
-      <p class="sub">Камера → «Готово» → сразу в кабинет. Без логина и пароля. Бесплатно.</p>
-      <div class="name-row"><label>Как к вам обращаться</label><input id="name" placeholder="Имя" maxlength="32"></div>
+      <p class="sub">Смотрите в камеру → «Готово» → кабинет. Без пароля. Бесплатно.</p>
+      <div class="name-row"><label>Имя</label><input id="name" placeholder="Как к вам обращаться" maxlength="32" autocomplete="name"></div>
       <div class="cam-frame" id="frame">
         <video id="video" autoplay playsinline muted></video>
-        <canvas id="canvas"></canvas>
-        <img id="preview" alt="">
+        <canvas id="canvas" hidden></canvas>
+        <img id="preview" alt="Ваше фото">
       </div>
-      <p class="hint" id="hint">Разрешите доступ к камере</p>
+      <p class="hint" id="hint">Включаем камеру…</p>
       <p class="err" id="err"></p>
       <div class="actions">
         <button type="button" class="btn-primary btn-block" id="btnReady" disabled>Готово — войти</button>
-        <button type="button" class="btn-ghost btn-block" id="btnRetake" hidden>Снять ещё раз</button>
-        <div class="or">или</div>
+        <button type="button" class="btn-ghost btn-block" id="btnRetake" hidden>Снять снова</button>
+        <span class="or">или</span>
         <button type="button" class="btn-ghost btn-block" id="btnGuest">Продолжить без фото</button>
       </div>
     </div>
@@ -50,8 +50,9 @@
   <script src="../js/core.js" defer></script>
   <script>
     document.addEventListener('DOMContentLoaded', () => {
+      if (typeof AC === 'undefined') return;
       AC.applyTheme();
-      if (AC.getSession()) { location.href = 'dashboard.html'; return; }
+      if (AC.getSession()) { location.replace('dashboard.html'); return; }
       const video = document.getElementById('video');
       const canvas = document.getElementById('canvas');
       const preview = document.getElementById('preview');
@@ -60,55 +61,59 @@
       const btnRetake = document.getElementById('btnRetake');
       const hint = document.getElementById('hint');
       const err = document.getElementById('err');
-      let stream = null, photoData = null;
+      let stream = null, photoData = null, step = 0;
 
       async function startCam() {
         try {
-          stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user', width: { ideal: 640 }, height: { ideal: 640 } }, audio: false });
+          if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) throw new Error('no cam');
+          stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user' }, audio: false });
           video.srcObject = stream;
+          await video.play().catch(() => {});
           hint.textContent = 'Смотрите в камеру и нажмите «Готово»';
           btnReady.disabled = false;
         } catch (e) {
           hint.textContent = 'Камера недоступна — войдите без фото';
-          err.textContent = 'Нет доступа к камере.';
+          err.textContent = 'Нет доступа к камере (HTTPS или разрешение).';
           err.classList.add('show');
         }
       }
-      function stopCam() { if (stream) stream.getTracks().forEach(t => t.stop()); stream = null; }
+      function stopCam() {
+        if (stream) stream.getTracks().forEach(t => t.stop());
+        stream = null;
+      }
       function capture() {
         const w = video.videoWidth || 480, h = video.videoHeight || 480;
         canvas.width = w; canvas.height = h;
         canvas.getContext('2d').drawImage(video, 0, 0, w, h);
-        photoData = canvas.toDataURL('image/jpeg', 0.85);
+        photoData = canvas.toDataURL('image/jpeg', 0.8);
         preview.src = photoData;
         frame.classList.add('shot');
         stopCam();
+        step = 1;
       }
       function enter(withPhoto) {
         const name = document.getElementById('name').value.trim() || 'Гость';
-        if (typeof AC.enterWithPhoto === 'function') {
-          AC.enterWithPhoto({ name, photoDataUrl: withPhoto ? photoData : null });
-        } else {
-          AC.setSession({ login: 'guest_' + Date.now(), name, photoAuth: !!withPhoto });
-        }
-        location.href = 'dashboard.html';
+        AC.enterWithPhoto({ name, photoDataUrl: withPhoto ? photoData : null });
+        location.replace('dashboard.html');
       }
       btnReady.onclick = () => {
-        if (!photoData) {
+        if (step === 0) {
+          if (!stream) { AC.toast('Камера не готова'); return; }
           capture();
           btnRetake.hidden = false;
-          btnReady.textContent = 'Подтвердить и войти';
-          hint.textContent = 'Фото готово. Нажмите ещё раз, чтобы войти';
+          btnReady.textContent = 'Подтвердить вход';
+          hint.textContent = 'Фото снято. Нажмите ещё раз, чтобы войти';
           return;
         }
         btnReady.disabled = true;
         btnReady.textContent = 'Входим…';
-        setTimeout(() => enter(true), 300);
+        enter(true);
       };
       btnRetake.onclick = () => {
-        photoData = null;
+        photoData = null; step = 0;
         frame.classList.remove('shot');
         btnRetake.hidden = true;
+        btnReady.disabled = true;
         btnReady.textContent = 'Готово — войти';
         startCam();
       };
