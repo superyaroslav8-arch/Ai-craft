@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Редактор кода — Ai крафт</title>
+  <link rel="stylesheet" href="../css/style.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+<div class="app">
+  <aside class="sidebar">
+    <a href="../index.html" class="logo"><span class="logo-mark">✦</span> Ai крафт</a>
+    <nav class="side-nav">
+      <a href="dashboard.html">Проекты</a>
+      <a href="create.html">Создать сайт</a>
+      <a href="editor.html" class="active">Редактор кода</a>
+      <a href="links.html">Ссылки</a>
+      <a href="neuro.html">Нейро</a>
+      <a href="settings.html">Настройки</a>
+      <a href="media.html">Медиа AI</a>
+    </nav>
+    <div class="side-user"><strong id="userLogin">—</strong><a href="#" id="logout">Выйти</a></div>
+  </aside>
+  <main class="main" style="padding-top:16px">
+    <div class="page-head">
+      <h1 id="title">Редактор</h1>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <select id="siteSelect" style="padding:8px 12px;border-radius:10px;border:1px solid var(--border);background:var(--surface);color:var(--text)"></select>
+        <button class="btn-ghost btn-sm" id="previewBtn">Предпросмотр</button>
+        <button class="btn-primary btn-sm" id="saveBtn">Сохранить</button>
+      </div>
+    </div>
+    <div class="editor-shell">
+      <div class="editor-toolbar">
+        <span style="font-size:12px;color:var(--text-muted)">Вкладки HTML · CSS · JS</span>
+        <span style="font-size:12px;color:var(--text-muted)">Позиция вкладок — в Настройках</span>
+      </div>
+      <div class="editor-body">
+        <div class="editor-code" id="codePane">
+          <div class="editor-tabs" id="tabs">
+            <button class="tab active" data-file="index.html">index.html</button>
+            <button class="tab" data-file="style.css">style.css</button>
+            <button class="tab" data-file="script.js">script.js</button>
+          </div>
+          <div class="editor-area"><textarea id="code" spellcheck="false"></textarea></div>
+        </div>
+        <div class="editor-preview"><iframe id="frame" title="preview"></iframe></div>
+      </div>
+    </div>
+  </main>
+</div>
+<script src="../js/core.js"></script>
+<script>
+  const session = AC.requireAuth();
+  AC.applyTheme();
+  document.getElementById('userLogin').textContent = session.login;
+  document.getElementById('logout').onclick = e => { e.preventDefault(); AC.clearSession(); location.href='../index.html'; };
+  const params = new URLSearchParams(location.search);
+  let sites = AC.getUserSites(session.login);
+  let currentId = params.get('id') || sites[0]?.id;
+  let files = { 'index.html': '', 'style.css': '', 'script.js': '' };
+  let active = 'index.html';
+  const select = document.getElementById('siteSelect');
+  select.innerHTML = sites.map(s => `<option value="${s.id}">${AC.escapeHtml(s.name)}</option>`).join('') || '<option>Нет проектов</option>';
+  if (currentId) select.value = currentId;
+  function loadSite(id) {
+    sites = AC.getUserSites(session.login);
+    const site = sites.find(s => s.id === id);
+    if (!site) return;
+    currentId = id;
+    files = { 'index.html': '', 'style.css': '', 'script.js': '', ...(site.files || {}) };
+    document.getElementById('title').textContent = site.name;
+    document.getElementById('code').value = files[active] || '';
+    refreshPreview();
+  }
+  function refreshPreview() {
+    let doc = files['index.html'] || '';
+    const css = files['style.css'] || '';
+    const js = files['script.js'] || '';
+    if (doc.includes('</head>')) doc = doc.replace('</head>', `<style>${css}</style></head>`);
+    else doc = `<style>${css}</style>` + doc;
+    if (doc.includes('src="script.js"')) doc = doc.replace('<script src="script.js"></script>', `<script>${js}<\/script>`);
+    else doc += `<script>${js}<\/script>`;
+    document.getElementById('frame').srcdoc = doc;
+  }
+  document.getElementById('code').addEventListener('input', e => { files[active] = e.target.value; refreshPreview(); });
+  document.querySelectorAll('#tabs .tab').forEach(tab => {
+    tab.onclick = () => {
+      files[active] = document.getElementById('code').value;
+      document.querySelectorAll('#tabs .tab').forEach(t => t.classList.remove('active'));
+      tab.classList.add('active');
+      active = tab.dataset.file;
+      document.getElementById('code').value = files[active] || '';
+    };
+  });
+  select.onchange = () => loadSite(select.value);
+  document.getElementById('saveBtn').onclick = () => {
+    files[active] = document.getElementById('code').value;
+    AC.updateSite(session.login, currentId, { files: { ...files } });
+    const b = document.getElementById('saveBtn');
+    b.textContent = 'Сохранено'; setTimeout(() => b.textContent = 'Сохранить', 1200);
+  };
+  document.getElementById('previewBtn').onclick = () => {
+    files[active] = document.getElementById('code').value; refreshPreview();
+    const w = window.open('', '_blank'); w.document.write(document.getElementById('frame').srcdoc); w.document.close();
+  };
+  if (currentId) loadSite(currentId);
+  else document.getElementById('code').value = '<!-- Создай сайт в разделе «Создать сайт» -->';
+</script>
+</body>
+</html>
