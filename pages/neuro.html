@@ -4,7 +4,6 @@
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Нейро — Ai крафт</title>
 <link rel="stylesheet" href="../css/style.css">
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@600;700&display=swap" rel="stylesheet">
 <style>
 body{overflow:hidden}
 .n-app{display:flex;height:100vh;background:var(--bg)}
@@ -12,7 +11,6 @@ body{overflow:hidden}
 [data-theme="light"] .n-side{background:#f9f9f9;border-color:#e5e5e5}
 .n-side-top{padding:12px;display:flex;flex-direction:column;gap:8px}
 .n-new{display:flex;align-items:center;gap:10px;width:100%;padding:10px 12px;border:1px solid #2f2f2f;border-radius:10px;font-size:14px;color:var(--text);text-align:left}
-.n-new:hover{background:rgba(255,255,255,.05)}
 .n-chats{flex:1;overflow:auto;padding:8px}
 .n-chat-item{width:100%;text-align:left;padding:10px 12px;border-radius:10px;font-size:13px;color:var(--text-muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:2px}
 .n-chat-item:hover,.n-chat-item.active{background:rgba(255,255,255,.08);color:var(--text)}
@@ -22,28 +20,23 @@ body{overflow:hidden}
 .n-messages{flex:1;overflow:auto;padding:24px 16px 140px}
 .n-center{max-width:768px;margin:0 auto;width:100%}
 .n-welcome{text-align:center;padding:48px 16px 24px}
-.n-welcome h1{font-family:var(--display);font-size:28px;margin-bottom:8px;font-weight:600}
+.n-welcome h1{font-size:28px;margin-bottom:8px;font-weight:600}
 .n-welcome p{color:var(--text-muted);font-size:15px;margin-bottom:28px}
 .n-suggestions{display:grid;grid-template-columns:1fr 1fr;gap:10px;max-width:640px;margin:0 auto}
 .n-sug{text-align:left;padding:14px 16px;border:1px solid var(--border);border-radius:14px;background:var(--surface);font-size:13px;color:var(--text)}
-.n-sug:hover{border-color:var(--accent);background:var(--accent-soft)}
 .n-sug small{display:block;color:var(--text-muted);margin-top:4px;font-size:12px}
 .n-row{display:flex;gap:14px;padding:18px 0}
 .n-avatar{width:32px;height:32px;border-radius:50%;flex-shrink:0;display:grid;place-items:center;font-size:13px;font-weight:700;color:#fff}
 .n-avatar.user{background:#5b5bd6}.n-avatar.bot{background:linear-gradient(135deg,#10a37f,#1a7f64)}
 .n-bubble{flex:1;min-width:0;font-size:15px;line-height:1.65;padding-top:4px;white-space:pre-wrap;word-break:break-word}
-.n-actions{margin-top:8px;opacity:0}.n-row:hover .n-actions{opacity:1}
-.n-actions button{padding:4px 8px;border-radius:6px;font-size:11px;color:var(--text-muted)}
 .n-composer-wrap{position:absolute;left:0;right:0;bottom:0;padding:12px 16px 20px;background:linear-gradient(transparent,var(--bg) 30%)}
-.n-composer{max-width:768px;margin:0 auto;background:var(--surface);border:1px solid var(--border);border-radius:24px;padding:10px 12px 10px 16px;display:flex;align-items:flex-end;gap:8px;box-shadow:0 8px 30px rgba(0,0,0,.2)}
-.n-composer textarea{flex:1;border:0;background:transparent;color:var(--text);resize:none;outline:none;max-height:160px;min-height:24px;line-height:1.5;font-size:15px;padding:6px 0}
-.n-send{width:36px;height:36px;border-radius:50%;background:var(--accent);color:#fff;display:grid;place-items:center;flex-shrink:0}
+.n-composer{max-width:768px;margin:0 auto;background:var(--surface);border:1px solid var(--border);border-radius:24px;padding:10px 12px 10px 16px;display:flex;align-items:flex-end;gap:8px}
+.n-composer textarea{flex:1;border:0;background:transparent;color:var(--text);resize:none;outline:none;max-height:160px;min-height:24px;line-height:1.5;font-size:15px}
+.n-send{width:36px;height:36px;border-radius:50%;background:var(--accent);color:#fff;display:grid;place-items:center;flex-shrink:0;border:0}
 .n-tools{display:flex;gap:6px;flex-wrap:wrap;max-width:768px;margin:0 auto 8px}
 .n-tool{padding:6px 12px;border-radius:999px;border:1px solid var(--border);font-size:12px;color:var(--text-muted);background:var(--bg)}
-.n-tool.active,.n-tool:hover{border-color:var(--accent);color:var(--accent);background:var(--accent-soft)}
+.n-tool.active{border-color:var(--accent);color:var(--accent);background:var(--accent-soft)}
 .n-hint{text-align:center;font-size:11px;color:var(--text-muted);margin-top:8px}
-.typing span{display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--text-muted);margin:0 2px;animation:blink 1.2s infinite}
-@keyframes blink{0%,80%,100%{opacity:.3}40%{opacity:1}}
 @media(max-width:800px){.n-side{display:none}.n-suggestions{grid-template-columns:1fr}}
 </style>
 </head>
@@ -52,18 +45,18 @@ body{overflow:hidden}
 <aside class="n-side">
 <div class="n-side-top">
 <button class="n-new" id="newChat" type="button">＋ Новый чат</button>
-<a class="n-new" href="dashboard.html" style="text-decoration:none">← К проектам</a>
+<a class="n-new" href="dashboard.html" style="text-decoration:none">← Мои сайты</a>
 </div>
 <div class="n-chats" id="chatList"></div>
 <div class="n-side-foot"><div id="userLogin">—</div>
 <a href="settings.html">Настройки</a> · <a href="#" id="logout">Выйти</a></div>
 </aside>
 <div class="n-main">
-<div class="n-top"><span>Нейро · Ai крафт</span><span><a href="create.html">Создать сайт</a> · <a href="editor.html">Код</a></span></div>
+<div class="n-top"><span>Нейро · Ai крафт</span><span><a href="create.html">Собрать сайт</a></span></div>
 <div class="n-messages" id="messages">
 <div class="n-center" id="welcome"><div class="n-welcome">
 <h1>Чем могу помочь?</h1>
-<p>Нейро — помощник Ai крафт. Сайты, код, ссылки или просто разговор.</p>
+<p>Нейро — помощник Ai крафт. Сайты, советы или просто разговор.</p>
 <div class="n-suggestions" id="sugs"></div>
 </div></div>
 <div class="n-center" id="thread" style="display:none"></div>
@@ -76,52 +69,95 @@ body{overflow:hidden}
 <button type="button" class="n-tool" data-mode="explain">Объясни</button>
 </div>
 <form class="n-composer" id="form">
-<textarea id="input" rows="1" placeholder="Спросите что угодно…" autofocus></textarea>
+<textarea id="input" rows="1" placeholder="Спросите что угодно…"></textarea>
 <button class="n-send" type="submit">↑</button>
 </form>
-<div class="n-hint">Нейро может ошибаться. Проверяйте важные ответы.</div>
+<div class="n-hint">Нейро отвечает локально. Проверяйте важные факты.</div>
 </div>
 </div>
 </div>
-<script src="../js/core.js"></script>
-<script src="../js/neuro.js"></script>
+<script src="../js/core.js" defer></script>
+<script src="../js/neuro.js" defer></script>
 <script>
-const session=AC.requireAuth();AC.applyTheme();
-document.getElementById('userLogin').textContent=session.login;
-document.getElementById('logout').onclick=e=>{e.preventDefault();AC.clearSession();location.href='../index.html';};
-const SUGS=[{t:'Помоги создать сайт',s:'landing для кофейни'},{t:'Напиши HTML блок',s:'карточка товара'},{t:'Как опубликовать',s:'поддомен ai_craft'},{t:'Поболтаем',s:'расскажи анекдот'}];
-document.getElementById('sugs').innerHTML=SUGS.map(x=>`<button type="button" class="n-sug" data-q="${AC.escapeHtml(x.t+': '+x.s)}"><strong>${AC.escapeHtml(x.t)}</strong><small>${AC.escapeHtml(x.s)}</small></button>`).join('');
-document.querySelectorAll('.n-sug').forEach(b=>b.onclick=()=>send(b.dataset.q));
-let mode='chat';
-document.querySelectorAll('.n-tool').forEach(b=>b.onclick=()=>{mode=b.dataset.mode;document.querySelectorAll('.n-tool').forEach(x=>x.classList.toggle('active',x===b));document.getElementById('input').placeholder={chat:'Спросите что угодно…',code:'Опишите код…',site:'Опишите сайт…',explain:'Вставьте код или вопрос…'}[mode];});
-const KEY='aicraft_neuro_chats_'+session.login;
-function loadChats(){try{return JSON.parse(localStorage.getItem(KEY)||'[]');}catch{return[];}}
-function saveChats(list){localStorage.setItem(KEY,JSON.stringify(list));}
-let chats=loadChats(),currentId=chats[0]?.id||null;
-function renderChatList(){const el=document.getElementById('chatList');if(!chats.length){el.innerHTML='<div style="padding:12px;font-size:12px;color:var(--text-muted)">Нет чатов</div>';return;}
-el.innerHTML=chats.map(c=>`<button type="button" class="n-chat-item ${c.id===currentId?'active':''}" data-id="${c.id}">${AC.escapeHtml(c.title||'Чат')}</button>`).join('');
-el.querySelectorAll('[data-id]').forEach(b=>b.onclick=()=>{currentId=b.dataset.id;renderThread();renderChatList();});}
-function renderThread(){const chat=chats.find(c=>c.id===currentId);const welcome=document.getElementById('welcome'),thread=document.getElementById('thread');
-if(!chat||!chat.messages.length){welcome.style.display='';thread.style.display='none';thread.innerHTML='';return;}
-welcome.style.display='none';thread.style.display='';
-thread.innerHTML=chat.messages.map(m=>`<div class="n-row"><div class="n-avatar ${m.role==='user'?'user':'bot'}">${m.role==='user'?'Я':'N'}</div><div class="n-bubble">${AC.escapeHtml(m.text)}${m.role==='bot'?'<div class="n-actions"><button type="button" data-copy>Копировать</button></div>':''}</div></div>`).join('');
-thread.querySelectorAll('[data-copy]').forEach(btn=>btn.onclick=()=>{navigator.clipboard.writeText(btn.closest('.n-bubble').childNodes[0].textContent.trim()).then(()=>AC.toast('Скопировано'));});
-document.getElementById('messages').scrollTop=99999;}
-function ensureChat(){if(currentId&&chats.find(c=>c.id===currentId))return chats.find(c=>c.id===currentId);const id='c_'+Date.now();const chat={id,title:'Новый чат',messages:[],createdAt:Date.now()};chats.unshift(chat);currentId=id;saveChats(chats);return chat;}
-function replyFor(text){const t=text.toLowerCase();if(mode==='code'||/код|html|css|js/.test(t))return Neuro.answerCode(text)||Neuro.reply('code',text);if(mode==='site'||/сайт|лендинг|домен/.test(t))return Neuro.reply('site',text);if(mode==='explain'||/объясни/.test(t))return Neuro.reply('explain',text);return Neuro.reply('general',text);}
-function send(text){text=(text||'').trim();if(!text)return;const chat=ensureChat();if(!chat.messages.length)chat.title=text.slice(0,40)+(text.length>40?'…':'');
-chat.messages.push({role:'user',text});saveChats(chats);renderChatList();renderThread();document.getElementById('input').value='';autoSize();
-const thread=document.getElementById('thread');document.getElementById('welcome').style.display='none';thread.style.display='';
-const typing=document.createElement('div');typing.className='n-row';typing.innerHTML='<div class="n-avatar bot">N</div><div class="n-bubble"><span class="typing"><span></span><span></span><span></span></span></div>';thread.appendChild(typing);
-document.getElementById('messages').scrollTop=99999;
-setTimeout(()=>{typing.remove();chat.messages.push({role:'bot',text:replyFor(text)});saveChats(chats);renderThread();renderChatList();},600+Math.min(text.length*8,1200));}
-document.getElementById('form').onsubmit=e=>{e.preventDefault();send(document.getElementById('input').value);};
-document.getElementById('newChat').onclick=()=>{currentId=null;ensureChat();renderChatList();renderThread();document.getElementById('input').focus();};
-const input=document.getElementById('input');
-function autoSize(){input.style.height='auto';input.style.height=Math.min(input.scrollHeight,160)+'px';}
-input.addEventListener('input',autoSize);
-input.addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();send(input.value);}});
-renderChatList();renderThread();
+document.addEventListener('DOMContentLoaded', () => {
+  const session = AC.requireAuth('auth.html');
+  if (!session) return;
+  AC.applyTheme();
+  document.getElementById('userLogin').textContent = session.name || session.login;
+  document.getElementById('logout').onclick = e => { e.preventDefault(); AC.clearSession(); location.href = 'auth.html'; };
+  const SUGS = [
+    { t: 'Помоги создать сайт', s: 'landing для кофейни' },
+    { t: 'Напиши HTML блок', s: 'карточка товара' },
+    { t: 'Как сохранить сайт', s: 'поддомен и открыть' },
+    { t: 'Поболтаем', s: 'расскажи шутку' }
+  ];
+  document.getElementById('sugs').innerHTML = SUGS.map(x =>
+    '<button type="button" class="n-sug" data-q="' + AC.escapeHtml(x.t + ': ' + x.s) + '"><strong>' +
+    AC.escapeHtml(x.t) + '</strong><small>' + AC.escapeHtml(x.s) + '</small></button>'
+  ).join('');
+  document.querySelectorAll('.n-sug').forEach(b => b.onclick = () => send(b.dataset.q));
+  let mode = 'chat';
+  document.querySelectorAll('.n-tool').forEach(b => b.onclick = () => {
+    mode = b.dataset.mode;
+    document.querySelectorAll('.n-tool').forEach(x => x.classList.toggle('active', x === b));
+  });
+  const KEY = 'aicraft_neuro_chats_' + session.login;
+  function loadChats() { try { return JSON.parse(localStorage.getItem(KEY) || '[]'); } catch { return []; } }
+  function saveChats(list) { localStorage.setItem(KEY, JSON.stringify(list)); }
+  let chats = loadChats(), currentId = chats[0] && chats[0].id || null;
+  function renderChatList() {
+    const el = document.getElementById('chatList');
+    if (!chats.length) { el.innerHTML = '<div style="padding:12px;font-size:12px;color:var(--text-muted)">Нет чатов</div>'; return; }
+    el.innerHTML = chats.map(c =>
+      '<button type="button" class="n-chat-item ' + (c.id === currentId ? 'active' : '') + '" data-id="' + c.id + '">' +
+      AC.escapeHtml(c.title || 'Чат') + '</button>'
+    ).join('');
+    el.querySelectorAll('[data-id]').forEach(b => b.onclick = () => { currentId = b.dataset.id; renderThread(); renderChatList(); });
+  }
+  function renderThread() {
+    const chat = chats.find(c => c.id === currentId);
+    const welcome = document.getElementById('welcome'), thread = document.getElementById('thread');
+    if (!chat || !chat.messages.length) { welcome.style.display = ''; thread.style.display = 'none'; thread.innerHTML = ''; return; }
+    welcome.style.display = 'none'; thread.style.display = '';
+    thread.innerHTML = chat.messages.map(m =>
+      '<div class="n-row"><div class="n-avatar ' + (m.role === 'user' ? 'user' : 'bot') + '">' +
+      (m.role === 'user' ? 'Я' : 'N') + '</div><div class="n-bubble">' + AC.escapeHtml(m.text) + '</div></div>'
+    ).join('');
+    document.getElementById('messages').scrollTop = 99999;
+  }
+  function ensureChat() {
+    if (currentId && chats.find(c => c.id === currentId)) return chats.find(c => c.id === currentId);
+    const id = 'c_' + Date.now();
+    const chat = { id, title: 'Новый чат', messages: [], createdAt: Date.now() };
+    chats.unshift(chat); currentId = id; saveChats(chats); return chat;
+  }
+  function replyFor(text) {
+    if (typeof Neuro === 'undefined') return 'Нейро загружается. Обновите страницу.';
+    const t = text.toLowerCase();
+    if (mode === 'code' || /код|html|css|js/.test(t)) return Neuro.answerCode(text) || Neuro.reply('code', text);
+    if (mode === 'site' || /сайт|лендинг|домен/.test(t)) return Neuro.reply('site', text);
+    if (mode === 'explain' || /объясни/.test(t)) return Neuro.reply('explain', text);
+    return Neuro.reply('general', text);
+  }
+  function send(text) {
+    text = (text || '').trim();
+    if (!text) return;
+    const chat = ensureChat();
+    if (!chat.messages.length) chat.title = text.slice(0, 40) + (text.length > 40 ? '…' : '');
+    chat.messages.push({ role: 'user', text });
+    saveChats(chats); renderChatList(); renderThread();
+    document.getElementById('input').value = '';
+    setTimeout(() => {
+      chat.messages.push({ role: 'bot', text: replyFor(text) });
+      saveChats(chats); renderThread(); renderChatList();
+    }, 400);
+  }
+  document.getElementById('form').onsubmit = e => { e.preventDefault(); send(document.getElementById('input').value); };
+  document.getElementById('newChat').onclick = () => { currentId = null; ensureChat(); renderChatList(); renderThread(); };
+  const input = document.getElementById('input');
+  input.addEventListener('keydown', e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); send(input.value); } });
+  renderChatList(); renderThread();
+});
 </script>
 </body>
 </html>
