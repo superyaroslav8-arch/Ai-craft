@@ -5,81 +5,92 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Редактор — Ai крафт</title>
   <link rel="stylesheet" href="../css/style.css">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
   <style>
     body{overflow:hidden}
-    .ide{display:flex;flex-direction:column;height:100vh;background:var(--bg)}
-    .ide-bar{height:48px;flex-shrink:0;display:flex;align-items:center;gap:12px;padding:0 14px;border-bottom:1px solid var(--border);background:var(--bg-alt)}
-    .ide-bar .logo{font-size:15px;margin-right:8px}
-    .ide-bar select{padding:6px 10px;border-radius:8px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:13px;max-width:200px}
+    .ide{display:flex;flex-direction:column;height:100vh;background:#0d0d0f;color:#e8e8ed}
+    [data-theme="light"] .ide{background:#f5f5f7;color:#1a1a1e}
+    .ide-bar{height:48px;display:flex;align-items:center;gap:12px;padding:0 14px;border-bottom:1px solid #2a2a30;background:#121215;flex-shrink:0}
+    [data-theme="light"] .ide-bar{background:#fff;border-color:#e4e4e8}
+    .ide-bar .brand{font-weight:700;font-size:14px;margin-right:8px;color:inherit;text-decoration:none}
+    .ide-bar select{background:#1a1a1f;border:1px solid #333;color:inherit;border-radius:8px;padding:6px 10px;font-size:13px;max-width:220px}
+    [data-theme="light"] .ide-bar select{background:#fff;border-color:#ddd}
     .ide-bar .spacer{flex:1}
-    .ide-bar .hint{font-size:12px;color:var(--text-muted)}
+    .ide-bar .btn{padding:7px 12px;border-radius:8px;font-size:12px;font-weight:600;border:1px solid #333;background:#1a1a1f;color:#ccc;text-decoration:none}
+    .ide-bar .btn:hover{background:#25252c;color:#fff}
+    .ide-bar .btn-main{background:var(--accent,#8b5cf6);border-color:transparent;color:#fff}
     .ide-body{display:flex;flex:1;min-height:0}
-    .ide-files{width:200px;flex-shrink:0;border-right:1px solid var(--border);background:var(--bg-alt);display:flex;flex-direction:column}
-    .ide-files-head{padding:10px 12px;font-size:11px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;color:var(--text-muted);border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center}
-    .ide-files-head button{font-size:11px;padding:4px 8px;border-radius:6px;border:1px solid var(--border);color:var(--accent);background:var(--accent-soft)}
-    .ide-file-list{flex:1;overflow:auto;padding:6px}
-    .ide-file{display:block;width:100%;text-align:left;padding:8px 10px;border-radius:8px;font-size:13px;color:var(--text-muted);margin-bottom:2px}
-    .ide-file:hover{background:var(--surface);color:var(--text)}
-    .ide-file.active{background:var(--accent-soft);color:var(--accent);font-weight:600}
+    .ide-files{width:200px;border-right:1px solid #2a2a30;background:#121215;display:flex;flex-direction:column;flex-shrink:0}
+    [data-theme="light"] .ide-files{background:#fafafa;border-color:#e4e4e8}
+    .ide-files-head{padding:10px 12px;font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:#888;display:flex;justify-content:space-between;align-items:center}
+    .ide-files-head button{font-size:11px;color:var(--accent,#8b5cf6);font-weight:600}
+    .ide-files-list{flex:1;overflow:auto;padding:4px 6px}
+    .ide-file{display:block;width:100%;text-align:left;padding:8px 10px;border-radius:8px;font-size:13px;color:#aaa;font-family:JetBrains Mono,ui-monospace,monospace}
+    .ide-file:hover{background:#1c1c22;color:#eee}
+    .ide-file.active{background:#252530;color:#fff}
+    [data-theme="light"] .ide-file:hover,[data-theme="light"] .ide-file.active{background:#eee;color:#111}
     .ide-work{flex:1;display:flex;flex-direction:column;min-width:0}
-    .ide-tabs{display:flex;gap:2px;padding:6px 8px;background:var(--surface-2);border-bottom:1px solid var(--border);overflow-x:auto;flex-shrink:0}
-    .ide-tab{padding:7px 14px;border-radius:8px;font-size:12px;color:var(--text-muted);white-space:nowrap}
-    .ide-tab.active{background:var(--surface);color:var(--text);font-weight:600}
-    .ide-split{flex:1;display:grid;grid-template-columns:1fr 1fr;min-height:0}
-    .ide-split.no-preview{grid-template-columns:1fr}
-    .ide-code-pane{display:flex;flex-direction:column;min-width:0;border-right:1px solid var(--border)}
-    .ide-code-label{padding:6px 12px;font-size:11px;color:var(--text-muted);background:var(--surface-2);border-bottom:1px solid var(--border)}
-    .ide-code-pane textarea{flex:1;width:100%;border:0;resize:none;padding:14px 16px;background:var(--bg);color:var(--text);font-family:ui-monospace,Menlo,Consolas,monospace;font-size:var(--editor-font-size,14px);line-height:1.55;outline:none}
-    .ide-preview-pane{display:flex;flex-direction:column;min-width:0;background:#fff}
-    .ide-preview-label{padding:6px 12px;font-size:11px;color:#666;background:#f4f4f5;border-bottom:1px solid #e4e4e7;display:flex;justify-content:space-between}
-    .ide-preview-pane iframe{flex:1;width:100%;border:0;background:#fff}
-    .ide-empty{flex:1;display:grid;place-items:center;text-align:center;padding:40px;color:var(--text-muted)}
-    .ide-empty h2{color:var(--text);font-size:18px;margin-bottom:8px}
-    .ide-empty p{font-size:14px;max-width:360px;margin:0 auto 16px}
-    @media(max-width:900px){.ide-files{width:150px}.ide-split{grid-template-columns:1fr}.ide-preview-pane{display:none}}
-    @media(max-width:600px){.ide-files{display:none}.ide-bar .hint{display:none}}
+    .ide-tabs{display:flex;gap:2px;padding:6px 8px 0;background:#121215;border-bottom:1px solid #2a2a30;overflow-x:auto;flex-shrink:0}
+    [data-theme="light"] .ide-tabs{background:#fafafa;border-color:#e4e4e8}
+    .ide-tab{padding:8px 14px;font-size:12px;border-radius:8px 8px 0 0;color:#888;border:1px solid transparent;font-family:JetBrains Mono,ui-monospace,monospace}
+    .ide-tab.active{background:#0d0d0f;border-color:#2a2a30;border-bottom-color:#0d0d0f;color:#eee}
+    [data-theme="light"] .ide-tab.active{background:#fff;border-color:#e4e4e8;border-bottom-color:#fff;color:#111}
+    .ide-editor-wrap{flex:1;display:flex;min-height:0}
+    .ide-code{flex:1;display:flex;flex-direction:column;min-width:0;border-right:1px solid #2a2a30}
+    .ide-code textarea{flex:1;width:100%;border:0;resize:none;padding:16px 18px;background:#0d0d0f;color:#e8e8ed;outline:none;font-family:JetBrains Mono,ui-monospace,Menlo,Consolas,monospace;font-size:13.5px;line-height:1.6;tab-size:2}
+    [data-theme="light"] .ide-code textarea{background:#fff;color:#1a1a1e}
+    .ide-preview{flex:1;display:flex;flex-direction:column;min-width:0;background:#fff}
+    .ide-preview-bar{height:36px;display:flex;align-items:center;gap:8px;padding:0 12px;background:#f0f0f2;border-bottom:1px solid #e0e0e4;font-size:12px;color:#666;flex-shrink:0}
+    .ide-preview iframe{flex:1;border:0;width:100%;background:#fff}
+    .ide-status{height:28px;display:flex;align-items:center;gap:16px;padding:0 14px;border-top:1px solid #2a2a30;background:#121215;font-size:11px;color:#777;flex-shrink:0}
+    [data-theme="light"] .ide-status{background:#fafafa;border-color:#e4e4e8}
+    .ide-empty{flex:1;display:grid;place-items:center;text-align:center;padding:40px;color:#888}
+    .ide-empty h2{color:#ddd;font-size:18px;margin-bottom:8px}
+    [data-theme="light"] .ide-empty h2{color:#222}
+    .ide-empty p{font-size:14px;max-width:360px;margin:0 auto 20px;line-height:1.5}
+    .dot{width:8px;height:8px;border-radius:50%;display:inline-block}
+    .dot.r{background:#ff5f57}.dot.y{background:#febc2e}.dot.g{background:#28c840}
+    @media(max-width:900px){.ide-files{width:140px}.ide-editor-wrap{flex-direction:column}.ide-code{border-right:0;border-bottom:1px solid #2a2a30;min-height:40vh}.ide-preview{min-height:40vh}}
   </style>
 </head>
 <body>
-<div class="ide">
+<div class="ide" id="ide">
   <div class="ide-bar">
-    <a href="dashboard.html" class="logo">Ai крафт</a>
+    <a href="dashboard.html" class="brand">Ai крафт</a>
     <select id="project" title="Проект"></select>
-    <button class="btn-ghost btn-sm" type="button" id="btnNewFile">+ Файл</button>
-    <button class="btn-ghost btn-sm" type="button" id="btnPreview">Открыть превью</button>
     <div class="spacer"></div>
-    <span class="hint" id="status">Выберите проект сверху</span>
-    <button class="btn-primary btn-sm" type="button" id="btnSave">Сохранить</button>
-    <a class="btn-ghost btn-sm" href="dashboard.html">К проектам</a>
+    <button type="button" class="btn" id="btnNewFile">+ Файл</button>
+    <button type="button" class="btn" id="btnPreview">Открыть сайт</button>
+    <button type="button" class="btn btn-main" id="btnSave">Сохранить</button>
+    <a href="dashboard.html" class="btn">К проектам</a>
   </div>
-  <div class="ide-body">
+  <div class="ide-body" id="workspace">
     <aside class="ide-files">
-      <div class="ide-files-head"><span>Файлы</span><button type="button" id="btnAddFile">Добавить</button></div>
-      <div class="ide-file-list" id="fileList"></div>
+      <div class="ide-files-head"><span>Файлы</span><button type="button" id="btnNewFile2">Добавить</button></div>
+      <div class="ide-files-list" id="fileList"></div>
     </aside>
     <div class="ide-work">
-      <div class="ide-empty" id="emptyState">
-        <div>
-          <h2>Редактор кода</h2>
-          <p>1. Выберите проект сверху<br>2. Откройте файл слева<br>3. Пишите код — превью справа обновится само</p>
-          <a class="btn-primary" href="create.html">Сначала создать сайт</a>
-        </div>
-      </div>
-      <div id="editorUI" hidden>
-        <div class="ide-tabs" id="tabs"></div>
-        <div class="ide-split" id="split">
-          <div class="ide-code-pane">
-            <div class="ide-code-label">Код · <span id="activeName">—</span></div>
-            <textarea id="code" spellcheck="false" placeholder="Пишите код здесь…"></textarea>
-          </div>
-          <div class="ide-preview-pane">
-            <div class="ide-preview-label"><span>Превью сайта</span><span>HTML + CSS + JS</span></div>
-            <iframe id="frame" title="Превью"></iframe>
-          </div>
+      <div class="ide-tabs" id="tabs"></div>
+      <div class="ide-editor-wrap">
+        <div class="ide-code"><textarea id="code" spellcheck="false" placeholder="Выберите файл слева"></textarea></div>
+        <div class="ide-preview">
+          <div class="ide-preview-bar"><span class="dot r"></span><span class="dot y"></span><span class="dot g"></span><span id="previewLabel">Предпросмотр</span></div>
+          <iframe id="frame" title="Предпросмотр"></iframe>
         </div>
       </div>
     </div>
+  </div>
+  <div class="ide-empty" id="empty" hidden>
+    <div>
+      <h2>Нет проекта</h2>
+      <p>Сначала создайте сайт: опишите идею — появится структура файлов, здесь можно править код.</p>
+      <a class="btn btn-main" href="create.html" style="display:inline-block">Создать сайт</a>
+    </div>
+  </div>
+  <div class="ide-status">
+    <span id="statusFile">—</span>
+    <span id="statusSave">Готово</span>
+    <span style="margin-left:auto">Слева файлы · по центру код · справа сайт</span>
   </div>
 </div>
 <script src="../js/core.js"></script>
@@ -87,60 +98,67 @@
   const session = AC.requireAuth();
   const settings = AC.getSettings();
   AC.applyTheme(settings);
-  const $ = id => document.getElementById(id);
-  const projectSel = $('project');
-  const codeEl = $('code');
-  const params = new URLSearchParams(location.search);
+  document.documentElement.setAttribute('data-theme', settings.theme || 'dark');
+  const codeEl = document.getElementById('code');
+  const frame = document.getElementById('frame');
+  const projectSel = document.getElementById('project');
   let sites = AC.getUserSites(session.login);
-  let currentId = params.get('id') || '';
-  let files = {};
-  let active = '';
-  let openTabs = [];
-  projectSel.innerHTML = '<option value="">— Выберите проект —</option>' +
-    sites.map(s => `<option value="${s.id}">${AC.escapeHtml(s.name)}</option>`).join('');
+  let currentId = new URLSearchParams(location.search).get('id') || sites[0]?.id || null;
+  let files = {}, active = null, openTabs = [], dirty = false;
+  projectSel.innerHTML = sites.length ? sites.map(s => '<option value="'+s.id+'">'+AC.escapeHtml(s.name)+'</option>').join('') : '<option value="">Нет проектов</option>';
   if (currentId) projectSel.value = currentId;
-  function setStatus(t) { $('status').textContent = t; }
-  function showEditor(on) { $('emptyState').hidden = on; $('editorUI').hidden = !on; }
-  function fileNames() { return Object.keys(files).sort(); }
+  function showEmpty(show) {
+    document.getElementById('empty').hidden = !show;
+    document.getElementById('workspace').style.display = show ? 'none' : 'flex';
+  }
+  function sortedFiles() {
+    const order = ['index.html','style.css','script.js'];
+    return Object.keys(files).sort((a,b) => {
+      const ia = order.indexOf(a), ib = order.indexOf(b);
+      if (ia >= 0 || ib >= 0) return (ia < 0 ? 99 : ia) - (ib < 0 ? 99 : ib);
+      return a.localeCompare(b);
+    });
+  }
   function renderFiles() {
-    const list = $('fileList');
-    const names = fileNames();
-    if (!names.length) { list.innerHTML = '<p style="padding:12px;font-size:12px;color:var(--text-muted)">Нет файлов. Нажмите «Добавить».</p>'; return; }
-    list.innerHTML = names.map(f => `<button type="button" class="ide-file ${f===active?'active':''}" data-f="${AC.escapeHtml(f)}">${AC.escapeHtml(f)}</button>`).join('');
+    const list = document.getElementById('fileList');
+    list.innerHTML = sortedFiles().map(name =>
+      '<button type="button" class="ide-file '+(name===active?'active':'')+'" data-f="'+AC.escapeHtml(name)+'">'+AC.escapeHtml(name)+'</button>'
+    ).join('') || '<p style="padding:12px;font-size:12px;color:#666">Нет файлов</p>';
     list.querySelectorAll('[data-f]').forEach(b => b.onclick = () => openFile(b.dataset.f));
   }
   function renderTabs() {
-    if (!openTabs.includes(active) && active) openTabs.push(active);
     openTabs = openTabs.filter(t => files[t] !== undefined);
-    $('tabs').innerHTML = openTabs.map(f => `<button type="button" class="ide-tab ${f===active?'active':''}" data-f="${AC.escapeHtml(f)}">${AC.escapeHtml(f)}</button>`).join('');
-    $('tabs').querySelectorAll('.ide-tab').forEach(t => t.onclick = () => openFile(t.dataset.f));
-    $('activeName').textContent = active || '—';
+    if (active && !openTabs.includes(active)) openTabs.push(active);
+    document.getElementById('tabs').innerHTML = openTabs.map(name =>
+      '<button type="button" class="ide-tab '+(name===active?'active':'')+'" data-f="'+AC.escapeHtml(name)+'">'+AC.escapeHtml(name)+'</button>'
+    ).join('');
+    document.querySelectorAll('#tabs [data-f]').forEach(t => t.onclick = () => openFile(t.dataset.f));
+    document.getElementById('statusFile').textContent = active || '—';
   }
   function openFile(name) {
     if (active) files[active] = codeEl.value;
     active = name;
-    codeEl.value = files[name] || '';
+    codeEl.value = files[name] ?? '';
     renderFiles(); renderTabs(); refreshPreview();
-    setStatus('Файл: ' + name);
   }
   function refreshPreview() {
-    if (!settings.showPreview) { $('split').classList.add('no-preview'); return; }
-    $('split').classList.remove('no-preview');
-    const html = files['index.html'] || files[fileNames().find(f => f.endsWith('.html'))] || '';
-    const css = [files['style.css'], files['styles.css'], files['main.css']].filter(Boolean).join('\n');
-    const js = [files['script.js'], files['main.js'], files['app.js']].filter(Boolean).join('\n');
-    if (!html) { $('frame').srcdoc = '<p style="font-family:system-ui;padding:24px;color:#666">Добавьте index.html — тогда здесь будет превью.</p>'; return; }
+    const html = files['index.html'] || Object.entries(files).find(([k]) => k.endsWith('.html'))?.[1] || '';
+    const css = files['style.css'] || files['styles.css'] || '';
+    const js = files['script.js'] || files['main.js'] || '';
+    if (!html) { frame.srcdoc = '<div style="font-family:system-ui;padding:24px;color:#666">Нет index.html — добавьте файл с разметкой</div>'; return; }
     let doc = html;
-    if (doc.includes('</head>')) doc = doc.replace('</head>', '<style>' + css + '</style></head>');
-    else doc = '<style>' + css + '</style>' + doc;
-    if (/src=["']script\.js["']/.test(doc)) doc = doc.replace(/<script src=["']script\.js["']><\/script>/, '<script>' + js + '<\/script>');
-    else doc += '<script>' + js + '<\/script>';
-    $('frame').srcdoc = doc;
+    if (doc.includes('</head>')) doc = doc.replace('</head>', '<style>'+css+'</style></head>');
+    else doc = '<style>'+css+'</style>' + doc;
+    if (/src=["']script\.js["']/.test(doc)) doc = doc.replace(/<script\s+src=["']script\.js["']\s*><\/script>/i, '<script>'+js+'<\/script>');
+    else doc += '<script>'+js+'<\/script>';
+    frame.srcdoc = doc;
+    document.getElementById('previewLabel').textContent = 'Предпросмотр · ' + (files['index.html'] ? 'index.html' : 'HTML');
   }
   function loadProject(id) {
     sites = AC.getUserSites(session.login);
     const site = sites.find(s => s.id === id);
-    if (!site) { showEditor(false); setStatus('Проект не найден'); return; }
+    if (!site) { showEmpty(true); return; }
+    showEmpty(false);
     currentId = id;
     files = { ...(site.files || {}) };
     if (!Object.keys(files).length) {
@@ -150,50 +168,52 @@
         'script.js': '// Ai крафт\n'
       };
     }
-    active = files['index.html'] !== undefined ? 'index.html' : fileNames()[0];
+    active = files['index.html'] !== undefined ? 'index.html' : sortedFiles()[0];
     openTabs = [active];
     codeEl.value = files[active] || '';
-    showEditor(true); renderFiles(); renderTabs(); refreshPreview();
-    setStatus('Проект: ' + site.name);
-  }
-  function addFile() {
-    if (!currentId) { AC.toast('Сначала выберите проект'); return; }
-    const name = prompt('Имя файла\nНапример: about.html, style.css, app.js');
-    if (!name) return;
-    const clean = name.trim().replace(/[^a-zA-Z0-9._-]/g, '');
-    if (!clean) { AC.toast('Некорректное имя'); return; }
-    if (files[clean] !== undefined) { AC.toast('Такой файл уже есть'); return; }
-    files[clean] = ''; openFile(clean); AC.toast('Файл создан');
+    dirty = false;
+    document.getElementById('statusSave').textContent = 'Открыт: ' + site.name;
+    renderFiles(); renderTabs(); refreshPreview();
   }
   function save() {
-    if (!currentId) { AC.toast('Нет проекта'); return; }
+    if (!currentId) return;
     if (active) files[active] = codeEl.value;
     AC.updateSite(session.login, currentId, { files: { ...files } });
-    setStatus('Сохранено'); AC.toast('Сохранено');
+    dirty = false;
+    document.getElementById('statusSave').textContent = 'Сохранено · ' + new Date().toLocaleTimeString();
+    AC.toast('Сохранено');
   }
-  let timer;
+  function addFile() {
+    if (!currentId) { AC.toast('Сначала создайте сайт'); return; }
+    const name = prompt('Имя файла\nПримеры: about.html, style.css, app.js, data.json');
+    if (!name) return;
+    const clean = name.trim().replace(/[^a-zA-Z0-9._-]/g, '');
+    if (!clean) { alert('Некорректное имя'); return; }
+    if (files[clean] !== undefined) { alert('Такой файл уже есть'); return; }
+    files[clean] = ''; openFile(clean); dirty = true;
+    document.getElementById('statusSave').textContent = 'Не сохранено';
+  }
+  let saveTimer;
   codeEl.addEventListener('input', () => {
     if (!active) return;
-    files[active] = codeEl.value; refreshPreview();
-    if (settings.autoSave && currentId) {
-      clearTimeout(timer); timer = setTimeout(save, 1000); setStatus('Печатаете…');
-    }
+    files[active] = codeEl.value; dirty = true;
+    document.getElementById('statusSave').textContent = 'Изменения…';
+    refreshPreview();
+    if (settings.autoSave && currentId) { clearTimeout(saveTimer); saveTimer = setTimeout(save, 1000); }
   });
   projectSel.onchange = () => {
-    if (!projectSel.value) { showEditor(false); setStatus('Выберите проект'); return; }
+    if (dirty && !confirm('Есть несохранённые изменения. Продолжить?')) { projectSel.value = currentId; return; }
     loadProject(projectSel.value);
   };
-  $('btnSave').onclick = save;
-  $('btnNewFile').onclick = addFile;
-  $('btnAddFile').onclick = addFile;
-  $('btnPreview').onclick = () => {
+  document.getElementById('btnSave').onclick = save;
+  document.getElementById('btnNewFile').onclick = addFile;
+  document.getElementById('btnNewFile2').onclick = addFile;
+  document.getElementById('btnPreview').onclick = () => {
     if (active) files[active] = codeEl.value; refreshPreview();
     const w = window.open('', '_blank');
-    if (w) { w.document.write($('frame').srcdoc); w.document.close(); }
+    w.document.write(frame.srcdoc); w.document.close();
   };
-  if (currentId) loadProject(currentId);
-  else if (sites.length === 1) { projectSel.value = sites[0].id; loadProject(sites[0].id); }
-  else showEditor(false);
+  if (currentId) loadProject(currentId); else showEmpty(true);
 </script>
 </body>
 </html>
