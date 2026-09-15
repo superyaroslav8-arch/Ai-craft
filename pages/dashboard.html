@@ -4,25 +4,22 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Мои сайты — Ai крафт</title>
-  <link rel="stylesheet" href="../css/style.css">
+  <link rel="stylesheet" href="../css/style.css?v=3">
 </head>
 <body>
-<div class="app">
+<div class="app" id="app">
   <aside class="sidebar">
-    <a href="../index.html" class="logo">Ai крафт</a>
+    <a href="../index.html?v=3" class="logo">Ai крафт</a>
     <nav class="side-nav">
-      <a href="dashboard.html" class="active">Мои сайты</a>
-      <a href="create.html">Собрать сайт</a>
-      <a href="neuro.html">Нейро</a>
-      <a href="media.html">Медиа</a>
-      <a href="links.html">Ссылки</a>
-      <a href="settings.html">Настройки</a>
+      <a href="dashboard.html?v=3" class="active">Мои сайты</a>
+      <a href="create.html?v=3">Собрать сайт</a>
+      <a href="neuro.html?v=3">Нейро</a>
+      <a href="media.html?v=3">Медиа</a>
+      <a href="links.html?v=3">Ссылки</a>
+      <a href="settings.html?v=3">Настройки</a>
     </nav>
     <div class="side-user">
-      <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">
-        <img id="avatar" alt="" width="36" height="36" style="border-radius:10px;object-fit:cover;background:var(--surface-2);display:none">
-        <strong id="userLogin">—</strong>
-      </div>
+      <strong id="userLogin">—</strong>
       <a href="#" id="logout">Выйти</a>
     </div>
   </aside>
@@ -30,84 +27,89 @@
     <div class="page-head">
       <div>
         <h1>Мои сайты</h1>
-        <p style="color:var(--text-muted);font-size:14px;margin-top:4px">Собранные по описанию. Нажмите «Открыть».</p>
+        <p style="color:var(--text-muted);font-size:14px;margin-top:4px">Собранные по описанию</p>
       </div>
-      <a class="btn-primary" href="create.html">Собрать сайт</a>
+      <a class="btn-primary" href="create.html?v=3">Собрать сайт</a>
     </div>
     <div id="list"></div>
   </main>
 </div>
 <nav class="mobile-nav">
-  <a href="dashboard.html" class="active">Сайты</a>
-  <a href="create.html">Собрать</a>
-  <a href="neuro.html">Нейро</a>
-  <a href="settings.html">Ещё</a>
+  <a href="dashboard.html?v=3" class="active">Сайты</a>
+  <a href="create.html?v=3">Собрать</a>
+  <a href="neuro.html?v=3">Нейро</a>
+  <a href="settings.html?v=3">Ещё</a>
 </nav>
-<script src="../js/core.js" defer></script>
+<script src="../js/core.js?v=3"></script>
 <script>
-document.addEventListener('DOMContentLoaded', () => {
-  const session = AC.requireAuth('auth.html');
-  if (!session) return;
-  AC.applyTheme();
+(function(){
+  function getSession(){
+    try { return JSON.parse(localStorage.getItem('aicraft_session')||'null'); } catch(e){ return null; }
+  }
+  function getUsers(){
+    try { return JSON.parse(localStorage.getItem('aicraft_users')||'{}'); } catch(e){ return {}; }
+  }
+  function saveUsers(u){ localStorage.setItem('aicraft_users', JSON.stringify(u)); }
+
+  var session = getSession();
+  if (!session) { location.href = 'auth.html?v=3'; return; }
+
   document.getElementById('userLogin').textContent = session.name || session.login;
-  const id = AC.getIdentity && AC.getIdentity();
-  if (id && id.photo) {
-    const img = document.getElementById('avatar');
-    img.src = id.photo;
-    img.style.display = 'block';
-  }
-  document.getElementById('logout').onclick = e => {
+  document.getElementById('logout').onclick = function(e){
     e.preventDefault();
-    AC.clearSession();
-    location.href = 'auth.html';
+    localStorage.removeItem('aicraft_session');
+    location.href = 'auth.html?v=3';
   };
-  function addr(s) {
+
+  if (typeof AC !== 'undefined') AC.applyTheme();
+
+  function sites(){
+    var u = getUsers()[session.login];
+    return (u && u.sites) ? u.sites : [];
+  }
+  function addr(s){
     if (s.customDomain) return s.customDomain;
-    return (s.subdomain || 'site') + '.' + (s.domain || 'ai_craft.ru');
+    return (s.subdomain||'site') + '.' + (s.domain||'ai_craft.ru');
   }
-  function openPreview(id) {
-    const site = AC.getUserSites(session.login).find(x => x.id === id);
-    if (!site || !site.files || !site.files['index.html']) {
-      AC.toast('Нет содержимого');
+  function esc(t){
+    var d=document.createElement('div'); d.textContent=t||''; return d.innerHTML;
+  }
+  function openSite(id){
+    var site = sites().find(function(x){ return x.id===id; });
+    if (!site || !site.files || !site.files['index.html']) { alert('Нет содержимого'); return; }
+    var doc = site.files['index.html'];
+    var css = site.files['style.css']||'';
+    var js = site.files['script.js']||'';
+    if (doc.indexOf('</head>')!==-1) doc = doc.replace('</head>', '<style>'+css+'</style></head>');
+    else doc = '<style>'+css+'</style>'+doc;
+    doc = doc.replace(/<script\s+src=["']script\.js["']\s*><\/script>/i, '<script>'+js+'</script>');
+    var w = window.open('', '_blank');
+    if (!w) { alert('Разрешите всплывающие окна'); return; }
+    w.document.open(); w.document.write(doc); w.document.close();
+  }
+  function render(){
+    var list = sites();
+    var el = document.getElementById('list');
+    if (!list.length){
+      el.innerHTML = '<div class="empty"><h3>Пока нет сайтов</h3><p>Нажмите «Собрать сайт» и опишите идею.</p><a class="btn-primary" href="create.html?v=3" style="margin-top:16px">Собрать</a></div>';
       return;
     }
-    let doc = site.files['index.html'];
-    const css = site.files['style.css'] || '';
-    const js = site.files['script.js'] || '';
-    if (doc.includes('</head>')) doc = doc.replace('</head>', '<style>' + css + '</style></head>');
-    else doc = '<style>' + css + '</style>' + doc;
-    doc = doc.replace(/<script\s+src=["']script\.js["']\s*><\/script>/i, '<script>' + js + '<\/script>');
-    const w = window.open('', '_blank');
-    if (!w) { AC.toast('Разрешите всплывающие окна'); return; }
-    w.document.open();
-    w.document.write(doc);
-    w.document.close();
-  }
-  function render() {
-    const sites = AC.getUserSites(session.login);
-    const el = document.getElementById('list');
-    if (!sites.length) {
-      el.innerHTML = '<div class="empty"><h3>Пока нет сайтов</h3><p>Опишите идею — соберём структуру.</p><a class="btn-primary" href="create.html" style="margin-top:16px">Собрать первый сайт</a></div>';
-      return;
-    }
-    el.innerHTML = '<div class="grid-cards">' + sites.map(s =>
-      '<div class="card"><h3>' + AC.escapeHtml(s.name) + '</h3><div class="meta">' + AC.escapeHtml(addr(s)) +
-      '</div><p>' + AC.escapeHtml((s.description || '').slice(0, 140)) + '</p><div class="card-actions">' +
-      '<button type="button" data-open="' + s.id + '">Открыть</button>' +
-      '<a href="create.html">Ещё сайт</a>' +
-      '<button type="button" data-del="' + s.id + '">Удалить</button></div></div>'
-    ).join('') + '</div>';
-    el.querySelectorAll('[data-open]').forEach(b => b.onclick = () => openPreview(b.dataset.open));
-    el.querySelectorAll('[data-del]').forEach(b => b.onclick = () => {
-      if (confirm('Удалить сайт?')) {
-        AC.deleteSite(session.login, b.dataset.del);
-        render();
-        AC.toast('Удалено');
-      }
-    });
+    el.innerHTML = '<div class="grid-cards">' + list.map(function(s){
+      return '<div class="card"><h3>'+esc(s.name)+'</h3><div class="meta">'+esc(addr(s))+'</div><p>'+esc((s.description||'').slice(0,140))+
+        '</p><div class="card-actions"><button type="button" data-open="'+s.id+'">Открыть</button> '+
+        '<a href="create.html?v=3">Ещё</a> <button type="button" data-del="'+s.id+'">Удалить</button></div></div>';
+    }).join('') + '</div>';
+    el.querySelectorAll('[data-open]').forEach(function(b){ b.onclick=function(){ openSite(b.getAttribute('data-open')); }; });
+    el.querySelectorAll('[data-del]').forEach(function(b){ b.onclick=function(){
+      if (!confirm('Удалить?')) return;
+      var users = getUsers();
+      if (users[session.login]) users[session.login].sites = sites().filter(function(s){ return s.id !== b.getAttribute('data-del'); });
+      saveUsers(users);
+      render();
+    }; });
   }
   render();
-});
+})();
 </script>
 </body>
 </html>
