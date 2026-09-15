@@ -17,7 +17,7 @@ const AC = {
   setIdentity(id) { localStorage.setItem(this.KEYS.identity, JSON.stringify(id)); },
   enterWithPhoto({ name, photoDataUrl }) {
     const login = (name || 'Гость').trim().slice(0, 32) || 'Гость';
-    const key = 'photo_' + login.toLowerCase().replace(/\s+/g, '_');
+    const key = 'photo_' + login.toLowerCase().replace(/\s+/g, '_').replace(/[^a-z0-9_а-яё]/gi, '') || ('u_' + Date.now());
     const users = this.getUsers();
     if (!users[key]) users[key] = { password: null, photoAuth: true, sites: [], name: login, photo: photoDataUrl || null };
     else { users[key].photo = photoDataUrl || users[key].photo; users[key].name = login; }
@@ -26,7 +26,7 @@ const AC = {
     this.setSession({ login: key, name: login, photoAuth: true });
     return this.getSession();
   },
-  requireAuth(redirect = '../index.html') {
+  requireAuth(redirect = 'auth.html') {
     const s = this.getSession();
     if (!s) { location.href = redirect; return null; }
     return s;
@@ -97,12 +97,13 @@ const AC = {
     el.textContent = msg; el.classList.add('show');
     clearTimeout(el._t); el._t = setTimeout(() => el.classList.remove('show'), 2200);
   },
+  /** Real AI image by description (free Pollinations, no API key) */
   imageUrl(prompt, opts) {
     opts = opts || {};
     const w = opts.width || 768, h = opts.height || 512;
-    const seed = opts.seed || Math.floor(Math.random() * 1e9);
-    const q = encodeURIComponent(String(prompt).slice(0, 300));
-    return 'https://image.pollinations.ai/prompt/' + q + '?width=' + w + '&height=' + h + '&seed=' + seed + '&nologo=true';
+    const seed = opts.seed != null ? opts.seed : Math.floor(Math.random() * 1e9);
+    const q = encodeURIComponent(String(prompt).slice(0, 350));
+    return 'https://image.pollinations.ai/prompt/' + q + '?width=' + w + '&height=' + h + '&seed=' + seed + '&nologo=true&model=flux';
   },
   parseIdea(description) {
     const d = (description || '').toLowerCase();
