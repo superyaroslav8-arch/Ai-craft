@@ -5,7 +5,7 @@
   }
   AK.applyTheme();
   var session = AK.session();
-  var isReg = false, built = null, mode = 'sub', pendingDomain = null, pendingTarget = '';
+  var isReg = false, built = null, bindId = null;
   var engine = AK.settings().engine || 'Host AI';
 
   function showGate() {
@@ -16,7 +16,6 @@
     document.getElementById('gate').style.display = 'none';
     document.getElementById('shell').style.display = 'flex';
     document.getElementById('who').textContent = session.name || session.email;
-    applyCompact();
     route();
   }
   function setMode(reg) {
@@ -56,23 +55,13 @@
   document.getElementById('btnLogout').onclick = doLogout;
   document.getElementById('btnDeleteAcc').onclick = function () {
     if (!session) return;
-    if (!confirm('Удалить все данные этого аккаунта на устройстве?')) return;
+    if (!confirm('Удалить все данные на этом устройстве?')) return;
     AK.deleteAccount(session.login);
     session = null;
     showGate();
-    notify('Данные удалены');
+    AK.toast('Данные удалены');
   };
 
-  function notify(m) {
-    if (AK.settings().toasts === 'off') return;
-    AK.toast(m);
-  }
-
-  function applyCompact() {
-    document.documentElement.setAttribute('data-compact', AK.settings().compact === 'on' ? 'on' : 'off');
-  }
-
-  // Engines
   function renderEngines() {
     var box = document.getElementById('engineChips');
     if (!box) return;
@@ -94,14 +83,14 @@
   }
   renderEngines();
 
-  function isLocallyTaken(domain) {
+  function isTaken(domain) {
     domain = String(domain || '').toLowerCase();
     var users = AK.users(), keys = Object.keys(users);
     for (var i = 0; i < keys.length; i++) {
       var u = users[keys[i]] || {};
       var sites = u.sites || [];
       for (var s = 0; s < sites.length; s++) {
-        var a = (sites[s].customDomain || ((sites[s].subdomain || '') + '.' + (sites[s].domain || ''))).toLowerCase();
+        var a = ((sites[s].subdomain || '') + '.' + (sites[s].domain || '')).toLowerCase();
         if (a === domain) return true;
       }
       var domains = u.domains || [];
@@ -112,40 +101,11 @@
     return false;
   }
 
-  async function checkDomain(domain) {
-    domain = domain.trim().toLowerCase().replace(/^https?:\/\//, '').replace(/\/.*$/, '');
-    if (!/^(?=.{1,253}$)([a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\.)+[a-z]{2,63}$/i.test(domain)) {
-      throw new Error('Некорректное имя');
-    }
-    if (isLocallyTaken(domain)) return { domain: domain, available: false, reason: 'local' };
-    if (/\.ai_craft\.(ru|com|dev)$/.test(domain)) return { domain: domain, available: true, reason: 'platform' };
-    var tld = domain.split('.').slice(1).join('.');
-    if (tld !== 'ru' && tld !== 'com' && tld !== 'dev') {
-      return { domain: domain, available: true, reason: 'label' };
-    }
-    var response = await fetch('https://dns.google/resolve?name=' + encodeURIComponent(domain) + '&type=NS');
-    if (!response.ok) throw new Error('Сервис проверки не ответил');
-    var data = await response.json();
-    if (data.Status === 3) return { domain: domain, available: true, reason: 'dns' };
-    if (data.Status === 0 && data.Answer && data.Answer.length) return { domain: domain, available: false, reason: 'dns' };
-    return { domain: domain, available: true, reason: 'dns' };
-  }
-
   function normalizeUrl(url) {
     url = String(url || '').trim();
     if (!url) return '';
     if (!/^https?:\/\//i.test(url)) url = 'https://' + url;
     try { new URL(url); return url; } catch (e) { return ''; }
-  }
-
-  function showResult(el, r) {
-    if (r.available) {
-      el.style.color = '#4ade80';
-      el.innerHTML = '✓ <strong>' + AK.esc(r.domain) + '</strong> — имя свободно. Можно создать.';
-    } else {
-      el.style.color = '#f87171';
-      el.innerHTML = '✕ <strong>' + AK.esc(r.domain) + '</strong> — занято. Другое имя.';
-    }
   }
 
   function route() {
@@ -167,17 +127,15 @@
   function renderHome() {
     var sites = AK.sites(session.login);
     var domains = AK.domains(session.login);
-    var links = AK.links(session.login);
     document.getElementById('statSites').textContent = sites.length;
     document.getElementById('statDomains').textContent = domains.length;
-    document.getElementById('statLinks').textContent = links.length;
 
     var el = document.getElementById('siteList');
     if (!sites.length) {
-      el.innerHTML = '<p class="sub">Пока нет сайтов. <a href="#create">Опишите идею →</a></p>';
+      el.innerHTML = '<p class="sub">Пока нет сайтов. <a href="#create">Создать →</a></p>';
     } else {
       el.innerHTML = sites.map(function (s) {
-        var addr = s.customDomain || ((s.subdomain || 'site') + '.' + (s.domain || 'ai_craft.ru'));
+        var addr = (s.subdomain || 'site') + '.' + (s.domain || 'ai_craft.ru');
         return '<div class="card"><h3>' + AK.esc(s.name) + '</h3><div class="meta">' + AK.esc(addr) +
           '</div><p style="color:var(--muted);font-size:12px">' + AK.esc(s.engine || '') +
           '</p><div class="actions"><button type="button" data-open="' + s.id + '">Открыть</button> ' +
@@ -196,7 +154,7 @@
       });
       el.querySelectorAll('[data-del]').forEach(function (b) {
         b.onclick = function () {
-          if (!confirm('Удалить сайт?')) return;
+          if (!confirm('Удалить?')) return;
           AK.saveSites(session.login, AK.sites(session.login).filter(function (s) {
             return s.id !== b.getAttribute('data-del');
           }));
@@ -206,25 +164,40 @@
     }
 
     var dl = document.getElementById('domainListHome');
-    if (!domains.length) dl.innerHTML = '<p class="sub">Нет доменов. <a href="#domains">Создать →</a></p>';
-    else {
+    if (!domains.length) {
+      dl.innerHTML = '<p class="sub">Нет доменов. <a href="#domains">Создать →</a></p>';
+    } else {
       dl.innerHTML = domains.map(function (d) {
         return '<div class="card"><div class="meta">' + AK.esc(d.domain) + '</div>' +
-          '<p style="font-size:12px;color:var(--muted)">' + AK.esc(d.target || '—') + '</p>' +
-          '<div class="actions"><button type="button" data-dopen="' + d.id + '">Открыть сайт</button> ' +
+          '<p style="font-size:12px;color:var(--muted)">' + (d.target ? ('→ ' + AK.esc(d.target)) : 'Не привязан') + '</p>' +
+          '<div class="actions">' +
+          (d.target ? '<button type="button" data-dopen="' + d.id + '">Открыть</button> ' : '') +
+          '<button type="button" data-dbind="' + d.id + '">Привязать</button> ' +
           '<button type="button" data-ddel="' + d.id + '">Удалить</button></div></div>';
       }).join('');
-      bindDomainActions(dl);
+      bindDomainButtons(dl);
     }
-    renderLinks();
   }
 
-  function bindDomainActions(root) {
+  function bindDomainButtons(root) {
     root.querySelectorAll('[data-dopen]').forEach(function (b) {
       b.onclick = function () {
         var d = AK.domains(session.login).find(function (x) { return x.id === b.getAttribute('data-dopen'); });
-        if (!d || !d.target) return notify('Нет целевой ссылки');
-        window.open(d.target, '_blank', 'noopener');
+        if (d && d.target) window.open(d.target, '_blank', 'noopener');
+      };
+    });
+    root.querySelectorAll('[data-dbind]').forEach(function (b) {
+      b.onclick = function () {
+        bindId = b.getAttribute('data-dbind');
+        var d = AK.domains(session.login).find(function (x) { return x.id === bindId; });
+        if (!d) return;
+        location.hash = 'domains';
+        setTimeout(function () {
+          document.getElementById('bindBox').style.display = 'block';
+          document.getElementById('bindDomainLabel').textContent = d.domain;
+          document.getElementById('domainTarget').value = d.target || '';
+          document.getElementById('bindBox').scrollIntoView({ behavior: 'smooth' });
+        }, 50);
       };
     });
     root.querySelectorAll('[data-ddel]').forEach(function (b) {
@@ -237,59 +210,7 @@
         renderSavedDomains();
       };
     });
-    root.querySelectorAll('[data-dcopy]').forEach(function (b) {
-      b.onclick = function () {
-        navigator.clipboard.writeText(b.getAttribute('data-dcopy')).then(function () { notify('Скопировано'); });
-      };
-    });
   }
-
-  function renderLinks() {
-    var links = AK.links(session.login);
-    var el = document.getElementById('linkList');
-    if (!links.length) { el.innerHTML = '<p class="sub">Пока нет ссылок</p>'; return; }
-    el.innerHTML = links.map(function (l) {
-      return '<div class="card"><strong>' + AK.esc(l.title) + '</strong><div class="meta">ai-craft/' + AK.esc(l.slug) +
-        '</div><div style="font-size:13px;color:var(--muted)">' + AK.esc(l.url) +
-        '</div><div class="actions"><button type="button" data-lopen="' + AK.esc(l.url) + '">Открыть</button> ' +
-        '<button type="button" data-copy="ai-craft/' + AK.esc(l.slug) + '">Копировать</button> ' +
-        '<button type="button" data-ldel="' + l.id + '">Удалить</button></div></div>';
-    }).join('');
-    el.querySelectorAll('[data-lopen]').forEach(function (b) {
-      b.onclick = function () { window.open(b.getAttribute('data-lopen'), '_blank', 'noopener'); };
-    });
-    el.querySelectorAll('[data-copy]').forEach(function (b) {
-      b.onclick = function () {
-        navigator.clipboard.writeText(b.getAttribute('data-copy')).then(function () { notify('Скопировано'); });
-      };
-    });
-    el.querySelectorAll('[data-ldel]').forEach(function (b) {
-      b.onclick = function () {
-        AK.saveLinks(session.login, AK.links(session.login).filter(function (l) {
-          return l.id !== b.getAttribute('data-ldel');
-        }));
-        renderLinks(); renderHome();
-      };
-    });
-  }
-
-  document.getElementById('btnLink').onclick = function () {
-    var url = normalizeUrl(document.getElementById('linkUrl').value);
-    if (!url) return notify('Укажите корректный URL');
-    var slug = Math.random().toString(36).slice(2, 8);
-    var links = AK.links(session.login);
-    links.unshift({
-      id: 'l_' + Date.now(),
-      title: document.getElementById('linkTitle').value.trim() || slug,
-      url: url,
-      slug: slug
-    });
-    AK.saveLinks(session.login, links);
-    document.getElementById('linkTitle').value = '';
-    document.getElementById('linkUrl').value = '';
-    renderHome();
-    notify('Ссылка создана');
-  };
 
   function showPreview(html, css) {
     var doc = html;
@@ -298,52 +219,37 @@
     document.getElementById('preview').srcdoc = doc;
   }
 
-  // NO default preview — only after build
   document.getElementById('afterBuild').style.display = 'none';
 
   document.getElementById('btnBuild').onclick = function () {
     var idea = document.getElementById('idea').value.trim();
-    if (idea.length < 5) return notify('Опишите идею чуть подробнее');
+    if (idea.length < 5) return AK.toast('Опишите идею подробнее');
+    var manual = document.getElementById('siteTitle').value.trim();
+    var title = manual || AK.suggestTitle(idea);
+    if (!manual) document.getElementById('siteTitle').value = title;
     var p = AK.parse(idea);
-    var html = AK.buildHTML(idea, p.title, engine);
+    var html = AK.buildHTML(idea, title, engine);
     var css = AK.buildCSS(p.tone);
-    built = { name: p.title, description: idea, html: html, css: css, engine: engine, tone: p.tone };
+    built = { name: title, description: idea, html: html, css: css, engine: engine };
     document.getElementById('afterBuild').style.display = 'block';
     showPreview(html, css);
-    if (!document.getElementById('sub').value) {
-      document.getElementById('sub').value =
-        (p.title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 16)) || 'site';
-    }
-    notify('Черновик готов — укажите адрес');
+    var slug = title.toLowerCase().replace(/[^a-z0-9а-яё]+/gi, '-').replace(/^-|-$/g, '').slice(0, 16);
+    slug = slug.replace(/[а-яё]/gi, function (ch) {
+      var map = {а:'a',б:'b',в:'v',г:'g',д:'d',е:'e',ё:'e',ж:'zh',з:'z',и:'i',й:'y',к:'k',л:'l',м:'m',н:'n',о:'o',п:'p',р:'r',с:'s',т:'t',у:'u',ф:'f',х:'h',ц:'ts',ч:'ch',ш:'sh',щ:'sch',ъ:'',ы:'y',ь:'',э:'e',ю:'yu',я:'ya'};
+      return map[ch.toLowerCase()] || '';
+    }) || 'site';
+    if (!document.getElementById('sub').value) document.getElementById('sub').value = slug;
+    AK.toast('Сайт собран: «' + title + '»');
     document.getElementById('afterBuild').scrollIntoView({ behavior: 'smooth', block: 'start' });
   };
 
-  document.querySelectorAll('#afterBuild .chip[data-mode]').forEach(function (c) {
-    c.onclick = function () {
-      mode = c.getAttribute('data-mode');
-      document.querySelectorAll('#afterBuild .chip[data-mode]').forEach(function (x) {
-        x.classList.toggle('on', x === c);
-      });
-      document.getElementById('subRow').style.display = mode === 'sub' ? 'block' : 'none';
-      document.getElementById('customRow').style.display = mode === 'custom' ? 'block' : 'none';
-    };
-  });
-
   document.getElementById('btnSave').onclick = function () {
-    if (!built) return notify('Сначала соберите сайт');
-    var subdomain = '', domain = '', customDomain = '';
-    if (mode === 'custom') {
-      customDomain = document.getElementById('customDomain').value.trim().toLowerCase().replace(/^https?:\/\//, '');
-      if (!customDomain || customDomain.indexOf('.') < 0) return notify('Пример: shop.ru');
-      subdomain = customDomain.split('.')[0];
-      domain = customDomain;
-    } else {
-      subdomain = document.getElementById('sub').value.trim().toLowerCase().replace(/[^a-z0-9-]/g, '');
-      domain = document.getElementById('tld').value;
-      if (subdomain.length < 2) return notify('Укажите имя');
-    }
-    var full = customDomain || (subdomain + '.' + domain);
-    if (isLocallyTaken(full)) return notify('Адрес занят');
+    if (!built) return AK.toast('Сначала соберите сайт');
+    var subdomain = document.getElementById('sub').value.trim().toLowerCase().replace(/[^a-z0-9-]/g, '');
+    var domain = document.getElementById('tld').value;
+    if (subdomain.length < 2) return AK.toast('Укажите имя адреса');
+    var full = subdomain + '.' + domain;
+    if (isTaken(full)) return AK.toast('Адрес занят — выберите другой');
     var list = AK.sites(session.login);
     list.unshift({
       id: 's_' + Date.now(),
@@ -351,128 +257,93 @@
       description: built.description,
       subdomain: subdomain,
       domain: domain,
-      customDomain: customDomain,
       html: built.html,
       css: built.css,
       engine: built.engine,
       createdAt: new Date().toISOString()
     });
     AK.saveSites(session.login, list);
-    notify('Сайт сохранён');
+    AK.toast('Сохранено бесплатно');
     location.hash = 'home';
   };
 
-  // Domains: target URL + name + tld
-  document.getElementById('btnDomainCheck').onclick = async function () {
-    var target = normalizeUrl(document.getElementById('domainTarget').value);
+  // Domains: name + tld → create, then optional bind
+  document.getElementById('btnDomainCreate').onclick = function () {
     var name = document.getElementById('domainName').value.trim().toLowerCase().replace(/[^a-z0-9-]/g, '');
     var tld = document.getElementById('domainTld').value;
     var res = document.getElementById('domainResult');
-    var btnSave = document.getElementById('btnDomainSave');
-    btnSave.style.display = 'none';
-    pendingDomain = null;
-    pendingTarget = '';
-    if (!target) { res.style.color = '#f87171'; res.textContent = 'Вставьте ссылку на существующий сайт'; return; }
-    if (!name) { res.style.color = '#f87171'; res.textContent = 'Введите имя'; return; }
-    var domain = name + tld;
-    res.style.color = 'var(--muted)';
-    res.textContent = 'Проверяем…';
-    try {
-      var r = await checkDomain(domain);
-      showResult(res, r);
-      if (r.available) {
-        pendingDomain = r.domain;
-        pendingTarget = target;
-        btnSave.style.display = 'inline-block';
-      }
-    } catch (e) {
+    if (!name || name.length < 2) {
       res.style.color = '#f87171';
-      res.textContent = e.message;
+      res.textContent = 'Введите имя (минимум 2 символа)';
+      return;
     }
-  };
-
-  document.getElementById('btnDomainSave').onclick = function () {
-    if (!pendingDomain || !pendingTarget) return;
-    if (isLocallyTaken(pendingDomain)) return notify('Имя занято');
+    var domain = name + tld;
+    if (isTaken(domain)) {
+      res.style.color = '#f87171';
+      res.textContent = '✕ ' + domain + ' — уже занят. Другое имя.';
+      return;
+    }
     var domains = AK.domains(session.login);
-    domains.unshift({
-      id: 'd_' + Date.now(),
-      domain: pendingDomain,
-      target: pendingTarget,
-      checkedAt: new Date().toISOString()
-    });
+    var id = 'd_' + Date.now();
+    domains.unshift({ id: id, domain: domain, target: '', createdAt: new Date().toISOString() });
     AK.saveDomains(session.login, domains);
-    notify('Домен создан → «Открыть» ведёт на ваш сайт');
-    pendingDomain = null;
-    pendingTarget = '';
-    document.getElementById('btnDomainSave').style.display = 'none';
+    res.style.color = '#4ade80';
+    res.textContent = '✓ ' + domain + ' создан. Можно привязать к сайту.';
     document.getElementById('domainName').value = '';
+    bindId = id;
+    document.getElementById('bindBox').style.display = 'block';
+    document.getElementById('bindDomainLabel').textContent = domain;
     document.getElementById('domainTarget').value = '';
-    document.getElementById('domainResult').textContent = '';
     renderSavedDomains();
+    AK.toast('Домен создан');
   };
 
-  document.getElementById('domainSearch').oninput = function () {
+  document.getElementById('btnDomainBind').onclick = function () {
+    if (!bindId) return;
+    var url = normalizeUrl(document.getElementById('domainTarget').value);
+    if (!url) return AK.toast('Укажите корректный URL');
+    var domains = AK.domains(session.login);
+    var found = false;
+    for (var i = 0; i < domains.length; i++) {
+      if (domains[i].id === bindId) {
+        domains[i].target = url;
+        found = true;
+        break;
+      }
+    }
+    if (!found) return AK.toast('Домен не найден');
+    AK.saveDomains(session.login, domains);
+    AK.toast('Привязано — «Открыть» ведёт на сайт');
+    document.getElementById('bindBox').style.display = 'none';
+    bindId = null;
     renderSavedDomains();
   };
 
   function renderSavedDomains() {
-    var q = (document.getElementById('domainSearch').value || '').toLowerCase().trim();
-    var domains = AK.domains(session.login).filter(function (d) {
-      if (!q) return true;
-      return (d.domain || '').toLowerCase().indexOf(q) >= 0 || (d.target || '').toLowerCase().indexOf(q) >= 0;
-    });
+    var domains = AK.domains(session.login);
     var el = document.getElementById('savedDomains');
-    if (!domains.length) { el.innerHTML = '<p class="sub">Список пуст</p>'; return; }
+    if (!domains.length) { el.innerHTML = '<p class="sub">Пока пусто</p>'; return; }
     el.innerHTML = domains.map(function (d) {
-      return '<div class="card">' +
-        '<div class="meta">' + AK.esc(d.domain) + '</div>' +
-        '<p style="font-size:13px;color:var(--muted);word-break:break-all">→ ' + AK.esc(d.target || 'нет URL') + '</p>' +
+      return '<div class="card"><div class="meta">' + AK.esc(d.domain) + '</div>' +
+        '<p style="font-size:13px;color:var(--muted)">' + (d.target ? ('→ ' + AK.esc(d.target)) : 'Не привязан') + '</p>' +
         '<div class="actions">' +
-        '<button type="button" data-dopen="' + d.id + '">Открыть сайт</button> ' +
-        '<button type="button" data-dcopy="' + AK.esc(d.domain) + '">Копировать имя</button> ' +
-        '<button type="button" data-ddel="' + d.id + '">Удалить</button>' +
-        '</div></div>';
+        (d.target ? '<button type="button" data-dopen="' + d.id + '">Открыть</button> ' : '') +
+        '<button type="button" data-dbind="' + d.id + '">Привязать</button> ' +
+        '<button type="button" data-dcopy="' + AK.esc(d.domain) + '">Копировать</button> ' +
+        '<button type="button" data-ddel="' + d.id + '">Удалить</button></div></div>';
     }).join('');
-    bindDomainActions(el);
+    bindDomainButtons(el);
+    el.querySelectorAll('[data-dcopy]').forEach(function (b) {
+      b.onclick = function () {
+        navigator.clipboard.writeText(b.getAttribute('data-dcopy')).then(function () { AK.toast('Скопировано'); });
+      };
+    });
   }
-
-  document.getElementById('btnCopyAllDomains').onclick = function () {
-    var list = AK.domains(session.login).map(function (d) { return d.domain; }).join('\n');
-    if (!list) return notify('Пусто');
-    navigator.clipboard.writeText(list).then(function () { notify('Скопировано'); });
-  };
-  document.getElementById('btnExportDomains').onclick = function () {
-    var data = JSON.stringify(AK.domains(session.login), null, 2);
-    var blob = new Blob([data], { type: 'application/json' });
-    var a = document.createElement('a');
-    a.href = URL.createObjectURL(blob);
-    a.download = 'ai-craft-domains.json';
-    a.click();
-  };
-  document.getElementById('btnClearDomains').onclick = function () {
-    if (!confirm('Удалить все домены?')) return;
-    AK.saveDomains(session.login, []);
-    renderSavedDomains();
-    notify('Очищено');
-  };
 
   function syncSettings() {
     var s = AK.settings();
     document.getElementById('accInfo').textContent =
       (session.name || '') + ' · ' + (session.email || session.login || '');
-
-    var sel = document.getElementById('langSelect');
-    if (sel && !sel.options.length && typeof AK_I18N !== 'undefined') {
-      AK_I18N.world.forEach(function (pair) {
-        var o = document.createElement('option');
-        o.value = pair[0];
-        o.textContent = pair[1] + ' (' + pair[0] + ')';
-        sel.appendChild(o);
-      });
-    }
-    if (sel) sel.value = s.lang || 'ru';
-
     var de = document.getElementById('defaultEngine');
     if (de && !de.options.length) {
       AK.ENGINES.forEach(function (e) {
@@ -482,31 +353,18 @@
       });
     }
     if (de) de.value = s.engine || 'Host AI';
-
     document.querySelectorAll('#theme .chip').forEach(function (c) {
       c.classList.toggle('on', c.getAttribute('data-v') === s.theme);
     });
     document.querySelectorAll('#accent .chip').forEach(function (c) {
       c.classList.toggle('on', c.getAttribute('data-v') === s.accent);
     });
-    document.querySelectorAll('#compact .chip').forEach(function (c) {
-      c.classList.toggle('on', c.getAttribute('data-v') === (s.compact || 'off'));
-    });
-    document.querySelectorAll('#toasts .chip').forEach(function (c) {
-      c.classList.toggle('on', c.getAttribute('data-v') === (s.toasts || 'on'));
-    });
   }
 
-  document.getElementById('langSelect').onchange = function () {
-    AK.saveSettings({ lang: this.value });
-    if (typeof AK_I18N !== 'undefined') AK_I18N.apply();
-    notify('Язык сохранён');
-  };
   document.getElementById('defaultEngine').onchange = function () {
     AK.saveSettings({ engine: this.value });
     engine = this.value;
     renderEngines();
-    notify('Движок по умолчанию: ' + this.value);
   };
   document.querySelectorAll('#theme .chip').forEach(function (c) {
     c.onclick = function () { AK.saveSettings({ theme: c.getAttribute('data-v') }); syncSettings(); };
@@ -514,53 +372,6 @@
   document.querySelectorAll('#accent .chip').forEach(function (c) {
     c.onclick = function () { AK.saveSettings({ accent: c.getAttribute('data-v') }); syncSettings(); };
   });
-  document.querySelectorAll('#compact .chip').forEach(function (c) {
-    c.onclick = function () {
-      AK.saveSettings({ compact: c.getAttribute('data-v') });
-      applyCompact();
-      syncSettings();
-    };
-  });
-  document.querySelectorAll('#toasts .chip').forEach(function (c) {
-    c.onclick = function () {
-      AK.saveSettings({ toasts: c.getAttribute('data-v') });
-      syncSettings();
-    };
-  });
-
-  document.getElementById('btnExportAll').onclick = function () {
-    if (!session) return;
-    var u = AK.users()[session.login] || {};
-    var blob = new Blob([JSON.stringify({ user: session, data: u, settings: AK.settings() }, null, 2)], { type: 'application/json' });
-    var a = document.createElement('a');
-    a.href = URL.createObjectURL(blob);
-    a.download = 'ai-craft-backup.json';
-    a.click();
-  };
-  document.getElementById('btnImportAll').onclick = function () {
-    document.getElementById('importFile').click();
-  };
-  document.getElementById('importFile').onchange = function (e) {
-    var f = e.target.files && e.target.files[0];
-    if (!f) return;
-    var reader = new FileReader();
-    reader.onload = function () {
-      try {
-        var data = JSON.parse(reader.result);
-        if (data.settings) AK.saveSettings(data.settings);
-        if (data.data && session) {
-          var users = AK.users();
-          users[session.login] = Object.assign(users[session.login] || {}, data.data);
-          AK.saveUsers(users);
-        }
-        notify('Импорт выполнен');
-        route();
-      } catch (err) {
-        notify('Неверный JSON');
-      }
-    };
-    reader.readAsText(f);
-  };
 
   if (session) showApp();
   else showGate();
