@@ -137,7 +137,7 @@
       el.innerHTML = sites.map(function (s) {
         var addr = (s.subdomain || 'site') + '.' + (s.domain || 'ai_craft.ru');
         return '<div class="card"><h3>' + AK.esc(s.name) + '</h3><div class="meta">' + AK.esc(addr) +
-          '</div><p style="color:var(--muted);font-size:12px">' + AK.esc(s.engine || '') +
+          '</div><p style="color:var(--muted);font-size:12px">' + AK.esc(s.engine || '') + ' · ' + AK.esc(s.type || '') +
           '</p><div class="actions"><button type="button" data-open="' + s.id + '">Открыть</button> ' +
           '<button type="button" data-del="' + s.id + '">Удалить</button></div></div>';
       }).join('');
@@ -167,49 +167,11 @@
     if (!domains.length) {
       dl.innerHTML = '<p class="sub">Нет доменов. <a href="#domains">Создать →</a></p>';
     } else {
-      dl.innerHTML = domains.map(function (d) {
+      dl.innerHTML = domains.slice(0, 5).map(function (d) {
         return '<div class="card"><div class="meta">' + AK.esc(d.domain) + '</div>' +
-          '<p style="font-size:12px;color:var(--muted)">' + (d.target ? ('→ ' + AK.esc(d.target)) : 'Не привязан') + '</p>' +
-          '<div class="actions">' +
-          (d.target ? '<button type="button" data-dopen="' + d.id + '">Открыть</button> ' : '') +
-          '<button type="button" data-dbind="' + d.id + '">Привязать</button> ' +
-          '<button type="button" data-ddel="' + d.id + '">Удалить</button></div></div>';
+          '<p style="font-size:12px;color:var(--muted)">' + (d.target ? ('→ ' + AK.esc(d.target)) : 'Не привязан') + '</p></div>';
       }).join('');
-      bindDomainButtons(dl);
     }
-  }
-
-  function bindDomainButtons(root) {
-    root.querySelectorAll('[data-dopen]').forEach(function (b) {
-      b.onclick = function () {
-        var d = AK.domains(session.login).find(function (x) { return x.id === b.getAttribute('data-dopen'); });
-        if (d && d.target) window.open(d.target, '_blank', 'noopener');
-      };
-    });
-    root.querySelectorAll('[data-dbind]').forEach(function (b) {
-      b.onclick = function () {
-        bindId = b.getAttribute('data-dbind');
-        var d = AK.domains(session.login).find(function (x) { return x.id === bindId; });
-        if (!d) return;
-        location.hash = 'domains';
-        setTimeout(function () {
-          document.getElementById('bindBox').style.display = 'block';
-          document.getElementById('bindDomainLabel').textContent = d.domain;
-          document.getElementById('domainTarget').value = d.target || '';
-          document.getElementById('bindBox').scrollIntoView({ behavior: 'smooth' });
-        }, 50);
-      };
-    });
-    root.querySelectorAll('[data-ddel]').forEach(function (b) {
-      b.onclick = function () {
-        if (!confirm('Удалить домен?')) return;
-        AK.saveDomains(session.login, AK.domains(session.login).filter(function (d) {
-          return d.id !== b.getAttribute('data-ddel');
-        }));
-        renderHome();
-        renderSavedDomains();
-      };
-    });
   }
 
   function showPreview(html, css) {
@@ -224,13 +186,13 @@
   document.getElementById('btnBuild').onclick = function () {
     var idea = document.getElementById('idea').value.trim();
     if (idea.length < 5) return AK.toast('Опишите идею подробнее');
+    var type = AK.detectType(idea);
     var manual = document.getElementById('siteTitle').value.trim();
-    var title = manual || AK.suggestTitle(idea);
+    var title = manual || AK.suggestTitle(idea, type);
     if (!manual) document.getElementById('siteTitle').value = title;
-    var p = AK.parse(idea);
     var html = AK.buildHTML(idea, title, engine);
-    var css = AK.buildCSS(p.tone);
-    built = { name: title, description: idea, html: html, css: css, engine: engine };
+    var css = AK.buildCSS(type);
+    built = { name: title, description: idea, html: html, css: css, engine: engine, type: type };
     document.getElementById('afterBuild').style.display = 'block';
     showPreview(html, css);
     var slug = title.toLowerCase().replace(/[^a-z0-9а-яё]+/gi, '-').replace(/^-|-$/g, '').slice(0, 16);
@@ -239,7 +201,7 @@
       return map[ch.toLowerCase()] || '';
     }) || 'site';
     if (!document.getElementById('sub').value) document.getElementById('sub').value = slug;
-    AK.toast('Сайт собран: «' + title + '»');
+    AK.toast('Собран тип: ' + type + ' · «' + title + '»');
     document.getElementById('afterBuild').scrollIntoView({ behavior: 'smooth', block: 'start' });
   };
 
@@ -249,7 +211,7 @@
     var domain = document.getElementById('tld').value;
     if (subdomain.length < 2) return AK.toast('Укажите имя адреса');
     var full = subdomain + '.' + domain;
-    if (isTaken(full)) return AK.toast('Адрес занят — выберите другой');
+    if (isTaken(full)) return AK.toast('Адрес занят');
     var list = AK.sites(session.login);
     list.unshift({
       id: 's_' + Date.now(),
@@ -260,35 +222,35 @@
       html: built.html,
       css: built.css,
       engine: built.engine,
+      type: built.type,
       createdAt: new Date().toISOString()
     });
     AK.saveSites(session.login, list);
-    AK.toast('Сохранено бесплатно');
+    AK.toast('Сохранено');
     location.hash = 'home';
   };
 
-  // Domains: name + tld → create, then optional bind
   document.getElementById('btnDomainCreate').onclick = function () {
     var name = document.getElementById('domainName').value.trim().toLowerCase().replace(/[^a-z0-9-]/g, '');
     var tld = document.getElementById('domainTld').value;
     var res = document.getElementById('domainResult');
     if (!name || name.length < 2) {
       res.style.color = '#f87171';
-      res.textContent = 'Введите имя (минимум 2 символа)';
+      res.textContent = 'Введите имя (от 2 символов)';
       return;
     }
     var domain = name + tld;
     if (isTaken(domain)) {
       res.style.color = '#f87171';
-      res.textContent = '✕ ' + domain + ' — уже занят. Другое имя.';
+      res.textContent = '✕ ' + domain + ' занят';
       return;
     }
     var domains = AK.domains(session.login);
     var id = 'd_' + Date.now();
-    domains.unshift({ id: id, domain: domain, target: '', createdAt: new Date().toISOString() });
+    domains.unshift({ id: id, domain: domain, target: '', note: '', createdAt: new Date().toISOString() });
     AK.saveDomains(session.login, domains);
     res.style.color = '#4ade80';
-    res.textContent = '✓ ' + domain + ' создан. Можно привязать к сайту.';
+    res.textContent = '✓ ' + domain + ' создан';
     document.getElementById('domainName').value = '';
     bindId = id;
     document.getElementById('bindBox').style.display = 'block';
@@ -301,19 +263,13 @@
   document.getElementById('btnDomainBind').onclick = function () {
     if (!bindId) return;
     var url = normalizeUrl(document.getElementById('domainTarget').value);
-    if (!url) return AK.toast('Укажите корректный URL');
+    if (!url) return AK.toast('Укажите URL');
     var domains = AK.domains(session.login);
-    var found = false;
     for (var i = 0; i < domains.length; i++) {
-      if (domains[i].id === bindId) {
-        domains[i].target = url;
-        found = true;
-        break;
-      }
+      if (domains[i].id === bindId) { domains[i].target = url; break; }
     }
-    if (!found) return AK.toast('Домен не найден');
     AK.saveDomains(session.login, domains);
-    AK.toast('Привязано — «Открыть» ведёт на сайт');
+    AK.toast('Привязано');
     document.getElementById('bindBox').style.display = 'none';
     bindId = null;
     renderSavedDomains();
@@ -325,17 +281,93 @@
     if (!domains.length) { el.innerHTML = '<p class="sub">Пока пусто</p>'; return; }
     el.innerHTML = domains.map(function (d) {
       return '<div class="card"><div class="meta">' + AK.esc(d.domain) + '</div>' +
-        '<p style="font-size:13px;color:var(--muted)">' + (d.target ? ('→ ' + AK.esc(d.target)) : 'Не привязан') + '</p>' +
+        '<p style="font-size:13px;color:var(--muted)">' + (d.target ? ('→ ' + AK.esc(d.target)) : 'Не привязан') +
+        (d.note ? (' · ' + AK.esc(d.note)) : '') + '</p>' +
         '<div class="actions">' +
         (d.target ? '<button type="button" data-dopen="' + d.id + '">Открыть</button> ' : '') +
         '<button type="button" data-dbind="' + d.id + '">Привязать</button> ' +
+        '<button type="button" data-dunbind="' + d.id + '">Отвязать</button> ' +
+        '<button type="button" data-dnote="' + d.id + '">Заметка</button> ' +
+        '<button type="button" data-ddup="' + d.id + '">Копия</button> ' +
         '<button type="button" data-dcopy="' + AK.esc(d.domain) + '">Копировать</button> ' +
-        '<button type="button" data-ddel="' + d.id + '">Удалить</button></div></div>';
+        '<button type="button" data-ddel="' + d.id + '">Удалить</button>' +
+        '</div></div>';
     }).join('');
-    bindDomainButtons(el);
+
+    el.querySelectorAll('[data-dopen]').forEach(function (b) {
+      b.onclick = function () {
+        var d = AK.domains(session.login).find(function (x) { return x.id === b.getAttribute('data-dopen'); });
+        if (d && d.target) window.open(d.target, '_blank', 'noopener');
+      };
+    });
+    el.querySelectorAll('[data-dbind]').forEach(function (b) {
+      b.onclick = function () {
+        bindId = b.getAttribute('data-dbind');
+        var d = AK.domains(session.login).find(function (x) { return x.id === bindId; });
+        if (!d) return;
+        document.getElementById('bindBox').style.display = 'block';
+        document.getElementById('bindDomainLabel').textContent = d.domain;
+        document.getElementById('domainTarget').value = d.target || '';
+        document.getElementById('bindBox').scrollIntoView({ behavior: 'smooth' });
+      };
+    });
+    el.querySelectorAll('[data-dunbind]').forEach(function (b) {
+      b.onclick = function () {
+        var domains = AK.domains(session.login);
+        for (var i = 0; i < domains.length; i++) {
+          if (domains[i].id === b.getAttribute('data-dunbind')) { domains[i].target = ''; break; }
+        }
+        AK.saveDomains(session.login, domains);
+        renderSavedDomains();
+        AK.toast('Отвязано');
+      };
+    });
+    el.querySelectorAll('[data-dnote]').forEach(function (b) {
+      b.onclick = function () {
+        var note = prompt('Заметка к домену', '');
+        if (note === null) return;
+        var domains = AK.domains(session.login);
+        for (var i = 0; i < domains.length; i++) {
+          if (domains[i].id === b.getAttribute('data-dnote')) { domains[i].note = note.slice(0, 80); break; }
+        }
+        AK.saveDomains(session.login, domains);
+        renderSavedDomains();
+      };
+    });
+    el.querySelectorAll('[data-ddup]').forEach(function (b) {
+      b.onclick = function () {
+        var src = AK.domains(session.login).find(function (x) { return x.id === b.getAttribute('data-ddup'); });
+        if (!src) return;
+        var base = src.domain.split('.')[0];
+        var tld = '.' + src.domain.split('.').slice(1).join('.');
+        var n = 2, candidate = base + n + tld;
+        while (isTaken(candidate) && n < 50) { n++; candidate = base + n + tld; }
+        if (isTaken(candidate)) return AK.toast('Не удалось');
+        var domains = AK.domains(session.login);
+        domains.unshift({
+          id: 'd_' + Date.now(),
+          domain: candidate,
+          target: src.target || '',
+          note: src.note || '',
+          createdAt: new Date().toISOString()
+        });
+        AK.saveDomains(session.login, domains);
+        renderSavedDomains();
+        AK.toast('Копия: ' + candidate);
+      };
+    });
     el.querySelectorAll('[data-dcopy]').forEach(function (b) {
       b.onclick = function () {
         navigator.clipboard.writeText(b.getAttribute('data-dcopy')).then(function () { AK.toast('Скопировано'); });
+      };
+    });
+    el.querySelectorAll('[data-ddel]').forEach(function (b) {
+      b.onclick = function () {
+        if (!confirm('Удалить?')) return;
+        AK.saveDomains(session.login, AK.domains(session.login).filter(function (d) {
+          return d.id !== b.getAttribute('data-ddel');
+        }));
+        renderSavedDomains();
       };
     });
   }
