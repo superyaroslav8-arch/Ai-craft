@@ -6,6 +6,10 @@
   AK.applyTheme();
   var session = AK.session();
   var isReg = false, built = null, mode = 'sub', pendingDomain = null;
+  var engine = AK.settings().engine || 'Host AI';
+
+  function t(k) { return (typeof AK_I18N !== 'undefined') ? AK_I18N.t(k) : k; }
+  function applyI18n() { if (typeof AK_I18N !== 'undefined') AK_I18N.apply(); }
 
   function showGate() {
     document.getElementById('gate').style.display = 'block';
@@ -15,8 +19,10 @@
     document.getElementById('gate').style.display = 'none';
     document.getElementById('shell').style.display = 'flex';
     document.getElementById('who').textContent = session.name || session.email;
+    applyI18n();
     route();
   }
+
   function setMode(reg) {
     isReg = reg;
     document.getElementById('tabLogin').classList.toggle('on', !reg);
@@ -42,24 +48,50 @@
           password: document.getElementById('password').value
         });
       }
-      showApp();
-      location.hash = 'home';
+      showApp(); location.hash = 'home';
     } catch (e) {
       err.textContent = e.message || 'Ошибка';
       err.style.display = 'block';
     }
   };
-  document.getElementById('logout').onclick = function (e) {
-    e.preventDefault();
+
+  function doLogout() {
     AK.clearSession();
     session = null;
     showGate();
+  }
+  document.getElementById('logoutSide').onclick = function (e) { e.preventDefault(); doLogout(); };
+  document.getElementById('btnLogout').onclick = doLogout;
+  document.getElementById('btnDeleteAcc').onclick = function () {
+    if (!session) return;
+    if (!confirm('Удалить все данные этого аккаунта на этом устройстве?')) return;
+    AK.deleteAccount(session.login);
+    session = null;
+    showGate();
+    AK.toast('Данные удалены');
   };
+
+  // Engines
+  (function renderEngines() {
+    var box = document.getElementById('engineChips');
+    if (!box) return;
+    box.innerHTML = AK.ENGINES.map(function (e) {
+      return '<span class="chip' + (e === engine ? ' on' : '') + '" data-engine="' + e + '">' + e + '</span>';
+    }).join('');
+    box.querySelectorAll('[data-engine]').forEach(function (c) {
+      c.onclick = function () {
+        engine = c.getAttribute('data-engine');
+        AK.saveSettings({ engine: engine });
+        box.querySelectorAll('.chip').forEach(function (x) {
+          x.classList.toggle('on', x.getAttribute('data-engine') === engine);
+        });
+      };
+    });
+  })();
 
   function isLocallyTaken(domain) {
     domain = String(domain || '').toLowerCase();
-    var users = AK.users();
-    var keys = Object.keys(users);
+    var users = AK.users(), keys = Object.keys(users);
     for (var i = 0; i < keys.length; i++) {
       var u = users[keys[i]] || {};
       var sites = u.sites || [];
@@ -83,9 +115,7 @@
     if (isLocallyTaken(domain)) return { domain: domain, available: false, reason: 'local' };
     if (/\.ai_craft\.(ru|com|dev)$/.test(domain)) return { domain: domain, available: true, reason: 'platform' };
     var tld = domain.split('.').slice(1).join('.');
-    if (tld !== 'ru' && tld !== 'com' && tld !== 'dev') {
-      throw new Error('Зоны: .ru .com .dev или *.ai_craft.*');
-    }
+    if (tld !== 'ru' && tld !== 'com' && tld !== 'dev') throw new Error('Зоны: .ru .com .dev или *.ai_craft.*');
     var response = await fetch('https://dns.google/resolve?name=' + encodeURIComponent(domain) + '&type=NS');
     if (!response.ok) throw new Error('Сервис проверки не ответил');
     var data = await response.json();
@@ -97,8 +127,7 @@
   function showResult(el, r) {
     if (r.available) {
       el.style.color = '#4ade80';
-      el.innerHTML = '✓ <strong>' + AK.esc(r.domain) + '</strong> — доступен. ' +
-        (r.reason === 'platform' ? 'Метка в Ai-craft.' : 'Проверка DNS, не покупка у регистратора.');
+      el.innerHTML = '✓ <strong>' + AK.esc(r.domain) + '</strong> — свободен. Можно сохранить.';
     } else {
       el.style.color = '#f87171';
       el.innerHTML = '✕ <strong>' + AK.esc(r.domain) + '</strong> — занят. Выберите другое имя.';
@@ -129,14 +158,15 @@
     document.getElementById('statLinks').textContent = links.length;
     var el = document.getElementById('siteList');
     if (!sites.length) {
-      el.innerHTML = '<p class="sub">Нет сайтов. <a href="#create">Создать</a></p>';
+      el.innerHTML = '<p class="sub">' + t('noSites') + ' <a href="#create">→</a></p>';
     } else {
       el.innerHTML = sites.map(function (s) {
         var addr = s.customDomain || ((s.subdomain || 'site') + '.' + (s.domain || 'ai_craft.ru'));
         return '<div class="card"><h3>' + AK.esc(s.name) + '</h3><div class="meta">' + AK.esc(addr) +
-          '</div><p style="color:var(--muted);font-size:13px">' + AK.esc((s.description || '').slice(0, 100)) +
-          '</p><div class="actions"><button type="button" data-open="' + s.id + '">Открыть</button> ' +
-          '<button type="button" data-del="' + s.id + '">Удалить</button></div></div>';
+          '</div><p style="color:var(--muted);font-size:12px">' + AK.esc(s.engine || '') +
+          '</p><p style="color:var(--muted);font-size:13px">' + AK.esc((s.description || '').slice(0, 100)) +
+          '</p><div class="actions"><button type="button" data-open="' + s.id + '">' + t('open') +
+          '</button> <button type="button" data-del="' + s.id + '">' + t('del') + '</button></div></div>';
       }).join('');
       el.querySelectorAll('[data-open]').forEach(function (b) {
         b.onclick = function () {
@@ -151,7 +181,7 @@
       });
       el.querySelectorAll('[data-del]').forEach(function (b) {
         b.onclick = function () {
-          if (!confirm('Удалить?')) return;
+          if (!confirm(t('del') + '?')) return;
           AK.saveSites(session.login, AK.sites(session.login).filter(function (s) {
             return s.id !== b.getAttribute('data-del');
           }));
@@ -160,12 +190,11 @@
       });
     }
     var dl = document.getElementById('domainListHome');
-    if (!domains.length) {
-      dl.innerHTML = '<p class="sub">Нет доменов. <a href="#domains">Проверить</a></p>';
-    } else {
+    if (!domains.length) dl.innerHTML = '<p class="sub">—</p>';
+    else {
       dl.innerHTML = domains.map(function (d) {
         return '<div class="card"><div class="meta">' + AK.esc(d.domain) +
-          '</div><div class="actions"><button type="button" data-ddel="' + d.id + '">Удалить</button></div></div>';
+          '</div><div class="actions"><button type="button" data-ddel="' + d.id + '">' + t('del') + '</button></div></div>';
       }).join('');
       dl.querySelectorAll('[data-ddel]').forEach(function (b) {
         b.onclick = function () {
@@ -182,15 +211,16 @@
   function renderLinks() {
     var links = AK.links(session.login);
     var el = document.getElementById('linkList');
-    if (!links.length) { el.innerHTML = '<p class="sub">Нет ссылок</p>'; return; }
+    if (!links.length) { el.innerHTML = '<p class="sub">—</p>'; return; }
     el.innerHTML = links.map(function (l) {
-      return '<div class="card"><div class="meta">ai-craft/' + AK.esc(l.slug) + '</div><div style="font-size:13px">' +
-        AK.esc(l.url) + '</div><div class="actions"><button type="button" data-copy="ai-craft/' + AK.esc(l.slug) +
-        '">Копировать</button> <button type="button" data-ldel="' + l.id + '">Удалить</button></div></div>';
+      return '<div class="card"><strong>' + AK.esc(l.title) + '</strong><div class="meta">ai-craft/' + AK.esc(l.slug) +
+        '</div><div style="font-size:13px;color:var(--muted)">' + AK.esc(l.url) +
+        '</div><div class="actions"><button type="button" data-copy="ai-craft/' + AK.esc(l.slug) +
+        '">Copy</button> <button type="button" data-ldel="' + l.id + '">' + t('del') + '</button></div></div>';
     }).join('');
     el.querySelectorAll('[data-copy]').forEach(function (b) {
       b.onclick = function () {
-        navigator.clipboard.writeText(b.getAttribute('data-copy')).then(function () { AK.toast('Скопировано'); });
+        navigator.clipboard.writeText(b.getAttribute('data-copy')).then(function () { AK.toast('OK'); });
       };
     });
     el.querySelectorAll('[data-ldel]').forEach(function (b) {
@@ -198,15 +228,15 @@
         AK.saveLinks(session.login, AK.links(session.login).filter(function (l) {
           return l.id !== b.getAttribute('data-ldel');
         }));
-        renderLinks();
-        renderHome();
+        renderLinks(); renderHome();
       };
     });
   }
 
   document.getElementById('btnLink').onclick = function () {
     var url = document.getElementById('linkUrl').value.trim();
-    if (!url) return AK.toast('Укажите URL');
+    if (!url) return AK.toast('URL');
+    if (!/^https?:\/\//i.test(url)) url = 'https://' + url;
     var slug = Math.random().toString(36).slice(2, 8);
     var links = AK.links(session.login);
     links.unshift({
@@ -219,7 +249,7 @@
     document.getElementById('linkTitle').value = '';
     document.getElementById('linkUrl').value = '';
     renderHome();
-    AK.toast('Ссылка создана');
+    AK.toast(t('createLink'));
   };
 
   function showPreview(html, css) {
@@ -231,21 +261,18 @@
 
   document.getElementById('btnBuild').onclick = function () {
     var idea = document.getElementById('idea').value.trim();
-    if (idea.length < 5) return AK.toast('Опишите подробнее');
+    if (idea.length < 5) return AK.toast('Чуть подробнее');
     var p = AK.parse(idea);
-    built = {
-      name: p.title,
-      description: idea,
-      html: AK.buildHTML(idea, p.title),
-      css: AK.buildCSS()
-    };
-    showPreview(built.html, built.css);
+    var html = AK.buildHTML(idea, p.title, engine);
+    var css = AK.buildCSS(p.tone);
+    built = { name: p.title, description: idea, html: html, css: css, engine: engine, tone: p.tone };
+    showPreview(html, css);
     document.getElementById('addrBox').style.display = 'block';
     if (!document.getElementById('sub').value) {
       document.getElementById('sub').value =
         (p.title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 16)) || 'site';
     }
-    AK.toast('Собрано');
+    AK.toast('Черновик готов → адрес');
   };
 
   document.querySelectorAll('#addrBox .chip').forEach(function (c) {
@@ -271,7 +298,7 @@
       if (subdomain.length < 2) return AK.toast('Укажите имя');
     }
     var full = customDomain || (subdomain + '.' + domain);
-    if (isLocallyTaken(full)) return AK.toast('Адрес занят. Выберите другой.');
+    if (isLocallyTaken(full)) return AK.toast('Адрес занят');
     var list = AK.sites(session.login);
     list.unshift({
       id: 's_' + Date.now(),
@@ -282,6 +309,7 @@
       customDomain: customDomain,
       html: built.html,
       css: built.css,
+      engine: built.engine,
       createdAt: new Date().toISOString()
     });
     AK.saveSites(session.login, list);
@@ -296,14 +324,10 @@
     var btnSave = document.getElementById('btnDomainSave');
     btnSave.style.display = 'none';
     pendingDomain = null;
-    if (!name) {
-      res.style.color = '#f87171';
-      res.textContent = 'Введите имя';
-      return;
-    }
+    if (!name) { res.style.color = '#f87171'; res.textContent = 'Введите имя'; return; }
     var domain = name + tld;
     res.style.color = 'var(--muted)';
-    res.textContent = 'Проверяем…';
+    res.textContent = '…';
     try {
       var r = await checkDomain(domain);
       showResult(res, r);
@@ -319,13 +343,9 @@
 
   document.getElementById('btnDomainSave').onclick = function () {
     if (!pendingDomain) return;
-    if (isLocallyTaken(pendingDomain)) return AK.toast('Уже занят');
+    if (isLocallyTaken(pendingDomain)) return AK.toast('Занят');
     var domains = AK.domains(session.login);
-    domains.unshift({
-      id: 'd_' + Date.now(),
-      domain: pendingDomain,
-      checkedAt: new Date().toISOString()
-    });
+    domains.unshift({ id: 'd_' + Date.now(), domain: pendingDomain, checkedAt: new Date().toISOString() });
     AK.saveDomains(session.login, domains);
     AK.toast('Домен сохранён');
     pendingDomain = null;
@@ -333,50 +353,13 @@
     renderSavedDomains();
   };
 
-  document.getElementById('btnAutoDomain').onclick = async function () {
-    var name = document.getElementById('autoDomainName').value.trim().toLowerCase().replace(/[^a-z0-9-]/g, '');
-    var box = document.getElementById('autoDomainResults');
-    if (!name) return AK.toast('Введите название');
-    box.innerHTML = '<p class="sub">Проверяем .ru .com .dev…</p>';
-    var tlds = ['.ru', '.com', '.dev'];
-    var html = '';
-    for (var i = 0; i < tlds.length; i++) {
-      try {
-        var r = await checkDomain(name + tlds[i]);
-        html += '<div class="card" style="margin-bottom:8px"><strong>' + AK.esc(r.domain) + '</strong> — ' +
-          (r.available ? '<span style="color:#4ade80">свободен</span>' : '<span style="color:#f87171">занят</span>');
-        if (r.available) {
-          html += ' <button type="button" class="chip" data-pick="' + AK.esc(r.domain) + '">Сохранить</button>';
-        }
-        html += '</div>';
-      } catch (e) {
-        html += '<div class="card">' + AK.esc(name + tlds[i]) + ': ошибка</div>';
-      }
-    }
-    box.innerHTML = html;
-    box.querySelectorAll('[data-pick]').forEach(function (b) {
-      b.onclick = function () {
-        var d = b.getAttribute('data-pick');
-        if (isLocallyTaken(d)) return AK.toast('Занят');
-        var domains = AK.domains(session.login);
-        domains.unshift({ id: 'd_' + Date.now(), domain: d, checkedAt: new Date().toISOString() });
-        AK.saveDomains(session.login, domains);
-        AK.toast('Сохранено');
-        renderSavedDomains();
-      };
-    });
-  };
-
   function renderSavedDomains() {
     var domains = AK.domains(session.login);
     var el = document.getElementById('savedDomains');
-    if (!domains.length) {
-      el.innerHTML = '<p class="sub">Пока пусто</p>';
-      return;
-    }
+    if (!domains.length) { el.innerHTML = '<p class="sub">—</p>'; return; }
     el.innerHTML = domains.map(function (d) {
       return '<div class="card"><div class="meta">' + AK.esc(d.domain) +
-        '</div><div class="actions"><button type="button" data-ddel="' + d.id + '">Удалить</button></div></div>';
+        '</div><div class="actions"><button type="button" data-ddel="' + d.id + '">' + t('del') + '</button></div></div>';
     }).join('');
     el.querySelectorAll('[data-ddel]').forEach(function (b) {
       b.onclick = function () {
@@ -390,9 +373,18 @@
 
   function syncSettings() {
     var s = AK.settings();
-    document.querySelectorAll('#lang .chip').forEach(function (c) {
-      c.classList.toggle('on', c.getAttribute('data-v') === (s.lang || 'ru'));
-    });
+    document.getElementById('accInfo').textContent =
+      (session.name || '') + ' · ' + (session.email || session.login || '');
+    var sel = document.getElementById('langSelect');
+    if (sel && !sel.options.length && typeof AK_I18N !== 'undefined') {
+      AK_I18N.world.forEach(function (pair) {
+        var o = document.createElement('option');
+        o.value = pair[0];
+        o.textContent = pair[1] + ' (' + pair[0] + ')';
+        sel.appendChild(o);
+      });
+    }
+    if (sel) sel.value = s.lang || 'ru';
     document.querySelectorAll('#theme .chip').forEach(function (c) {
       c.classList.toggle('on', c.getAttribute('data-v') === s.theme);
     });
@@ -400,17 +392,29 @@
       c.classList.toggle('on', c.getAttribute('data-v') === s.accent);
     });
   }
-  document.querySelectorAll('#lang .chip').forEach(function (c) {
-    c.onclick = function () { AK.saveSettings({ lang: c.getAttribute('data-v') }); syncSettings(); };
-  });
+
+  document.getElementById('langSelect').onchange = function () {
+    AK.saveSettings({ lang: this.value });
+    applyI18n();
+    syncSettings();
+    if (session) renderHome();
+  };
   document.querySelectorAll('#theme .chip').forEach(function (c) {
-    c.onclick = function () { AK.saveSettings({ theme: c.getAttribute('data-v') }); syncSettings(); };
+    c.onclick = function () {
+      AK.saveSettings({ theme: c.getAttribute('data-v') });
+      syncSettings();
+    };
   });
   document.querySelectorAll('#accent .chip').forEach(function (c) {
-    c.onclick = function () { AK.saveSettings({ accent: c.getAttribute('data-v') }); syncSettings(); };
+    c.onclick = function () {
+      AK.saveSettings({ accent: c.getAttribute('data-v') });
+      syncSettings();
+    };
   });
 
-  showPreview(AK.buildHTML('Превью', 'Ai-craft'), AK.buildCSS());
+  var demo = AK.buildHTML('Сайт с воздухом и тёплым светом.', 'Превью', engine);
+  showPreview(demo, AK.buildCSS('warm'));
+  applyI18n();
   if (session) showApp();
   else showGate();
 })();
