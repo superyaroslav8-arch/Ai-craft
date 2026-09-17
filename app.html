@@ -36,55 +36,58 @@
     <div class="brand">Ai-craft</div>
     <p class="tag">Идея → сайт</p>
     <nav>
-      <a href="#home" data-page="home" data-i18n="home">Главная</a>
-      <a href="#create" data-page="create" data-i18n="create">Создать сайт</a>
-      <a href="#domains" data-page="domains" data-i18n="domains">Домены</a>
-      <a href="#settings" data-page="settings" data-i18n="settings">Настройки</a>
+      <a href="#home" data-page="home">Главная</a>
+      <a href="#create" data-page="create">Создать сайт</a>
+      <a href="#domains" data-page="domains">Домены</a>
+      <a href="#settings" data-page="settings">Настройки</a>
     </nav>
-    <div class="user"><strong id="who">—</strong><br><a href="#" id="logoutSide" data-i18n="logout">Выйти</a></div>
+    <div class="user"><strong id="who">—</strong><br><a href="#" id="logoutSide">Выйти</a></div>
   </aside>
   <main class="main">
-    <!-- HOME -->
+
     <section class="page" id="page-home">
-      <h2 data-i18n="homeTitle">Главная</h2>
-      <p class="sub" data-i18n="homeSub">Сайты, домены и ссылки — всё здесь.</p>
+      <h2>Главная</h2>
+      <p class="sub">Сайты, домены и ссылки — управление в одном месте.</p>
       <div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:16px">
-        <div class="card" style="flex:1;min-width:100px"><div class="meta" data-i18n="sites">Сайты</div><strong id="statSites">0</strong></div>
-        <div class="card" style="flex:1;min-width:100px"><div class="meta" data-i18n="domains">Домены</div><strong id="statDomains">0</strong></div>
-        <div class="card" style="flex:1;min-width:100px"><div class="meta">Links</div><strong id="statLinks">0</strong></div>
+        <div class="card" style="flex:1;min-width:100px"><div class="meta">Сайты</div><strong id="statSites">0</strong></div>
+        <div class="card" style="flex:1;min-width:100px"><div class="meta">Домены</div><strong id="statDomains">0</strong></div>
+        <div class="card" style="flex:1;min-width:100px"><div class="meta">Ссылки</div><strong id="statLinks">0</strong></div>
       </div>
-      <a class="btn" href="#create" data-i18n="build">+ Собрать сайт</a>
-      <h3 style="margin:22px 0 10px;font-size:15px" data-i18n="sites">Сайты</h3>
+      <a class="btn" href="#create">+ Собрать сайт</a>
+      <h3 style="margin:22px 0 10px;font-size:15px">Сайты</h3>
       <div id="siteList"></div>
-      <h3 style="margin:22px 0 10px;font-size:15px" data-i18n="domains">Домены</h3>
+      <h3 style="margin:22px 0 10px;font-size:15px">Домены</h3>
       <div id="domainListHome"></div>
-      <h3 style="margin:22px 0 10px;font-size:15px" data-i18n="linksTitle">Короткие ссылки</h3>
-      <div class="widget"><strong data-i18n="linksTitle">Короткие ссылки</strong>
-        Короткая метка (ai-craft/xxxxx) → ваш полный URL. Удобно делиться.
+      <h3 style="margin:22px 0 10px;font-size:15px">Короткие ссылки</h3>
+      <div class="widget"><strong>Как работают ссылки</strong>
+        Название + полный URL → получаете метку <code>ai-craft/xxxxx</code>. Её можно копировать.
       </div>
-      <label data-i18n="linkName">Название ссылки</label>
-      <input id="linkTitle" data-i18n-ph="linkName" placeholder="Название ссылки">
-      <label data-i18n="linkUrl">Куда ведёт (URL)</label>
+      <label>Название</label>
+      <input id="linkTitle" placeholder="Например: мой лендинг">
+      <label>Куда ведёт (полный URL сайта)</label>
       <input id="linkUrl" placeholder="https://example.com">
-      <button class="btn" id="btnLink" type="button" style="margin-top:10px" data-i18n="createLink">Создать ссылку</button>
+      <button class="btn" id="btnLink" type="button" style="margin-top:10px">Создать ссылку</button>
       <div id="linkList" style="margin-top:12px"></div>
     </section>
 
-    <!-- CREATE — Host AI style -->
+    <!-- CREATE — Host AI style, no empty preview -->
     <section class="page" id="page-create">
-      <p class="badge" data-i18n="step1">1. Идея</p>
-      <h2 data-i18n="createTitle">Опишите идею</h2>
-      <p class="sub" data-i18n="createSub">Не нужно знать код. Нужно знать, чего хочется.</p>
-      <div class="grid create-host">
-        <div>
-          <label data-i18n="engine">Движок</label>
-          <div class="chips" id="engineChips"></div>
-          <label data-i18n="idea">Ваша идея</label>
-          <textarea id="idea" placeholder="Сайт небольшой кофейни. Много воздуха, тёплый свет и ощущение паузы."></textarea>
-          <button class="btn" id="btnBuild" type="button" style="margin-top:14px;width:100%" data-i18n="build">Собрать сайт</button>
-          <div id="addrBox" style="display:none;margin-top:22px">
-            <p class="badge" data-i18n="step3">3. Адрес</p>
-            <label data-i18n="address">Адрес сайта</label>
+      <div class="create-hero">
+        <p class="badge">Ai-craft / новый проект</p>
+        <h2>Опишите идею</h2>
+        <p class="sub">Не нужно знать код. Нужно знать, чего хочется.</p>
+      </div>
+      <label>Движок</label>
+      <div class="chips" id="engineChips"></div>
+      <label>Ваша идея</label>
+      <textarea id="idea" placeholder="Сайт небольшой кофейни. Много воздуха, тёплый свет и ощущение паузы."></textarea>
+      <button class="btn" id="btnBuild" type="button" style="margin-top:14px">Собрать сайт →</button>
+
+      <div id="afterBuild" style="display:none;margin-top:28px">
+        <div class="grid create-host">
+          <div>
+            <p class="badge">Адрес</p>
+            <p class="sub">Выберите имя и зону. Если занято — не сохраним.</p>
             <div class="chips">
               <span class="chip on" data-mode="sub">*.ai_craft</span>
               <span class="chip" data-mode="custom">Свой домен</span>
@@ -98,58 +101,81 @@
               </select>
             </div>
             <div id="customRow" style="display:none"><input id="customDomain" placeholder="mysite.ru"></div>
-            <p class="sub" style="font-size:12px;margin-top:8px">Если адрес уже занят — не сохраним. Публичный DNS для .ru/.com — у регистратора.</p>
-            <button class="btn" id="btnSave" type="button" style="margin-top:12px;width:100%" data-i18n="save">Сохранить</button>
+            <button class="btn" id="btnSave" type="button" style="margin-top:14px;width:100%">Сохранить сайт</button>
           </div>
-        </div>
-        <div>
-          <div class="preview-head"><span data-i18n="preview">Предпросмотр</span> ↗</div>
-          <div class="preview"><iframe id="preview" title="preview"></iframe></div>
+          <div>
+            <div class="preview-head">Предпросмотр ↗</div>
+            <div class="preview"><iframe id="preview" title="preview"></iframe></div>
+          </div>
         </div>
       </div>
     </section>
 
-    <!-- DOMAINS — no auto -->
+    <!-- DOMAINS: name + tld + target URL -->
     <section class="page" id="page-domains">
-      <h2 data-i18n="domainsTitle">Домены</h2>
-      <p class="sub" data-i18n="domainsSub">Имя и зона. Если занято — не создадим.</p>
+      <h2>Домены</h2>
+      <p class="sub">Имя + окончание + ссылка на уже существующий сайт. Новая метка будет открывать этот сайт.</p>
+
       <div class="card">
-        <label data-i18n="name">Имя</label>
+        <h3 style="margin-bottom:8px">1. Создать домен-ссылку</h3>
+        <label>Ссылка на существующий сайт (куда открывать)</label>
+        <input id="domainTarget" placeholder="https://example.com" autocomplete="off">
+        <label>Имя</label>
         <input id="domainName" placeholder="pauza" autocomplete="off">
-        <label data-i18n="tld">Окончание</label>
+        <label>Окончание</label>
         <select id="domainTld">
-          <option value=".ru">.ru</option>
-          <option value=".com">.com</option>
-          <option value=".dev">.dev</option>
           <option value=".ai_craft.ru">.ai_craft.ru</option>
           <option value=".ai_craft.com">.ai_craft.com</option>
           <option value=".ai_craft.dev">.ai_craft.dev</option>
+          <option value=".ru">.ru</option>
+          <option value=".com">.com</option>
+          <option value=".dev">.dev</option>
         </select>
-        <button class="btn" id="btnDomainCheck" type="button" style="margin-top:14px" data-i18n="check">Проверить</button>
-        <button class="btn secondary" id="btnDomainSave" type="button" style="margin-top:8px;display:none" data-i18n="saveDomain">Сохранить домен</button>
+        <div class="chips" style="margin-top:12px">
+          <button class="btn" id="btnDomainCheck" type="button">Проверить имя</button>
+          <button class="btn secondary" id="btnDomainSave" type="button" style="display:none">Создать домен</button>
+        </div>
         <div id="domainResult" class="sub" style="margin-top:12px"></div>
       </div>
-      <h3 style="margin:22px 0 10px;font-size:15px">Сохранённые</h3>
+
+      <div class="card">
+        <h3 style="margin-bottom:8px">2. Быстрые действия</h3>
+        <div class="chips">
+          <button type="button" class="chip" id="btnCopyAllDomains">Копировать все имена</button>
+          <button type="button" class="chip" id="btnExportDomains">Экспорт списка</button>
+          <button type="button" class="chip" id="btnClearDomains">Очистить все домены</button>
+        </div>
+        <p class="sub" style="margin-top:10px;font-size:12px">«Открыть» у домена ведёт на URL, который вы указали при создании — не на пустую страницу.</p>
+      </div>
+
+      <div class="card">
+        <h3 style="margin-bottom:8px">3. Поиск по доменам</h3>
+        <input id="domainSearch" placeholder="Найти по имени или URL…">
+      </div>
+
+      <h3 style="margin:18px 0 10px;font-size:15px">Мои домены</h3>
       <div id="savedDomains"></div>
     </section>
 
-    <!-- SETTINGS -->
     <section class="page" id="page-settings">
-      <h2 data-i18n="settingsTitle">Настройки</h2>
+      <h2>Настройки</h2>
+
       <div class="row" style="flex-direction:column;align-items:stretch">
-        <strong data-i18n="lang">Язык интерфейса</strong>
+        <strong>Язык интерфейса</strong>
         <select id="langSelect" style="margin-top:8px"></select>
-        <p class="sub" style="margin:8px 0 0;font-size:12px">Все языки мира в списке. Полный перевод UI: ru, en, es, de, fr, zh, ja, ar, pt, hi. Остальные — English + ваш выбор сохраняется.</p>
+        <p class="sub" style="margin:8px 0 0;font-size:12px">Список языков мира. Полный перевод: ru, en, es, de, fr, zh, ja, ar, pt, hi.</p>
       </div>
+
       <div class="row">
-        <div><strong data-i18n="theme">Тема</strong></div>
+        <div><strong>Тема</strong></div>
         <div class="chips" id="theme">
-          <span class="chip" data-v="dark" data-i18n="dark">Тёмная</span>
-          <span class="chip" data-v="light" data-i18n="light">Светлая</span>
+          <span class="chip" data-v="dark">Тёмная</span>
+          <span class="chip" data-v="light">Светлая</span>
         </div>
       </div>
+
       <div class="row" style="flex-direction:column;align-items:stretch">
-        <strong data-i18n="accent">Цвет акцента</strong>
+        <strong>Цвет акцента</strong>
         <div class="chips" id="accent" style="margin-top:10px">
           <span class="chip color-chip" data-v="#6ea8ff" style="background:#6ea8ff"></span>
           <span class="chip color-chip" data-v="#3b82f6" style="background:#3b82f6"></span>
@@ -162,24 +188,56 @@
           <span class="chip color-chip" data-v="#22c55e" style="background:#22c55e"></span>
           <span class="chip color-chip" data-v="#14b8a6" style="background:#14b8a6"></span>
           <span class="chip color-chip" data-v="#06b6d4" style="background:#06b6d4"></span>
-          <span class="chip color-chip" data-v="#ffffff;border:1px solid #888" style="background:#fff;border:1px solid #666"></span>
+          <span class="chip color-chip" data-v="#ffffff" style="background:#fff;border:1px solid #666"></span>
         </div>
       </div>
-      <div class="card" style="margin-top:8px">
-        <h3 data-i18n="account">Аккаунт</h3>
-        <p class="sub" id="accInfo" style="margin-top:8px">—</p>
-        <button class="btn secondary" id="btnLogout" type="button" style="margin-top:10px" data-i18n="logout">Выйти</button>
-        <button class="btn secondary" id="btnDeleteAcc" type="button" style="margin-top:8px;color:#f87171;border-color:#f87171" data-i18n="deleteAcc">Удалить данные аккаунта</button>
+
+      <div class="row" style="flex-direction:column;align-items:stretch">
+        <strong>Движок по умолчанию</strong>
+        <select id="defaultEngine" style="margin-top:8px"></select>
       </div>
+
+      <div class="row">
+        <div><strong>Компактный вид</strong></div>
+        <div class="chips" id="compact">
+          <span class="chip" data-v="off">Обычный</span>
+          <span class="chip" data-v="on">Компакт</span>
+        </div>
+      </div>
+
+      <div class="row">
+        <div><strong>Уведомления (toast)</strong></div>
+        <div class="chips" id="toasts">
+          <span class="chip" data-v="on">Вкл</span>
+          <span class="chip" data-v="off">Выкл</span>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>Данные</h3>
+        <div class="chips" style="margin-top:10px">
+          <button type="button" class="chip" id="btnExportAll">Экспорт всего</button>
+          <button type="button" class="chip" id="btnImportAll">Импорт JSON</button>
+        </div>
+        <input type="file" id="importFile" accept="application/json" style="display:none">
+      </div>
+
+      <div class="card">
+        <h3>Аккаунт</h3>
+        <p class="sub" id="accInfo" style="margin-top:8px">—</p>
+        <button class="btn secondary" id="btnLogout" type="button" style="margin-top:10px">Выйти</button>
+        <button class="btn secondary" id="btnDeleteAcc" type="button" style="margin-top:8px;color:#f87171;border-color:#f87171">Удалить данные аккаунта</button>
+      </div>
+
       <p class="sub" style="margin-top:16px">+7 (900) 237-32-22 · superyaroslav8@iCloud.com</p>
     </section>
   </main>
 </div>
 <nav class="mob">
-  <a href="#home" data-page="home" data-i18n="home">Главная</a>
-  <a href="#create" data-page="create" data-i18n="create">Сайт</a>
-  <a href="#domains" data-page="domains" data-i18n="domains">Домены</a>
-  <a href="#settings" data-page="settings" data-i18n="settings">Ещё</a>
+  <a href="#home" data-page="home">Главная</a>
+  <a href="#create" data-page="create">Сайт</a>
+  <a href="#domains" data-page="domains">Домены</a>
+  <a href="#settings" data-page="settings">Ещё</a>
 </nav>
 <script src="js/app.js"></script>
 <script src="js/i18n.js"></script>
